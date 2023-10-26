@@ -9,7 +9,12 @@ int getIntLine(FILE* file) {
     return atoi(line);
 }
 
-struct Graph* getInputGraphs(char* fileName) {
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        printf("Usage \n");
+        return 1;
+    }
+
     FILE* filePtr = fopen(argv[1], "rb");
 
     if (filePtr == NULL) {
@@ -18,7 +23,6 @@ struct Graph* getInputGraphs(char* fileName) {
     }
 
     int noOfGraphs = getIntLine(filePtr);
-    struct Graph graphs[noOfGraphs];
     for (int i = 0; i < noOfGraphs; i++) {
         int noOfVertices = getIntLine(filePtr);
         char **matrixRows = (char **)malloc(noOfVertices * sizeof(char *));
@@ -36,16 +40,6 @@ struct Graph* getInputGraphs(char* fileName) {
                 printf("Line: %s\n", matrixRows[j]);
             }
         }
-        graphs[0] = initGraph(noOfVertices, matrixRows);
     }
-    return graphs;
-}
-
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        printf("Usage \n");
-        return 1;
-    }
-    struct Graphs* input = getInputGraphs(argv[1]);
     return 0;
 }
