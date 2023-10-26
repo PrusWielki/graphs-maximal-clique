@@ -9,12 +9,7 @@ int getIntLine(FILE* file) {
     return atoi(line);
 }
 
-int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        printf("Usage \n");
-        return 1;
-    }
-
+struct Graph* getInputGraphs(char* fileName) {
     FILE* filePtr = fopen(argv[1], "rb");
 
     if (filePtr == NULL) {
@@ -43,6 +38,14 @@ int main(int argc, char* argv[]) {
         }
         graphs[0] = initGraph(noOfVertices, matrixRows);
     }
+    return graphs;
+}
 
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        printf("Usage \n");
+        return 1;
+    }
+    struct Graphs* input = getInputGraphs(argv[1]);
     return 0;
 }
