@@ -16,7 +16,7 @@ struct Graph
 int main(int argc, char* argv[])
 {
     // Initialization
-    if (argc != 2)
+    if (2 != argc)
     {
         printf("Usage \n");
         return 1;
@@ -24,15 +24,15 @@ int main(int argc, char* argv[])
 
     FILE* filePtr = fopen(argv[1], "rb");
 
-    if (filePtr == NULL)
+    if (NULL==filePtr)
     {
         printf("Error: could not open file %s", argv[1]);
         return 1;
     }
 
     size_t lineLength = 0;
-    char *line = NULL;
-    char* token;
+    char* line = NULL;
+    char* token = NULL;
     size_t bytesRead=0;
     int noOfVertices=0;
     int noOfGraphs=0;
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 
                 char *ptr = strtok(line, " ");
                 int k=0;
-                while(ptr != NULL)
+                while(NULL != ptr)
                 {
                     graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=atoi(ptr);
 #ifdef dbg
