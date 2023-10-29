@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     graphs=readGraphsFromFile(filePtr,&noOfGraphs);
 
     if(NULL==graphs)
-        return;
+        return -1;
 
     // Print graphs
     for(int i=0;i<noOfGraphs;i++){
