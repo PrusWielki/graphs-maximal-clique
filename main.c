@@ -103,9 +103,14 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
         bytesRead=getline(&line, &lineLength, filePtr);
         if(0<bytesRead)
         {
-            graphs[i].description = malloc(strlen(line) + 1);
-            strcpy(graphs[i].description, line);
-
+            graphs[i].description = malloc(bytesRead+1);
+            if(NULL!=graphs[i].description)
+            {
+                strncpy(graphs[i].description, line,bytesRead);
+                graphs[i].description[bytesRead]='\0';
+                if(graphs[i].description[bytesRead-1]=='\n')
+                    graphs[i].description[bytesRead-1]='\0';
+            }
 
 #ifdef dbg
             printf("Additional graph information: %s\n",graphs[i].description);
