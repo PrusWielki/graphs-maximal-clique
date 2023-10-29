@@ -144,5 +144,10 @@ int main(int argc, char* argv[])
         printGraph(graphs[i]);
     }
 
+    for(int i=0;i<noOfGraphs;i++){
+        free(graphs[i].adjacencyMatrix);
+    }
+    free(graphs);
+
     return 0;
 }
