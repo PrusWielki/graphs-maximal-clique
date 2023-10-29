@@ -2,7 +2,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define dbg
 
 struct Graph
 {
@@ -10,6 +9,24 @@ struct Graph
     int* adjacencyMatrix;
     char* description;
 } Graph;
+
+void printGraph (struct Graph graph)
+{
+
+    printf("-------------------------------------------------\n");
+    printf("Amount of vertices: %d\n",graph.noOfVertices);
+    printf("Adjacency matrix:\n");
+    for(int i=0; i<graph.noOfVertices*graph.noOfVertices; i++)
+    {
+        printf("%d",graph.adjacencyMatrix[i]);
+        if(0==(i+1)%graph.noOfVertices)
+            printf("\n");
+        else
+            printf(" ");
+    }
+    printf("Additional information: %s\n",graph.description);
+    printf("-------------------------------------------------\n");
+}
 
 
 
@@ -107,6 +124,7 @@ int main(int argc, char* argv[])
             printf("Additional graph information: %s\n",graphs[i].description);
 #endif // dbg
         }
+        printGraph(graphs[i]);
 
     }
 
