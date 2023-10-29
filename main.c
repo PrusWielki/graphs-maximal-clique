@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
     if (0<bytesRead)
     {
-        noOfGraphs=atoi(line);
+        noOfGraphs=strtol(line,NULL,10);
 
 #ifdef dbg
         printf("file: %s\n", line);
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         if (0>=bytesRead)
             continue;
 
-        noOfVertices=atoi(line);
+        noOfVertices=strtol(line,NULL,10);
         graphs[i].noOfVertices=noOfVertices;
 #ifdef dbg
         printf("file: %s\n", line);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
                 int k=0;
                 while(NULL != ptr)
                 {
-                    graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=atoi(ptr);
+                    graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=strtol(ptr,NULL,10);
 #ifdef dbg
                     printf("file: %s\n",ptr);
                     printf("new vertex in adj list: %d\n",graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]);
