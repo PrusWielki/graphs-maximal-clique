@@ -28,31 +28,15 @@ void printGraph (struct Graph graph)
     printf("-------------------------------------------------\n");
 }
 
+struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs){
 
 
-int main(int argc, char* argv[])
-{
-    // Initialization
-    if (2 != argc)
-    {
-        printf("Usage \n");
-        return 1;
-    }
-
-    FILE* filePtr = fopen(argv[1], "rb");
-
-    if (NULL==filePtr)
-    {
-        printf("Error: could not open file %s", argv[1]);
-        return 1;
-    }
 
     size_t lineLength = 0;
     char* line = NULL;
     char* token = NULL;
     size_t bytesRead=0;
     int noOfVertices=0;
-    int noOfGraphs=0;
 
 
     // Read number of graphs in a file
@@ -60,21 +44,21 @@ int main(int argc, char* argv[])
 
     if (0<bytesRead)
     {
-        noOfGraphs=strtol(line,NULL,10);
+        *noOfGraphs=strtol(line,NULL,10);
 
 #ifdef dbg
         printf("file: %s\n", line);
-        printf("Graphs: %d\n", noOfGraphs);
+        printf("Graphs: %d\n", *noOfGraphs);
 #endif // dbg
     }
 
 
 
-    struct Graph* graphs=malloc(noOfGraphs*sizeof(Graph));
+    struct Graph* graphs=malloc(*noOfGraphs*sizeof(Graph));
 
 
 
-    for (int i = 0; i < noOfGraphs; i++)
+    for (int i = 0; i < *noOfGraphs; i++)
     {
         bytesRead=getline(&line, &lineLength, filePtr);
 
@@ -124,8 +108,40 @@ int main(int argc, char* argv[])
             printf("Additional graph information: %s\n",graphs[i].description);
 #endif // dbg
         }
-        printGraph(graphs[i]);
 
+    }
+    return graphs;
+}
+
+
+int main(int argc, char* argv[])
+{
+    // Initialization
+    if (2 != argc)
+    {
+        printf("Usage \n");
+        return 1;
+    }
+    FILE* filePtr = fopen(argv[1], "rb");
+
+    if (NULL==filePtr)
+    {
+        printf("Error: could not open file %s", argv[1]);
+        return 1;
+    }
+
+    // Read graphs from file
+    struct Graph* graphs=NULL;
+    int noOfGraphs=0;
+
+    graphs=readGraphsFromFile(filePtr,&noOfGraphs);
+
+    if(NULL==graphs)
+        return;
+
+    // Print graphs
+    for(int i=0;i<noOfGraphs;i++){
+        printGraph(graphs[i]);
     }
 
     return 0;
