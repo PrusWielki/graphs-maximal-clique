@@ -77,26 +77,23 @@ int main(int argc, char* argv[])
 #endif // dbg
         for (int j = 0; j < noOfVertices; j++)
         {
+
             bytesRead=getline(&line, &lineLength, filePtr);
             if(0<bytesRead)
             {
-                // Implement a better way to split the string
-                for(int k=0; k<lineLength; k++)
+
+                char *ptr = strtok(line, " ");
+                int k=0;
+                while(ptr != NULL)
                 {
-                    if(line[k]==13||line[k]==10)break;
-                    if(line[k]==32)continue;
-
-
-                    graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=line[k]-'0';
-
+                    graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=atoi(ptr);
 #ifdef dbg
-                    printf("file: %c\n",line[k]);
+                    printf("file: %s\n",ptr);
                     printf("new vertex in adj list: %d\n",graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]);
 #endif // dbg
-
+                    ptr = strtok(NULL, " ");
+                    k++;
                 }
-
-
             }
 
         }
