@@ -28,7 +28,8 @@ void printGraph (struct Graph graph)
     printf("-------------------------------------------------\n");
 }
 
-struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs){
+struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
+{
 
 
 
@@ -102,7 +103,9 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs){
         bytesRead=getline(&line, &lineLength, filePtr);
         if(0<bytesRead)
         {
-            graphs[i].description=line;
+            graphs[i].description = malloc(strlen(line) + 1);
+            strcpy(graphs[i].description, line);
+
 
 #ifdef dbg
             printf("Additional graph information: %s\n",graphs[i].description);
@@ -140,12 +143,15 @@ int main(int argc, char* argv[])
         return -1;
 
     // Print graphs
-    for(int i=0;i<noOfGraphs;i++){
+    for(int i=0; i<noOfGraphs; i++)
+    {
         printGraph(graphs[i]);
     }
 
-    for(int i=0;i<noOfGraphs;i++){
+    for(int i=0; i<noOfGraphs; i++)
+    {
         free(graphs[i].adjacencyMatrix);
+        free(graphs[i].description);
     }
     free(graphs);
 
