@@ -16,3 +16,4 @@
 - [ ] Write a function to find maximum common induced subgraph.
 - [ ] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also
 - [ ] Run tests, measure the times.
+- [ ] Check and prepare for edge cases, such as empty graph description, vertex with no edges.
