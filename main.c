@@ -19,6 +19,11 @@ struct Graph
 struct Node *newNode(int vertex, int weight)
 {
     struct Node *node = malloc(sizeof(struct Node));
+    if (NULL == node)
+    {
+        printf("Error: Couldn't allocate memory for a new node\n");
+        return NULL;
+    }
     node->vertex = vertex;
     node->weight = weight;
     node->nextNode = NULL;
@@ -84,7 +89,11 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
     }
 
     struct Graph *graphs = malloc(*noOfGraphs * sizeof(Graph));
-
+    if (NULL == graphs)
+    {
+        printf("Error: Couldn't allocate memory for graphs\n");
+        return NULL;
+    }
     for (int i = 0; i < *noOfGraphs; i++)
     {
         bytesRead = getline(&line, &lineLength, filePtr);
@@ -100,6 +109,11 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
 #endif // dbg
 
         graphs[i].adjacencyLists = malloc(noOfVertices * sizeof(struct Node *));
+        if (NULL == graphs[i].adjacencyLists)
+        {
+            printf("Error: Couldn't allocate memory for new adjacency lists\n");
+            return NULL;
+        }
 
 #ifdef dbg
         printf("New adj matrix[0]: %d\n", graphs[i].adjacencyMatrix[0]);
@@ -138,6 +152,11 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
         if (0 < bytesRead)
         {
             graphs[i].description = malloc(bytesRead + 1);
+            if (NULL == graphs[i].description)
+            {
+                printf("Error: Couldn't allocate memory for graph description\n");
+                return NULL;
+            }
             if (NULL != graphs[i].description)
             {
                 strncpy(graphs[i].description, line, bytesRead);
