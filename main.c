@@ -221,13 +221,22 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
 
     for (int i = 0; i < G->noOfVertices; i++)
     {
-        for (int j = 0; j < H->adjacencyLists; j++)
+        for (int j = 0; j < H->noOfVertices; j++)
         {
             struct Node *iterator_G = G->adjacencyLists[i];
-            struct Node *iterator_H = H->adjacencyLists[j];
 
-            while (NULL != iterator_G && NULL != iterator_H)
+            while (NULL != iterator_G)
             {
+                struct Node *iterator_H = H->adjacencyLists[j];
+                while (NULL != iterator_H)
+                {
+                    printf("Would add edge from (%d,%d) to: (%d,%d)\n", i+1,j+1, iterator_G->vertex+1, iterator_H->vertex+1);
+                    iterator_H = iterator_H->nextNode;
+                }
+                iterator_G = iterator_G->nextNode;
+#ifdef dbg
+                printf("Value of iterator_H: %d\n", iterator_H);
+#endif // dbg
             }
         }
     }
@@ -259,7 +268,11 @@ int main(int argc, char *argv[])
         return -1;
 
     // Print graphs
-    printGraphs(graphs, noOfGraphs);
+    // printGraphs(graphs, noOfGraphs);
+
+    // Modular Graph Product
+
+    modularProduct(graphs, graphs + 1);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
