@@ -121,6 +121,12 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
     return graphs;
 }
 
+struct Graph* modularProduct(struct Graph* G, struct Graph* H){
+
+    // 1. First transfrom the graphs to adjacency List.
+    // 2. Write this function to multiply them :).
+
+};
 
 int main(int argc, char* argv[])
 {
