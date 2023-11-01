@@ -199,7 +199,10 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
             2. Take element from Adjacency list from graph G, for each element from adjacency list from graph H it will have an edge, Push it to graph's GxH adjacency list
         3. So far we would have all multiplied elements with condition 1. "u is adjacent with u' and v is adjacent with v'"
         4. The above is DONE, what's left is: Need to figure out a way to add edges that satisfy the second condition: 'u is not adjacent with u' and v is not adjacent with v''
-        5. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
+            1. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
+            2. The way I would do this is to:
+                1. Iterate over all vertices of GH, by creating two for loops iterating over vertices of G and H
+                2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
     */
     if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
     {
@@ -236,6 +239,28 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         for (int j = 0; j < H->noOfVertices; j++) // 2.1
         {
             GH->adjacencyLists[i * H->noOfVertices + j] = NULL;
+            for (int k = 0; k < G->noOfVertices; k++) // 4.1.2
+            {
+                if (k != i && !isVertexInsideList(G->adjacencyLists[i], k))
+                {
+                    for (int l = 0; l < H->noOfVertices; l++)
+                    {
+
+                        if (j != l && !isVertexInsideList(H->adjacencyLists[j], l))
+                        {
+                            struct Node *node = newNode(k * H->noOfVertices + l, G->adjacencyLists[k]->weight * H->adjacencyLists[l]->weight);
+                            if (NULL == node)
+                            {
+                                printf("Error: Couldn't add a new node\n");
+                                return NULL;
+                            }
+                            node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
+                            GH->adjacencyLists[i * H->noOfVertices + j] = node;
+                        }
+                    }
+                }
+            }
+
             struct Node *iterator_G = G->adjacencyLists[i];
 
             while (NULL != iterator_G)
@@ -303,9 +328,8 @@ int main(int argc, char *argv[])
 
     printGraph(*GH);
 
-
     // TODO: Free memory from product graph
-    
+
     for (int i = 0; i < noOfGraphs; i++)
     {
         struct Node *temporaryNode = NULL;
