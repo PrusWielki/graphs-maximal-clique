@@ -173,9 +173,8 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
     return graphs;
 }
 
-struct Graph *modularProduct(struct Graph *G, struct Graph *H){
-
-    // 2. Write this function to multiply them :).
+struct Graph *modularProduct(struct Graph *G, struct Graph *H)
+{
     /*
         1. Iterate over matrix G, over it's adjacencyLists
         2. For each AdjacencyList of graph G:
@@ -185,7 +184,24 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H){
         4. Need to figure out a way to add edges that satisfy the second condition: 'u is not adjacent with u' and v is not adjacent with v''
         5. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
     */
+    if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
+        return NULL;
 
+    struct Graph *GH = malloc(sizeof(struct Graph *));
+
+    if (NULL == GH)
+        return NULL;
+
+    GH->noOfVertices = G->noOfVertices * H->noOfVertices;
+
+    GH->adjacencyLists = malloc(GH->noOfVertices * sizeof(struct Node *));
+
+    if (NULL == GH->adjacencyLists)
+        return NULL;
+
+    for (int i = 0; i < G->noOfVertices; i++)
+    {
+    }
 };
 
 int main(int argc, char *argv[])
