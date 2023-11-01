@@ -73,7 +73,7 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
     size_t lineLength = 0;
     char *line = NULL;
     char *token = NULL;
-    size_t bytesRead = 0;
+    int bytesRead = 0;
     int noOfVertices = 0;
 
     // Read number of graphs in a file
@@ -157,23 +157,31 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
         bytesRead = getline(&line, &lineLength, filePtr);
         if (0 < bytesRead)
         {
-            graphs[i].description = malloc(bytesRead + 1);
+            graphs[i].description = malloc(sizeof(char) * (bytesRead + 1));
             if (NULL == graphs[i].description)
             {
                 printf("Error: Couldn't allocate memory for graph description\n");
                 return NULL;
             }
-            if (NULL != graphs[i].description)
-            {
-                strncpy(graphs[i].description, line, bytesRead);
-                graphs[i].description[bytesRead] = '\0';
-                if (graphs[i].description[bytesRead - 1] == '\n')
-                    graphs[i].description[bytesRead - 1] = '\0';
-            }
+
+            strncpy(graphs[i].description, line, bytesRead);
+            graphs[i].description[bytesRead] = '\0';
+            if (graphs[i].description[bytesRead - 1] == '\n')
+                graphs[i].description[bytesRead - 1] = '\0';
 
 #ifdef dbg
             printf("Additional graph information: %s\n", graphs[i].description);
 #endif // dbg
+        }
+        else
+        {
+            graphs[i].description = malloc(sizeof(char));
+            if (NULL == graphs[i].description)
+            {
+                printf("Error: Couldn't allocate memory for graph description\n");
+                return NULL;
+            }
+            graphs[i].description[0] = '\0';
         }
     }
     return graphs;
@@ -321,7 +329,7 @@ int main(int argc, char *argv[])
         return -1;
 
     // Print graphs
-    // printGraphs(graphs, noOfGraphs);
+    printGraphs(graphs, noOfGraphs);
 
     // Modular Graph Product
 
