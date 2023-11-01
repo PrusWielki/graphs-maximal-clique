@@ -44,6 +44,7 @@ void printGraph(struct Graph graph)
         while (NULL != temporaryNode)
         {
             printf("(%d, %d) ", temporaryNode->vertex, temporaryNode->weight);
+
             temporaryNode = temporaryNode->nextNode;
         }
 
@@ -134,6 +135,11 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
                     if (weight > 0)
                     {
                         struct Node *node = newNode(k, weight);
+                        if (NULL == node)
+                        {
+                            printf("Error: Couldn't add a new node\n");
+                            return NULL;
+                        }
                         node->nextNode = graphs[i].adjacencyLists[j];
                         graphs[i].adjacencyLists[j] = node;
                     }
@@ -208,7 +214,13 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         printf("Error: Couldn't allocate memory for graph product\n");
         return NULL;
     }
-
+    GH->description = malloc(sizeof(char));
+    if (NULL == GH->description)
+    {
+        printf("Error: Couldn't allocate memory for graph product description\n");
+        return NULL;
+    }
+    GH->description[0]='\0';
     GH->noOfVertices = G->noOfVertices * H->noOfVertices;
 
     GH->adjacencyLists = malloc(GH->noOfVertices * sizeof(struct Node *));
@@ -219,10 +231,11 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         return NULL;
     }
 
-    for (int i = 0; i < G->noOfVertices; i++)
+    for (int i = 0; i < G->noOfVertices; i++) // 1. 2.
     {
-        for (int j = 0; j < H->noOfVertices; j++)
+        for (int j = 0; j < H->noOfVertices; j++) // 2.1
         {
+            GH->adjacencyLists[i * H->noOfVertices + j] = NULL;
             struct Node *iterator_G = G->adjacencyLists[i];
 
             while (NULL != iterator_G)
@@ -230,7 +243,19 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
                 struct Node *iterator_H = H->adjacencyLists[j];
                 while (NULL != iterator_H)
                 {
-                    printf("Would add edge from (%d,%d) to: (%d,%d)\n", i+1,j+1, iterator_G->vertex+1, iterator_H->vertex+1);
+#ifdef dbg
+                    printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
+#endif
+                    printf("Would add edge from %d to: %d\n", i * H->noOfVertices + j, iterator_G->vertex * H->noOfVertices + iterator_H->vertex);
+                    struct Node *node = newNode(i * H->noOfVertices + j, iterator_G->weight * iterator_H->weight); // 2.2
+                    if (NULL == node)
+                    {
+                        printf("Error: Couldn't add a new node\n");
+                        return NULL;
+                    }
+                    node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
+                    GH->adjacencyLists[i * H->noOfVertices + j] = node;
+
                     iterator_H = iterator_H->nextNode;
                 }
                 iterator_G = iterator_G->nextNode;
@@ -240,6 +265,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
             }
         }
     }
+    return GH;
 };
 
 int main(int argc, char *argv[])
@@ -272,7 +298,9 @@ int main(int argc, char *argv[])
 
     // Modular Graph Product
 
-    modularProduct(graphs, graphs + 1);
+    struct Graph *GH = modularProduct(graphs, graphs + 1);
+
+    printGraph(*GH);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
