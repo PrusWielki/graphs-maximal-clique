@@ -72,7 +72,6 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
 
     size_t lineLength = 0;
     char *line = NULL;
-    char *token = NULL;
     int bytesRead = 0;
     int noOfVertices = 0;
 
