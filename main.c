@@ -159,7 +159,12 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H){
     // 2. Write this function to multiply them :).
     /*
         1. Iterate over matrix G, over it's adjacencyLists
-
+        2. For each AdjacencyList of graph G:
+            1. Iterate over AdjacencyLists from graph H
+            2. Take element from Adjacency list from graph G, for each element from adjacency list from graph H it will have an edge, Push it to graph's GxH adjacency list
+        3. So far we would have all multiplied elements with condition 1. "u is adjacent with u' and v is adjacent with v'"
+        4. Need to figure out a way to add edges that satisfy the second condition: 'u is not adjacent with u' and v is not adjacent with v''
+        5. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
     */
 
 };
