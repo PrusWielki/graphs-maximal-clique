@@ -173,6 +173,17 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
     return graphs;
 }
 
+int isVertexInsideList(struct Node *iterator, int desiredVertex)
+{
+    while (NULL != iterator)
+    {
+        if (iterator->vertex == desiredVertex)
+            return 1;
+        iterator = iterator->nextNode;
+    }
+    return 0;
+}
+
 struct Graph *modularProduct(struct Graph *G, struct Graph *H)
 {
     /*
@@ -195,7 +206,6 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     if (NULL == GH)
     {
         printf("Error: Couldn't allocate memory for graph product\n");
-
         return NULL;
     }
 
@@ -206,7 +216,6 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     if (NULL == GH->adjacencyLists)
     {
         printf("Error: Couldn't allocate memory for graph product adjacency lists\n");
-
         return NULL;
     }
 
@@ -214,6 +223,12 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     {
         for (int j = 0; j < H->adjacencyLists; j++)
         {
+            struct Node *iterator_G = G->adjacencyLists[i];
+            struct Node *iterator_H = H->adjacencyLists[j];
+
+            while (NULL != iterator_G && NULL != iterator_H)
+            {
+            }
         }
     }
 };
