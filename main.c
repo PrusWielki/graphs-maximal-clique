@@ -3,31 +3,68 @@
 #include<string.h>
 
 
+
+struct Node
+{
+    int vertex;
+    int weight;
+    struct Node* nextNode;
+} Node;
+
 struct Graph
 {
     int noOfVertices;
-    int* adjacencyMatrix;
+    struct Node** adjacencyLists;
     char* description;
 } Graph;
+
+
+struct Node* newNode(int vertex, int weight)
+{
+    struct Node* node = malloc(sizeof(struct Node));
+    node->vertex=vertex;
+    node->weight=weight;
+    node->nextNode=NULL;
+    return node;
+}
 
 void printGraph (struct Graph graph)
 {
 
-    printf("-------------------------------------------------\n");
     printf("Amount of vertices: %d\n",graph.noOfVertices);
-    printf("Adjacency matrix:\n");
-    for(int i=0; i<graph.noOfVertices*graph.noOfVertices; i++)
+    printf("Adjacency lists:\n");
+    struct Node* temporaryNode = NULL;
+    for(int i=0; i<graph.noOfVertices; i++)
     {
-        printf("%d",graph.adjacencyMatrix[i]);
-        if(0==(i+1)%graph.noOfVertices)
-            printf("\n");
-        else
-            printf(" ");
+        temporaryNode=graph.adjacencyLists[i];
+
+        printf("%d: ",i);
+        while(NULL!=temporaryNode)
+        {
+            printf("(%d, %d) ",temporaryNode->vertex,temporaryNode->weight);
+            temporaryNode=temporaryNode->nextNode;
+        }
+
+        printf("\n");
     }
     printf("Additional information: %s\n",graph.description);
-    printf("-------------------------------------------------\n");
+    printf("-------------------------------------------------\n\n");
 }
 
+void printGraphs(struct Graph* graphs, int noOfGraphs)
+{
+
+    printf("-------------------------------------------------\n");
+    printf("Printing graphs in the following format:\n");
+
+    printf("{vertex}: {(vertex, weight)}\n\n");
+    for(int i=0; i<noOfGraphs; i++)
+    {
+        printf("------------------Graph %d----------------------\n",i);
+        printGraph(graphs[i]);
+    }
+
+}
 struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
 {
 
@@ -73,13 +110,15 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
         printf("Vertices in graph %d: %d \n",i,graphs[i].noOfVertices);
 #endif // dbg
 
-        graphs[i].adjacencyMatrix=calloc(noOfVertices*noOfVertices,sizeof(int));
+        graphs[i].adjacencyLists=malloc(noOfVertices*sizeof(struct Node*));
+
+
 #ifdef dbg
         printf("New adj matrix[0]: %d\n",graphs[i].adjacencyMatrix[0]);
 #endif // dbg
         for (int j = 0; j < noOfVertices; j++)
         {
-
+            graphs[i].adjacencyLists[j]=NULL;
             bytesRead=getline(&line, &lineLength, filePtr);
             if(0<bytesRead)
             {
@@ -88,7 +127,15 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
                 int k=0;
                 while(NULL != ptr)
                 {
-                    graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=strtol(ptr,NULL,10);
+                    int weight = strtol(ptr,NULL,10);
+
+                    if(weight>0)
+                    {
+                        struct Node* node=newNode(k,weight);
+                        node->nextNode=graphs[i].adjacencyLists[j];
+                        graphs[i].adjacencyLists[j]=node;
+                    }
+
 #ifdef dbg
                     printf("file: %s\n",ptr);
                     printf("new vertex in adj list: %d\n",graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]);
@@ -121,9 +168,9 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
     return graphs;
 }
 
-struct Graph* modularProduct(struct Graph* G, struct Graph* H){
+struct Graph* modularProduct(struct Graph* G, struct Graph* H)
+{
 
-    // 1. First transfrom the graphs to adjacency List.
     // 2. Write this function to multiply them :).
 
 };
@@ -154,14 +201,23 @@ int main(int argc, char* argv[])
         return -1;
 
     // Print graphs
-    for(int i=0; i<noOfGraphs; i++)
-    {
-        printGraph(graphs[i]);
-    }
+    printGraphs(graphs, noOfGraphs);
 
     for(int i=0; i<noOfGraphs; i++)
     {
-        free(graphs[i].adjacencyMatrix);
+        struct Node* temporaryNode=NULL;
+        for(int j=0; j<graphs[i].noOfVertices; j++)
+        {
+
+            while(NULL!=graphs[i].adjacencyLists[j])
+            {
+                temporaryNode=graphs[i].adjacencyLists[j];
+                graphs[i].adjacencyLists[j]=graphs[i].adjacencyLists[j]->nextNode;
+                free(temporaryNode);
+            }
+
+        }
+        free(graphs[i].adjacencyLists);
         free(graphs[i].description);
     }
     free(graphs);
