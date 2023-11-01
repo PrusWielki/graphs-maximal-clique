@@ -185,22 +185,36 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         5. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
     */
     if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
+    {
+        printf("Error: Couldn't multiply matrices, given matrices don't contain enough information\n");
         return NULL;
+    }
 
     struct Graph *GH = malloc(sizeof(struct Graph *));
 
     if (NULL == GH)
+    {
+        printf("Error: Couldn't allocate memory for graph product\n");
+
         return NULL;
+    }
 
     GH->noOfVertices = G->noOfVertices * H->noOfVertices;
 
     GH->adjacencyLists = malloc(GH->noOfVertices * sizeof(struct Node *));
 
     if (NULL == GH->adjacencyLists)
+    {
+        printf("Error: Couldn't allocate memory for graph product adjacency lists\n");
+
         return NULL;
+    }
 
     for (int i = 0; i < G->noOfVertices; i++)
     {
+        for (int j = 0; j < H->adjacencyLists; j++)
+        {
+        }
     }
 };
 
