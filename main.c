@@ -220,7 +220,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         printf("Error: Couldn't allocate memory for graph product description\n");
         return NULL;
     }
-    GH->description[0]='\0';
+    GH->description[0] = '\0';
     GH->noOfVertices = G->noOfVertices * H->noOfVertices;
 
     GH->adjacencyLists = malloc(GH->noOfVertices * sizeof(struct Node *));
@@ -244,10 +244,11 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
                 while (NULL != iterator_H)
                 {
 #ifdef dbg
-                    printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
-#endif
+                    // printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
                     printf("Would add edge from %d to: %d\n", i * H->noOfVertices + j, iterator_G->vertex * H->noOfVertices + iterator_H->vertex);
-                    struct Node *node = newNode(i * H->noOfVertices + j, iterator_G->weight * iterator_H->weight); // 2.2
+#endif
+
+                    struct Node *node = newNode(iterator_G->vertex * H->noOfVertices + iterator_H->vertex, iterator_G->weight * iterator_H->weight); // 2.2
                     if (NULL == node)
                     {
                         printf("Error: Couldn't add a new node\n");
