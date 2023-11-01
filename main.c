@@ -303,6 +303,9 @@ int main(int argc, char *argv[])
 
     printGraph(*GH);
 
+
+    // TODO: Free memory from product graph
+    
     for (int i = 0; i < noOfGraphs; i++)
     {
         struct Node *temporaryNode = NULL;
