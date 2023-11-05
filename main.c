@@ -670,17 +670,7 @@ int main(int argc, char *argv[])
     // Print graphs
     printGraphs(graphs, noOfGraphs);
 
-    struct Vector R;
-    createVector(&R, graphs[0].noOfVertices);
-    struct Vector P;
-    createVector(&P, graphs[0].noOfVertices);
-    for (int i = 0; i < graphs[0].noOfVertices; i++)
-    {
-        pushBackVector(&P, i);
-    }
-    struct Vector X;
-    createVector(&X, graphs[0].noOfVertices);
-    bronKerbosch(R, P, X, &graphs[0]);
+
     // Modular Graph Product
     struct Graph *GH = NULL;
     if (1 < noOfGraphs)
@@ -688,6 +678,17 @@ int main(int argc, char *argv[])
     if (NULL != GH)
     {
         printGraph(*GH);
+            struct Vector R;
+    createVector(&R, GH->noOfVertices);
+    struct Vector P;
+    createVector(&P, GH->noOfVertices);
+    for (int i = 0; i < GH->noOfVertices; i++)
+    {
+        pushBackVector(&P, i);
+    }
+    struct Vector X;
+    createVector(&X, GH->noOfVertices);
+    bronKerbosch(R, P, X, GH);
     }
 
 #ifdef dbg
