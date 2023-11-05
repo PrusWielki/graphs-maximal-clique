@@ -350,6 +350,7 @@ struct Graph toUndirectedGraph(struct Graph G)
 {
 
     /*
+        DONE
         1. DONE: Write a function to remove a node from a list.
         2. Iterate over all adjacency lists.
             1. For each adjacency list, for each node, check if there is an edge in the other direction.
