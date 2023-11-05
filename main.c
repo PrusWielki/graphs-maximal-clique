@@ -1,51 +1,48 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 struct Graph
 {
     int noOfVertices;
-    int* adjacencyMatrix;
-    char* description;
+    int *adjacencyMatrix;
+    char *description;
 } Graph;
 
-void printGraph (struct Graph graph)
+void printGraph(struct Graph graph)
 {
 
     printf("-------------------------------------------------\n");
-    printf("Amount of vertices: %d\n",graph.noOfVertices);
+    printf("Amount of vertices: %d\n", graph.noOfVertices);
     printf("Adjacency matrix:\n");
-    for(int i=0; i<graph.noOfVertices*graph.noOfVertices; i++)
+    for (int i = 0; i < graph.noOfVertices * graph.noOfVertices; i++)
     {
-        printf("%d",graph.adjacencyMatrix[i]);
-        if(0==(i+1)%graph.noOfVertices)
+        printf("%d", graph.adjacencyMatrix[i]);
+        if (0 == (i + 1) % graph.noOfVertices)
             printf("\n");
         else
             printf(" ");
     }
-    printf("Additional information: %s\n",graph.description);
+    printf("Additional information: %s\n", graph.description);
     printf("-------------------------------------------------\n");
 }
 
-struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
+struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
 {
 
-
-
     size_t lineLength = 0;
-    char* line = NULL;
-    char* token = NULL;
-    size_t bytesRead=0;
-    int noOfVertices=0;
-
+    char *line = NULL;
+    char *token = NULL;
+    size_t bytesRead = 0;
+    int noOfVertices = 0;
 
     // Read number of graphs in a file
-    bytesRead=getline(&line, &lineLength, filePtr);
+    bytesRead = getline(&line, &lineLength, filePtr);
 
-    if (0<bytesRead)
+    if (0 < bytesRead)
     {
-        *noOfGraphs=strtol(line,NULL,10);
+        *noOfGraphs = strtol(line, NULL, 10);
 
 #ifdef dbg
         printf("file: %s\n", line);
@@ -53,76 +50,76 @@ struct Graph* readGraphsFromFile(FILE* filePtr, int* noOfGraphs)
 #endif // dbg
     }
 
-
-
-    struct Graph* graphs=malloc(*noOfGraphs*sizeof(Graph));
-
-
+    struct Graph *graphs = malloc(*noOfGraphs * sizeof(Graph));
 
     for (int i = 0; i < *noOfGraphs; i++)
     {
-        bytesRead=getline(&line, &lineLength, filePtr);
+        bytesRead = getline(&line, &lineLength, filePtr);
 
-        if (0>=bytesRead)
+        if (0 >= bytesRead)
             continue;
 
-        noOfVertices=strtol(line,NULL,10);
-        graphs[i].noOfVertices=noOfVertices;
+        noOfVertices = strtol(line, NULL, 10);
+        graphs[i].noOfVertices = noOfVertices;
 #ifdef dbg
         printf("file: %s\n", line);
-        printf("Vertices in graph %d: %d \n",i,graphs[i].noOfVertices);
+        printf("Vertices in graph %d: %d \n", i, graphs[i].noOfVertices);
 #endif // dbg
 
-        graphs[i].adjacencyMatrix=calloc(noOfVertices*noOfVertices,sizeof(int));
+        graphs[i].adjacencyMatrix = calloc(noOfVertices * noOfVertices, sizeof(int));
 #ifdef dbg
-        printf("New adj matrix[0]: %d\n",graphs[i].adjacencyMatrix[0]);
+        printf("New adj matrix[0]: %d\n", graphs[i].adjacencyMatrix[0]);
 #endif // dbg
         for (int j = 0; j < noOfVertices; j++)
         {
 
-            bytesRead=getline(&line, &lineLength, filePtr);
-            if(0<bytesRead)
+            bytesRead = getline(&line, &lineLength, filePtr);
+            if (0 < bytesRead)
             {
 
                 char *ptr = strtok(line, " ");
-                int k=0;
-                while(NULL != ptr)
+                int k = 0;
+                while (NULL != ptr)
                 {
-                    graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]=strtol(ptr,NULL,10);
+                    graphs[i].adjacencyMatrix[j * graphs[i].noOfVertices + k] = strtol(ptr, NULL, 10);
 #ifdef dbg
-                    printf("file: %s\n",ptr);
-                    printf("new vertex in adj list: %d\n",graphs[i].adjacencyMatrix[j*graphs[i].noOfVertices+k]);
+                    printf("file: %s\n", ptr);
+                    printf("new vertex in adj list: %d\n", graphs[i].adjacencyMatrix[j * graphs[i].noOfVertices + k]);
 #endif // dbg
                     ptr = strtok(NULL, " ");
                     k++;
                 }
             }
-
         }
 
-        bytesRead=getline(&line, &lineLength, filePtr);
-        if(0<bytesRead)
+        bytesRead = getline(&line, &lineLength, filePtr);
+        if (0 < bytesRead)
         {
-            graphs[i].description = malloc(bytesRead+1);
-            if(NULL!=graphs[i].description)
+            graphs[i].description = malloc(bytesRead + 1);
+            if (NULL != graphs[i].description)
             {
-                strncpy(graphs[i].description, line,bytesRead);
-                graphs[i].description[bytesRead]='\0';
-                if(graphs[i].description[bytesRead-1]=='\n')
-                    graphs[i].description[bytesRead-1]='\0';
+                strncpy(graphs[i].description, line, bytesRead);
+                graphs[i].description[bytesRead] = '\0';
+                if (graphs[i].description[bytesRead - 1] == '\n')
+                    graphs[i].description[bytesRead - 1] = '\0';
             }
 
 #ifdef dbg
-            printf("Additional graph information: %s\n",graphs[i].description);
+            printf("Additional graph information: %s\n", graphs[i].description);
 #endif // dbg
         }
-
     }
     return graphs;
 }
 
+void func()
+{
+    // implement whatever you want here
+    for (int c = 0; c < 1000000; c++)
+        ;
+}
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     // Initialization
     if (2 != argc)
@@ -130,35 +127,42 @@ int main(int argc, char* argv[])
         printf("Usage \n");
         return 1;
     }
-    FILE* filePtr = fopen(argv[1], "rb");
+    FILE *filePtr = fopen(argv[1], "rb");
 
-    if (NULL==filePtr)
+    if (NULL == filePtr)
     {
         printf("Error: could not open file %s", argv[1]);
         return 1;
     }
 
     // Read graphs from file
-    struct Graph* graphs=NULL;
-    int noOfGraphs=0;
+    struct Graph *graphs = NULL;
+    int noOfGraphs = 0;
 
-    graphs=readGraphsFromFile(filePtr,&noOfGraphs);
+    graphs = readGraphsFromFile(filePtr, &noOfGraphs);
 
-    if(NULL==graphs)
+    if (NULL == graphs)
         return -1;
 
     // Print graphs
-    for(int i=0; i<noOfGraphs; i++)
+    for (int i = 0; i < noOfGraphs; i++)
     {
         printGraph(graphs[i]);
     }
 
-    for(int i=0; i<noOfGraphs; i++)
+    for (int i = 0; i < noOfGraphs; i++)
     {
         free(graphs[i].adjacencyMatrix);
         free(graphs[i].description);
     }
     free(graphs);
+
+    clock_t start = clock();
+    func(); // Change it
+    clock_t end = clock();
+
+    double timeItTook = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("function took %f \n", timeItTook);
 
     return 0;
 }
