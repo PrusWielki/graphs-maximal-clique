@@ -477,7 +477,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
 
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
     {
-        printVector(P);
+        printVector(R);
         return;
     }
     int pivot = -1;
