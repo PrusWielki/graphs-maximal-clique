@@ -211,7 +211,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
                 1. Iterate over all vertices of GH, by creating two for loops iterating over vertices of G and H
                 2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
         5. TODO: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
-        6. TODO: Handle multigraphs. Edges should be in both directions.
+        6. DONE: Handle multigraphs. Edges should be in both directions.
         7. TODO: How to handle new weights? Add weights in both directions and multiply edges?
     */
     if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
@@ -251,12 +251,12 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
             GH->adjacencyLists[i * H->noOfVertices + j] = NULL;
             for (int k = 0; k < G->noOfVertices; k++) // 4.1.2
             {
-                if (k != i && !isVertexInsideList(G->adjacencyLists[i], k))
+                if (k != i && !isVertexInsideList(G->adjacencyLists[i], k) && !isVertexInsideList(G->adjacencyLists[k], i))
                 {
                     for (int l = 0; l < H->noOfVertices; l++)
                     {
 
-                        if (j != l && !isVertexInsideList(H->adjacencyLists[j], l))
+                        if (j != l && !isVertexInsideList(H->adjacencyLists[j], l) && !isVertexInsideList(H->adjacencyLists[l], j))
                         {
                             struct Node *node = newNode(k * H->noOfVertices + l, G->adjacencyLists[k]->weight * H->adjacencyLists[l]->weight);
                             if (NULL == node)
@@ -275,24 +275,30 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
 
             while (NULL != iterator_G)
             {
-                struct Node *iterator_H = H->adjacencyLists[j];
-                while (NULL != iterator_H)
+                if (isVertexInsideList(G->adjacencyLists[iterator_G->vertex], i))
                 {
+
+                    struct Node *iterator_H = H->adjacencyLists[j];
+                    while (NULL != iterator_H)
+                    {
+                        if (isVertexInsideList(H->adjacencyLists[iterator_H->vertex], j))
+                        {
 #ifdef dbg
-                    // printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
-                    printf("Would add edge from %d to: %d\n", i * H->noOfVertices + j, iterator_G->vertex * H->noOfVertices + iterator_H->vertex);
+                            // printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
+                            printf("Would add edge from %d to: %d\n", i * H->noOfVertices + j, iterator_G->vertex * H->noOfVertices + iterator_H->vertex);
 #endif
 
-                    struct Node *node = newNode(iterator_G->vertex * H->noOfVertices + iterator_H->vertex, iterator_G->weight * iterator_H->weight); // 2.2
-                    if (NULL == node)
-                    {
-                        printf("Error: Couldn't add a new node\n");
-                        return NULL;
+                            struct Node *node = newNode(iterator_G->vertex * H->noOfVertices + iterator_H->vertex, iterator_G->weight * iterator_H->weight); // 2.2
+                            if (NULL == node)
+                            {
+                                printf("Error: Couldn't add a new node\n");
+                                return NULL;
+                            }
+                            node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
+                            GH->adjacencyLists[i * H->noOfVertices + j] = node;
+                        }
+                        iterator_H = iterator_H->nextNode;
                     }
-                    node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
-                    GH->adjacencyLists[i * H->noOfVertices + j] = node;
-
-                    iterator_H = iterator_H->nextNode;
                 }
                 iterator_G = iterator_G->nextNode;
 #ifdef dbg
