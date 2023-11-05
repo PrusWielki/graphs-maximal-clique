@@ -44,7 +44,7 @@ int pushBackVector(struct Vector *vector, int value)
     if (vector->currentNumberOfElements >= vector->size)
     {
 
-        vector->data = realloc(vector->data, 2 * vector->size);
+        vector->data = realloc(vector->data, sizeof(int) * 2 * vector->size);
         if (NULL == vector->data)
             return -1;
         vector->size = 2 * vector->size;
@@ -93,6 +93,8 @@ int findElementVector(struct Vector *vector, int value)
 }
 void printVector(struct Vector vector)
 {
+    if (NULL == vector.data)
+        return;
     printf("[ ");
     for (int i = 0; i < vector.currentNumberOfElements; i++)
     {
@@ -474,83 +476,89 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         4. TODO: Test it.
         5. TODO: Free memory :)
     */
-
+    /*  printVector(R);
+      printVector(P);
+       printVector(X);
+       printf("\n"); */
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
     {
         printVector(R);
         return;
     }
-    int pivot = -1;
+    struct Node *iterator = NULL;
+    /* int pivot = -1;
     if (0 < P.currentNumberOfElements)
         pivot = P.data[0];
 
     else if (0 < X.currentNumberOfElements)
         pivot = X.data[0];
 
-    struct Vector *toIterateOver = malloc(sizeof(struct Vector));
-    struct Node *iterator = NULL;
-    createVector(toIterateOver, P.currentNumberOfElements);
+
+
+    struct Vector toIterateOver;
+    createVector(&toIterateOver, P.currentNumberOfElements);
     for (int i = 0; i < P.currentNumberOfElements; i++)
     {
-        pushBackVector(toIterateOver, P.data[i]);
+        pushBackVector(&toIterateOver, P.data[i]);
     }
     if (-1 != pivot)
     {
         iterator = graph->adjacencyLists[pivot];
         while (NULL != iterator)
         {
-            removeElementVector(toIterateOver, iterator->vertex);
+            removeElementVector(&toIterateOver, iterator->vertex);
             iterator = iterator->nextNode;
         }
     }
-
-    for (int i = 0; i < toIterateOver->currentNumberOfElements; i++)
+ */
+    int i = 0;
+    while (0 < P.currentNumberOfElements)
     {
         // R ⋃ {v}
-        struct Vector *rPlusV = malloc(sizeof(struct Vector));
-        createVector(rPlusV, R.currentNumberOfElements + 1);
-        for (int j = 0; j < R.currentNumberOfElements; j++)
-        {
-            pushBackVector(rPlusV, R.data[j]);
-        }
+        /*  struct Vector rPlusV;
+         createVector(&rPlusV, R.currentNumberOfElements + 1);
+         for (int j = 0; j < R.currentNumberOfElements; j++)
+         {
+             pushBackVector(&rPlusV, R.data[j]);
+         }
 
-        pushBackVector(rPlusV, toIterateOver->data[i]);
+         pushBackVector(&rPlusV, P.data[i]); */
+        pushBackVector(&R, P.data[i]);
 
         // P ⋂ N(v)
-        struct Vector *pAndVEdges = malloc(sizeof(struct Vector));
-        createVector(pAndVEdges, P.currentNumberOfElements);
-        iterator = graph->adjacencyLists[toIterateOver->data[i]];
+        struct Vector pAndVEdges;
+        createVector(&pAndVEdges, P.currentNumberOfElements);
+        iterator = graph->adjacencyLists[P.data[i]];
         for (int j = 0; j < P.currentNumberOfElements; j++)
         {
             if (isVertexInsideList(iterator, P.data[j]))
             {
-                pushBackVector(pAndVEdges, P.data[i]);
+                pushBackVector(&pAndVEdges, P.data[j]);
             }
         }
 
         // X ⋂ N(v)
-        struct Vector *xAndVEdges = malloc(sizeof(struct Vector));
-        createVector(xAndVEdges, X.currentNumberOfElements);
-        iterator = graph->adjacencyLists[toIterateOver->data[i]];
+        struct Vector xAndVEdges;
+        createVector(&xAndVEdges, X.currentNumberOfElements);
+        iterator = graph->adjacencyLists[P.data[i]];
         for (int j = 0; j < X.currentNumberOfElements; j++)
         {
             if (isVertexInsideList(iterator, X.data[j]))
             {
-                pushBackVector(xAndVEdges, X.data[i]);
+                pushBackVector(&xAndVEdges, X.data[j]);
             }
         }
         // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-        bronKerbosch(*rPlusV, *pAndVEdges, *xAndVEdges, graph);
+        bronKerbosch(R, pAndVEdges, xAndVEdges, graph);
 
         // P := P \ {v}
-        removeElementVector(&P, toIterateOver->data[i]);
+        removeElementVector(&P, P.data[i]);
 
         // X := X ⋃ {v}
-        pushBackVector(&X, toIterateOver->data[i]);
+        pushBackVector(&X, P.data[i]);
     }
 
-    free(toIterateOver->data);
-    free(toIterateOver);
+    // free(toIterateOver.data);
 }
 
 void dbgTests(struct Graph directedGraph)
@@ -647,17 +655,17 @@ int main(int argc, char *argv[])
     if (NULL != GH)
     {
         printGraph(*GH);
-        struct Vector *R = malloc(sizeof(struct Vector));
-        createVector(R, 0);
-        struct Vector *P = malloc(sizeof(struct Vector));
-        createVector(P, GH->noOfVertices);
+        struct Vector R;
+        createVector(&R, 1);
+        struct Vector P;
+        createVector(&P, GH->noOfVertices);
         for (int i = 0; i < GH->noOfVertices; i++)
         {
-            pushBackVector(P, i);
+            pushBackVector(&P, i);
         }
-        struct Vector *X = malloc(sizeof(struct Vector));
-        createVector(X, 0);
-        bronKerbosch(*R, *P, *X, GH);
+        struct Vector X;
+        createVector(&X, 1);
+        bronKerbosch(R, P, X, GH);
     }
 
 #ifdef dbg
