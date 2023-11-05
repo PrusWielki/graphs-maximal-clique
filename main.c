@@ -309,10 +309,21 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     return GH;
 };
 
+struct Graph toDirectedGraph(struct Graph G)
+{
+
+    /*
+        1. Write a function to remove a node from a list.
+        2. Allocate memory for a new Graph.
+        3. Iterate over all adjacency lists.
+            1. For each adjacency list, for each node, check if there is an edge in the other direction.
+                1. If not remove the node.
+        4. Return the resulting new graph.
+    */
+}
 
 void bronKerbosch()
 {
-
     /*
         1. TODO: Write a function to transform a directed graph to undirected graph (just remove the single edges)
         2. TODO: Write needed datastructures to hold vertices, I guess we could use a List to dynamically store a list of vertices, or we could implement a vector.
