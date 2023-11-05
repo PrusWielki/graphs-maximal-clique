@@ -212,7 +212,6 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
                 2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
         5. TODO: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
         6. DONE: Handle multigraphs. Edges should be in both directions.
-        7. TODO: How to handle new weights? Add weights in both directions and multiply edges?
     */
     if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
     {
