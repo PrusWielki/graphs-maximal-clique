@@ -34,6 +34,7 @@ void removeNode(struct Node **head, int vertexToRemove)
 {
 
     /*
+        DONE
         1. Two variables, current and previous.
         2. Special case when the vertexToRemove is the first in the list.
             1. Point head to the next element and free the memory.
@@ -235,6 +236,7 @@ int isVertexInsideList(struct Node *iterator, int desiredVertex)
 struct Graph *modularProduct(struct Graph *G, struct Graph *H)
 {
     /*
+        DONE
         1. Iterate over matrix G, over it's adjacencyLists
         2. For each AdjacencyList of graph G:
             1. Iterate over AdjacencyLists from graph H
@@ -348,7 +350,7 @@ struct Graph toDirectedGraph(struct Graph G)
 {
 
     /*
-        1. Write a function to remove a node from a list.
+        1. DONE: Write a function to remove a node from a list.
         2. Allocate memory for a new Graph.
         3. Iterate over all adjacency lists.
             1. For each adjacency list, for each node, check if there is an edge in the other direction.
