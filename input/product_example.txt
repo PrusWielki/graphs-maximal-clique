@@ -1,0 +1,10 @@
+2
+3
+0 1 0
+1 0 1
+0 1 0
+more graph description
+3
+0 1 0
+1 0 1
+0 1 0
