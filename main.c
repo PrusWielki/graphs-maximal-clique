@@ -258,7 +258,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
 
                         if (j != l && !isVertexInsideList(H->adjacencyLists[j], l) && !isVertexInsideList(H->adjacencyLists[l], j))
                         {
-                            struct Node *node = newNode(k * H->noOfVertices + l, G->adjacencyLists[k]->weight * H->adjacencyLists[l]->weight);
+                            struct Node *node = newNode(k * H->noOfVertices + l, 1);
                             if (NULL == node)
                             {
                                 printf("Error: Couldn't add a new node\n");
