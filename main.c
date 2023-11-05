@@ -474,8 +474,12 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         4. TODO: Test it.
         5. TODO: Free memory :)
     */
+
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
+    {
         printVector(P);
+        return;
+    }
     int pivot = -1;
     if (0 < P.currentNumberOfElements)
         pivot = P.data[0];
