@@ -30,6 +30,41 @@ struct Node *newNode(int vertex, int weight)
     return node;
 }
 
+void removeNode(struct Node **head, int vertexToRemove)
+{
+
+    /*
+        1. Two variables, current and previous.
+        2. Special case when the vertexToRemove is the first in the list.
+            1. Point head to the next element and free the memory.
+        3. Previous should point to the next, and current should be freed.
+    */
+
+    struct Node *current = *head;
+    struct Node *previous = *head;
+
+    int index = 0;
+    while (NULL != current)
+    {
+        current = current->nextNode;
+        if (0 == index && vertexToRemove == previous->vertex)
+        {
+            *head = previous->nextNode;
+            free(previous);
+            break;
+        }
+        if (vertexToRemove == current->vertex)
+        {
+            previous->nextNode = current->nextNode;
+            free(current);
+            break;
+        }
+
+        previous = previous->nextNode;
+        index++;
+    }
+}
+
 void printGraph(struct Graph graph)
 {
 
@@ -366,6 +401,29 @@ int main(int argc, char *argv[])
 
     printGraph(*GH);
 
+#ifdef dbg
+    // Remove from list test
+
+    struct Node *newList = NULL;
+    for (int i = 0; i < 4; i++)
+    {
+        struct Node *node = newNode(i, i);
+        if (NULL == node)
+        {
+            printf("Error: Couldn't add a new node\n");
+            return -1;
+        }
+        node->nextNode = newList;
+        newList = node;
+    }
+
+    removeNode(&newList, 0);
+    while (newList != NULL)
+    {
+        printf("%d\n", newList->vertex);
+        newList = newList->nextNode;
+    }
+#endif // dbg
     // TODO: Free memory from product graph
 
     for (int i = 0; i < noOfGraphs; i++)
