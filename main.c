@@ -91,6 +91,15 @@ int findElementVector(struct Vector *vector, int value)
     }
     return -1;
 }
+void printVector(struct Vector vector)
+{
+    printf("[ ");
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+        printf("%d ", vector.data[i]);
+    }
+    printf("]\n");
+}
 struct Node *newNode(int vertex, int weight)
 {
     struct Node *node = malloc(sizeof(struct Node));
@@ -456,7 +465,7 @@ struct Graph toUndirectedGraph(struct Graph G)
     return G;
 }
 
-void bronKerbosch()
+void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph)
 {
     /*
         1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
@@ -464,6 +473,55 @@ void bronKerbosch()
         3. TODO: Write the Bron-Kerbosch
         4. TODO: Test it.
     */
+    if (0 == R.currentNumberOfElements && 0 == X.currentNumberOfElements)
+        printVector(P);
+    int pivot = -1;
+    if (0 < P.currentNumberOfElements)
+        pivot = P.data[0];
+
+    else if (0 < X.currentNumberOfElements)
+        pivot = X.data[0];
+
+    struct Vector *toIterateOver = malloc(sizeof(struct Vector));
+    createVector(toIterateOver, P.currentNumberOfElements);
+    for (int i = 0; i < P.currentNumberOfElements; i++)
+    {
+        pushBackVector(toIterateOver, P.data[i]);
+    }
+    if (-1 != pivot)
+    {
+        struct Node *iterator = graph->adjacencyLists[pivot];
+        while (NULL != iterator)
+        {
+            removeElementVector(toIterateOver, iterator->vertex);
+            iterator = iterator->nextNode;
+        }
+    }
+
+    for (int i = 0; i < toIterateOver->currentNumberOfElements; i++)
+    {
+        // R ⋃ {v}
+        struct Vector *rAndV = malloc(sizeof(struct Vector));
+        createVector(rAndV, R.currentNumberOfElements + 1);
+        for (int j = 0; j < R.currentNumberOfElements; j++)
+        {
+            pushBackVector(rAndV, R.data[j]);
+        }
+
+        pushBackVector(rAndV, toIterateOver->data[i]);
+
+        // P ⋂ N(v)
+
+        // X ⋂ N(v)
+
+        // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
+
+        // P := P \ {v}
+        // X := X ⋃ {v}
+    }
+
+    free(toIterateOver->data);
+    free(toIterateOver);
 }
 
 void dbgTests(struct Graph directedGraph)
