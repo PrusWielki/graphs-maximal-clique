@@ -152,7 +152,7 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
         }
 
 #ifdef dbg
-        printf("New adj matrix[0]: %d\n", graphs[i].adjacencyMatrix[0]);
+        printf("New adj list[0]: %d\n", graphs[i].adjacencyLists[0]);
 #endif // dbg
         for (int j = 0; j < noOfVertices; j++)
         {
@@ -181,7 +181,7 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
 
 #ifdef dbg
                     printf("file: %s\n", ptr);
-                    printf("new vertex in adj list: %d\n", graphs[i].adjacencyMatrix[j * graphs[i].noOfVertices + k]);
+                    printf("new vertex in adj list: %d\n", graphs[i].adjacencyLists[j * graphs[i].noOfVertices + k]);
 #endif // dbg
                     ptr = strtok(NULL, " ");
                     k++;
@@ -338,7 +338,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
                 }
                 iterator_G = iterator_G->nextNode;
 #ifdef dbg
-                printf("Value of iterator_H: %d\n", iterator_H);
+                printf("Value of iterator_G: %d\n", iterator_G);
 #endif // dbg
             }
         }
@@ -346,17 +346,38 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     return GH;
 };
 
-struct Graph toDirectedGraph(struct Graph G)
+struct Graph toUndirectedGraph(struct Graph G)
 {
 
     /*
         1. DONE: Write a function to remove a node from a list.
-        2. Allocate memory for a new Graph.
-        3. Iterate over all adjacency lists.
+        2. Iterate over all adjacency lists.
             1. For each adjacency list, for each node, check if there is an edge in the other direction.
                 1. If not remove the node.
-        4. Return the resulting new graph.
+        3. Return the resulting new graph.
     */
+
+    for (int i = 0; i < G.noOfVertices; i++)
+    {
+        if (NULL == G.adjacencyLists[i])
+            continue;
+        struct Node *iterator = G.adjacencyLists[i];
+        while (NULL != iterator)
+        {
+#ifdef dbg
+            printf("List: %d, vertex: %d\n", i, iterator->vertex);
+#endif
+            if (NULL == G.adjacencyLists[iterator->vertex] || !isVertexInsideList(G.adjacencyLists[iterator->vertex], i))
+            {
+#ifdef dbg
+                printf("Removing vertex %d from list %d\n", iterator->vertex, i);
+#endif
+                removeNode(&G.adjacencyLists[i], iterator->vertex);
+            }
+            iterator = iterator->nextNode;
+        }
+    }
+    return G;
 }
 
 void bronKerbosch()
@@ -367,6 +388,37 @@ void bronKerbosch()
         3. TODO: Write the Bron-Kerbosch
         4. TODO: Test it.
     */
+}
+
+void dbgTests(struct Graph directedGraph)
+{
+
+    // Remove from list test
+
+    struct Node *newList = NULL;
+    for (int i = 0; i < 4; i++)
+    {
+        struct Node *node = newNode(i, i);
+        if (NULL == node)
+        {
+            printf("Error: Couldn't add a new node\n");
+            return;
+        }
+        node->nextNode = newList;
+        newList = node;
+    }
+
+    removeNode(&newList, 0);
+    while (newList != NULL)
+    {
+        printf("%d\n", newList->vertex);
+        newList = newList->nextNode;
+    }
+    // ----------------------------
+
+    // To undirected graph
+    struct Graph undirectedGraph = toUndirectedGraph(directedGraph);
+    printGraph(undirectedGraph);
 }
 
 int main(int argc, char *argv[])
@@ -398,34 +450,16 @@ int main(int argc, char *argv[])
     printGraphs(graphs, noOfGraphs);
 
     // Modular Graph Product
-
-    struct Graph *GH = modularProduct(graphs, graphs + 1);
-
-    printGraph(*GH);
+    struct Graph *GH = NULL;
+    if (1 < noOfGraphs)
+        GH = modularProduct(graphs, graphs + 1);
+    if (NULL != GH)
+        printGraph(*GH);
 
 #ifdef dbg
-    // Remove from list test
-
-    struct Node *newList = NULL;
-    for (int i = 0; i < 4; i++)
-    {
-        struct Node *node = newNode(i, i);
-        if (NULL == node)
-        {
-            printf("Error: Couldn't add a new node\n");
-            return -1;
-        }
-        node->nextNode = newList;
-        newList = node;
-    }
-
-    removeNode(&newList, 0);
-    while (newList != NULL)
-    {
-        printf("%d\n", newList->vertex);
-        newList = newList->nextNode;
-    }
+    dbgTests(graphs[0]);
 #endif // dbg
+
     // TODO: Free memory from product graph
 
     for (int i = 0; i < noOfGraphs; i++)
