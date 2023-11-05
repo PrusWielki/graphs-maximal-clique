@@ -41,12 +41,19 @@ int pushBackVector(struct Vector *vector, int value)
 {
     if (NULL == vector || NULL == vector->data)
         return -1;
-    if (vector->currentNumberOfElements >= vector->size)
+    if (vector->currentNumberOfElements == vector->size)
     {
-
-        vector->data = realloc(vector->data, sizeof(int) * 2 * vector->size);
-        if (NULL == vector->data)
+        int *newArray = malloc(sizeof(int) * 2 * vector->size);
+        if (NULL == newArray)
             return -1;
+
+        for (int i = 0; i < vector->currentNumberOfElements; i++)
+        {
+            newArray[i] = vector->data[i];
+        }
+
+        free(vector->data);
+        vector->data = newArray;
         vector->size = 2 * vector->size;
     }
     if (NULL != vector->data)
