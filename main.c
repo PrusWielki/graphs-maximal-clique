@@ -16,6 +16,81 @@ struct Graph
     char *description;
 } Graph;
 
+struct Vector
+{
+    int *data;
+    int size;
+    int currentNumberOfElements;
+} Vector;
+
+int createVector(struct Vector *newVector, int size)
+{
+    /*
+        Accepts a pointer to already allocated memory for struct Vector
+    */
+    if (NULL == newVector)
+        return -1;
+    newVector->data = malloc(size * sizeof(int));
+    if (NULL == newVector->data)
+        return -1;
+    newVector->currentNumberOfElements = 0;
+    newVector->size = size;
+    return 1;
+}
+int pushBackVector(struct Vector *vector, int value)
+{
+    if (NULL == vector || NULL == vector->data)
+        return -1;
+    if (vector->currentNumberOfElements >= vector->size)
+    {
+
+        vector->data = realloc(vector->data, 2 * vector->size);
+        if (NULL == vector->data)
+            return -1;
+        vector->size = 2 * vector->size;
+    }
+    if (NULL != vector->data)
+    {
+        vector->data[vector->currentNumberOfElements] = value;
+        vector->currentNumberOfElements = vector->currentNumberOfElements + 1;
+    }
+    return 1;
+}
+
+int removeElementVector(struct Vector *vector, int value)
+{
+    if (NULL == vector || NULL == vector->data)
+        return -1;
+    for (int i = 0; i < vector->currentNumberOfElements; i++)
+    {
+        if (vector->data[i] == value)
+        {
+            for (int j = i; j < vector->currentNumberOfElements - 1; j++)
+            {
+                vector->data[j] = vector->data[j + 1];
+            }
+            vector->currentNumberOfElements = vector->currentNumberOfElements - 1;
+            return 1;
+        }
+    }
+    return -1;
+}
+
+int findElementVector(struct Vector *vector, int value)
+{
+    /*
+        -1 if no element found
+        index if element found
+    */
+    if (NULL == vector || NULL == vector->data)
+        return -1;
+    for (int i = 0; i < vector->currentNumberOfElements; i++)
+    {
+        if (vector->data[i] == value)
+            return i;
+    }
+    return -1;
+}
 struct Node *newNode(int vertex, int weight)
 {
     struct Node *node = malloc(sizeof(struct Node));
@@ -420,6 +495,34 @@ void dbgTests(struct Graph directedGraph)
     // To undirected graph
     struct Graph undirectedGraph = toUndirectedGraph(directedGraph);
     printGraph(undirectedGraph);
+
+    // ----------------------------
+
+    // Vector tests
+
+    struct Vector *newVector = malloc(sizeof(struct Vector));
+
+    createVector(newVector, 2);
+    pushBackVector(newVector, 1);
+    pushBackVector(newVector, 2);
+    pushBackVector(newVector, 3);
+    for (int i = 0; i < newVector->currentNumberOfElements; i++)
+    {
+        printf("Vector: index: %d value: %d\n", i, newVector->data[i]);
+    }
+    printf("Vector number of elements %d\n", newVector->currentNumberOfElements);
+    printf("Vector size %d\n", newVector->size);
+
+    removeElementVector(newVector, 3);
+    for (int i = 0; i < newVector->currentNumberOfElements; i++)
+    {
+        printf("Vector: index: %d value: %d\n", i, newVector->data[i]);
+    }
+    printf("Vector number of elements %d\n", newVector->currentNumberOfElements);
+    printf("Vector size %d\n", newVector->size);
+
+    printf("Element %d found at index %d\n", 2, findElementVector(newVector, 2));
+    printf("Element %d found at index %d\n", 3, findElementVector(newVector, 3));
 }
 
 int main(int argc, char *argv[])
