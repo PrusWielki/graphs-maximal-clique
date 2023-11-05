@@ -3,38 +3,77 @@
 #include <string.h>
 #include <time.h>
 
+struct Node
+{
+    int vertex;
+    int weight;
+    struct Node *nextNode;
+} Node;
+
 struct Graph
 {
     int noOfVertices;
-    int *adjacencyMatrix;
+    struct Node **adjacencyLists;
     char *description;
 } Graph;
+
+struct Node *newNode(int vertex, int weight)
+{
+    struct Node *node = malloc(sizeof(struct Node));
+    if (NULL == node)
+    {
+        printf("Error: Couldn't allocate memory for a new node\n");
+        return NULL;
+    }
+    node->vertex = vertex;
+    node->weight = weight;
+    node->nextNode = NULL;
+    return node;
+}
 
 void printGraph(struct Graph graph)
 {
 
-    printf("-------------------------------------------------\n");
     printf("Amount of vertices: %d\n", graph.noOfVertices);
-    printf("Adjacency matrix:\n");
-    for (int i = 0; i < graph.noOfVertices * graph.noOfVertices; i++)
+    printf("Adjacency lists:\n");
+    struct Node *temporaryNode = NULL;
+    for (int i = 0; i < graph.noOfVertices; i++)
     {
-        printf("%d", graph.adjacencyMatrix[i]);
-        if (0 == (i + 1) % graph.noOfVertices)
-            printf("\n");
-        else
-            printf(" ");
+        temporaryNode = graph.adjacencyLists[i];
+
+        printf("%d: ", i);
+        while (NULL != temporaryNode)
+        {
+            printf("(%d, %d) ", temporaryNode->vertex, temporaryNode->weight);
+
+            temporaryNode = temporaryNode->nextNode;
+        }
+
+        printf("\n");
     }
     printf("Additional information: %s\n", graph.description);
-    printf("-------------------------------------------------\n");
+    printf("-------------------------------------------------\n\n");
 }
 
+void printGraphs(struct Graph *graphs, int noOfGraphs)
+{
+
+    printf("-------------------------------------------------\n");
+    printf("Printing graphs in the following format:\n");
+
+    printf("{vertex}: {(vertex, weight)}\n\n");
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        printf("------------------Graph %d----------------------\n", i);
+        printGraph(graphs[i]);
+    }
+}
 struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
 {
 
     size_t lineLength = 0;
     char *line = NULL;
-    char *token = NULL;
-    size_t bytesRead = 0;
+    int bytesRead = 0;
     int noOfVertices = 0;
 
     // Read number of graphs in a file
@@ -51,7 +90,11 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
     }
 
     struct Graph *graphs = malloc(*noOfGraphs * sizeof(Graph));
-
+    if (NULL == graphs)
+    {
+        printf("Error: Couldn't allocate memory for graphs\n");
+        return NULL;
+    }
     for (int i = 0; i < *noOfGraphs; i++)
     {
         bytesRead = getline(&line, &lineLength, filePtr);
@@ -66,13 +109,19 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
         printf("Vertices in graph %d: %d \n", i, graphs[i].noOfVertices);
 #endif // dbg
 
-        graphs[i].adjacencyMatrix = calloc(noOfVertices * noOfVertices, sizeof(int));
+        graphs[i].adjacencyLists = malloc(noOfVertices * sizeof(struct Node *));
+        if (NULL == graphs[i].adjacencyLists)
+        {
+            printf("Error: Couldn't allocate memory for new adjacency lists\n");
+            return NULL;
+        }
+
 #ifdef dbg
         printf("New adj matrix[0]: %d\n", graphs[i].adjacencyMatrix[0]);
 #endif // dbg
         for (int j = 0; j < noOfVertices; j++)
         {
-
+            graphs[i].adjacencyLists[j] = NULL;
             bytesRead = getline(&line, &lineLength, filePtr);
             if (0 < bytesRead)
             {
@@ -81,7 +130,20 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
                 int k = 0;
                 while (NULL != ptr)
                 {
-                    graphs[i].adjacencyMatrix[j * graphs[i].noOfVertices + k] = strtol(ptr, NULL, 10);
+                    int weight = strtol(ptr, NULL, 10);
+
+                    if (weight > 0)
+                    {
+                        struct Node *node = newNode(k, weight);
+                        if (NULL == node)
+                        {
+                            printf("Error: Couldn't add a new node\n");
+                            return NULL;
+                        }
+                        node->nextNode = graphs[i].adjacencyLists[j];
+                        graphs[i].adjacencyLists[j] = node;
+                    }
+
 #ifdef dbg
                     printf("file: %s\n", ptr);
                     printf("new vertex in adj list: %d\n", graphs[i].adjacencyMatrix[j * graphs[i].noOfVertices + k]);
@@ -95,18 +157,31 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
         bytesRead = getline(&line, &lineLength, filePtr);
         if (0 < bytesRead)
         {
-            graphs[i].description = malloc(bytesRead + 1);
-            if (NULL != graphs[i].description)
+            graphs[i].description = malloc(sizeof(char) * (bytesRead + 1));
+            if (NULL == graphs[i].description)
             {
-                strncpy(graphs[i].description, line, bytesRead);
-                graphs[i].description[bytesRead] = '\0';
-                if (graphs[i].description[bytesRead - 1] == '\n')
-                    graphs[i].description[bytesRead - 1] = '\0';
+                printf("Error: Couldn't allocate memory for graph description\n");
+                return NULL;
             }
+
+            strncpy(graphs[i].description, line, bytesRead);
+            graphs[i].description[bytesRead] = '\0';
+            if (graphs[i].description[bytesRead - 1] == '\n')
+                graphs[i].description[bytesRead - 1] = '\0';
 
 #ifdef dbg
             printf("Additional graph information: %s\n", graphs[i].description);
 #endif // dbg
+        }
+        else
+        {
+            graphs[i].description = malloc(sizeof(char));
+            if (NULL == graphs[i].description)
+            {
+                printf("Error: Couldn't allocate memory for graph description\n");
+                return NULL;
+            }
+            graphs[i].description[0] = '\0';
         }
     }
     return graphs;
@@ -118,6 +193,122 @@ void func()
     for (int c = 0; c < 1000000; c++)
         ;
 }
+
+int isVertexInsideList(struct Node *iterator, int desiredVertex)
+{
+    while (NULL != iterator)
+    {
+        if (iterator->vertex == desiredVertex)
+            return 1;
+        iterator = iterator->nextNode;
+    }
+    return 0;
+}
+
+struct Graph *modularProduct(struct Graph *G, struct Graph *H)
+{
+    /*
+        1. Iterate over matrix G, over it's adjacencyLists
+        2. For each AdjacencyList of graph G:
+            1. Iterate over AdjacencyLists from graph H
+            2. Take element from Adjacency list from graph G, for each element from adjacency list from graph H it will have an edge, Push it to graph's GxH adjacency list
+        3. So far we would have all multiplied elements with condition 1. "u is adjacent with u' and v is adjacent with v'"
+        4. The above is DONE, what's left is: Need to figure out a way to add edges that satisfy the second condition: 'u is not adjacent with u' and v is not adjacent with v''
+            1. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
+            2. The way I would do this is to:
+                1. Iterate over all vertices of GH, by creating two for loops iterating over vertices of G and H
+                2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
+        5. TODO: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
+    */
+    if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
+    {
+        printf("Error: Couldn't multiply matrices, given matrices don't contain enough information\n");
+        return NULL;
+    }
+
+    struct Graph *GH = malloc(sizeof(struct Graph *));
+
+    if (NULL == GH)
+    {
+        printf("Error: Couldn't allocate memory for graph product\n");
+        return NULL;
+    }
+    GH->description = malloc(sizeof(char));
+    if (NULL == GH->description)
+    {
+        printf("Error: Couldn't allocate memory for graph product description\n");
+        return NULL;
+    }
+    GH->description[0] = '\0';
+    GH->noOfVertices = G->noOfVertices * H->noOfVertices;
+
+    GH->adjacencyLists = malloc(GH->noOfVertices * sizeof(struct Node *));
+
+    if (NULL == GH->adjacencyLists)
+    {
+        printf("Error: Couldn't allocate memory for graph product adjacency lists\n");
+        return NULL;
+    }
+
+    for (int i = 0; i < G->noOfVertices; i++) // 1. 2.
+    {
+        for (int j = 0; j < H->noOfVertices; j++) // 2.1
+        {
+            GH->adjacencyLists[i * H->noOfVertices + j] = NULL;
+            for (int k = 0; k < G->noOfVertices; k++) // 4.1.2
+            {
+                if (k != i && !isVertexInsideList(G->adjacencyLists[i], k))
+                {
+                    for (int l = 0; l < H->noOfVertices; l++)
+                    {
+
+                        if (j != l && !isVertexInsideList(H->adjacencyLists[j], l))
+                        {
+                            struct Node *node = newNode(k * H->noOfVertices + l, G->adjacencyLists[k]->weight * H->adjacencyLists[l]->weight);
+                            if (NULL == node)
+                            {
+                                printf("Error: Couldn't add a new node\n");
+                                return NULL;
+                            }
+                            node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
+                            GH->adjacencyLists[i * H->noOfVertices + j] = node;
+                        }
+                    }
+                }
+            }
+
+            struct Node *iterator_G = G->adjacencyLists[i];
+
+            while (NULL != iterator_G)
+            {
+                struct Node *iterator_H = H->adjacencyLists[j];
+                while (NULL != iterator_H)
+                {
+#ifdef dbg
+                    // printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
+                    printf("Would add edge from %d to: %d\n", i * H->noOfVertices + j, iterator_G->vertex * H->noOfVertices + iterator_H->vertex);
+#endif
+
+                    struct Node *node = newNode(iterator_G->vertex * H->noOfVertices + iterator_H->vertex, iterator_G->weight * iterator_H->weight); // 2.2
+                    if (NULL == node)
+                    {
+                        printf("Error: Couldn't add a new node\n");
+                        return NULL;
+                    }
+                    node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
+                    GH->adjacencyLists[i * H->noOfVertices + j] = node;
+
+                    iterator_H = iterator_H->nextNode;
+                }
+                iterator_G = iterator_G->nextNode;
+#ifdef dbg
+                printf("Value of iterator_H: %d\n", iterator_H);
+#endif // dbg
+            }
+        }
+    }
+    return GH;
+};
 
 int main(int argc, char *argv[])
 {
@@ -145,14 +336,30 @@ int main(int argc, char *argv[])
         return -1;
 
     // Print graphs
-    for (int i = 0; i < noOfGraphs; i++)
-    {
-        printGraph(graphs[i]);
-    }
+    printGraphs(graphs, noOfGraphs);
+
+    // Modular Graph Product
+
+    struct Graph *GH = modularProduct(graphs, graphs + 1);
+
+    printGraph(*GH);
+
+    // TODO: Free memory from product graph
 
     for (int i = 0; i < noOfGraphs; i++)
     {
-        free(graphs[i].adjacencyMatrix);
+        struct Node *temporaryNode = NULL;
+        for (int j = 0; j < graphs[i].noOfVertices; j++)
+        {
+
+            while (NULL != graphs[i].adjacencyLists[j])
+            {
+                temporaryNode = graphs[i].adjacencyLists[j];
+                graphs[i].adjacencyLists[j] = graphs[i].adjacencyLists[j]->nextNode;
+                free(temporaryNode);
+            }
+        }
+        free(graphs[i].adjacencyLists);
         free(graphs[i].description);
     }
     free(graphs);
