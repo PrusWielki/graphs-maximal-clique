@@ -489,6 +489,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
        printf("\n"); */
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
     {
+        printf("Final: ");
         printVector(R);
         return;
     }
@@ -522,19 +523,24 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
     while (0 < P.currentNumberOfElements)
     {
         // R ⋃ {v}
-        /*  struct Vector rPlusV;
-         createVector(&rPlusV, R.currentNumberOfElements + 1);
-         for (int j = 0; j < R.currentNumberOfElements; j++)
-         {
-             pushBackVector(&rPlusV, R.data[j]);
-         }
+        struct Vector rPlusV;
+        createVector(&rPlusV, R.currentNumberOfElements + 1);
+        for (int j = 0; j < R.currentNumberOfElements; j++)
+        {
+            pushBackVector(&rPlusV, R.data[j]);
+        }
 
-         pushBackVector(&rPlusV, P.data[i]); */
-        pushBackVector(&R, P.data[i]);
+        pushBackVector(&rPlusV, P.data[i]);
+
+/*         printVector(R);
+        printVector(P);
+        printVector(X);
+        printf("%d\n", P.data[i]); */
+        // pushBackVector(&R, P.data[i]);
 
         // P ⋂ N(v)
         struct Vector pAndVEdges;
-        createVector(&pAndVEdges, P.currentNumberOfElements);
+        createVector(&pAndVEdges, P.size);
         iterator = graph->adjacencyLists[P.data[i]];
         for (int j = 0; j < P.currentNumberOfElements; j++)
         {
@@ -546,7 +552,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
 
         // X ⋂ N(v)
         struct Vector xAndVEdges;
-        createVector(&xAndVEdges, X.currentNumberOfElements);
+        createVector(&xAndVEdges, X.size);
         iterator = graph->adjacencyLists[P.data[i]];
         for (int j = 0; j < X.currentNumberOfElements; j++)
         {
@@ -556,15 +562,24 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
             }
         }
         // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-        bronKerbosch(R, pAndVEdges, xAndVEdges, graph);
+/* 
+        printVector(rPlusV);
+        printVector(pAndVEdges);
+        printVector(xAndVEdges);
+        printf("\n"); */
 
-        // P := P \ {v}
-        removeElementVector(&P, P.data[i]);
+        bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph);
 
         // X := X ⋃ {v}
         pushBackVector(&X, P.data[i]);
-    }
 
+        // P := P \ {v}
+/*         printf("Removed: %d\n", P.data[i]); */
+        removeElementVector(&P, P.data[i]);
+/*         printVector(P);
+        printf("\n"); */
+    }
+    return;
     // free(toIterateOver.data);
 }
 
@@ -655,6 +670,17 @@ int main(int argc, char *argv[])
     // Print graphs
     printGraphs(graphs, noOfGraphs);
 
+    struct Vector R;
+    createVector(&R, graphs[0].noOfVertices);
+    struct Vector P;
+    createVector(&P, graphs[0].noOfVertices);
+    for (int i = 0; i < graphs[0].noOfVertices; i++)
+    {
+        pushBackVector(&P, i);
+    }
+    struct Vector X;
+    createVector(&X, graphs[0].noOfVertices);
+    bronKerbosch(R, P, X, &graphs[0]);
     // Modular Graph Product
     struct Graph *GH = NULL;
     if (1 < noOfGraphs)
@@ -662,17 +688,6 @@ int main(int argc, char *argv[])
     if (NULL != GH)
     {
         printGraph(*GH);
-        struct Vector R;
-        createVector(&R, 1);
-        struct Vector P;
-        createVector(&P, GH->noOfVertices);
-        for (int i = 0; i < GH->noOfVertices; i++)
-        {
-            pushBackVector(&P, i);
-        }
-        struct Vector X;
-        createVector(&X, 1);
-        bronKerbosch(R, P, X, GH);
     }
 
 #ifdef dbg
