@@ -384,7 +384,7 @@ struct Graph toUndirectedGraph(struct Graph G)
 void bronKerbosch()
 {
     /*
-        1. TODO: Write a function to transform a directed graph to undirected graph (just remove the single edges)
+        1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
         2. TODO: Write needed datastructures to hold vertices, I guess we could use a List to dynamically store a list of vertices, or we could implement a vector.
         3. TODO: Write the Bron-Kerbosch
         4. TODO: Test it.
