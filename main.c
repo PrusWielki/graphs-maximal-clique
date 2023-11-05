@@ -679,15 +679,15 @@ int main(int argc, char *argv[])
     {
         printGraph(*GH);
             struct Vector R;
-    createVector(&R, GH->noOfVertices);
+    createVector(&R, 1);
     struct Vector P;
-    createVector(&P, GH->noOfVertices);
+    createVector(&P, 1);
     for (int i = 0; i < GH->noOfVertices; i++)
     {
         pushBackVector(&P, i);
     }
     struct Vector X;
-    createVector(&X, GH->noOfVertices);
+    createVector(&X, 1);
     bronKerbosch(R, P, X, GH);
     }
 
