@@ -649,6 +649,12 @@ void dbgTests(struct Graph directedGraph)
 
 int main(int argc, char *argv[])
 {
+    /*
+        1. Read all input graphs from a single file.
+        2. Iterate over them and for each print maximal cliques.
+        3. Multiply all of them and find maximal clique - that will be a maximal common subgraph.
+    */
+
     // Initialization
     if (2 != argc)
     {
