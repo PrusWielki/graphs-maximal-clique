@@ -494,7 +494,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         return;
     }
     struct Node *iterator = NULL;
-    /* int pivot = -1;
+     int pivot = -1;
     if (0 < P.currentNumberOfElements)
         pivot = P.data[0];
 
@@ -518,9 +518,9 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
             iterator = iterator->nextNode;
         }
     }
- */
+ 
     int i = 0;
-    while (0 < P.currentNumberOfElements)
+    while (0 < toIterateOver.currentNumberOfElements)
     {
         // R ⋃ {v}
         struct Vector rPlusV;
@@ -530,7 +530,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
             pushBackVector(&rPlusV, R.data[j]);
         }
 
-        pushBackVector(&rPlusV, P.data[i]);
+        pushBackVector(&rPlusV, toIterateOver.data[i]);
 
 /*         printVector(R);
         printVector(P);
@@ -541,7 +541,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         // P ⋂ N(v)
         struct Vector pAndVEdges;
         createVector(&pAndVEdges, P.size);
-        iterator = graph->adjacencyLists[P.data[i]];
+        iterator = graph->adjacencyLists[toIterateOver.data[i]];
         for (int j = 0; j < P.currentNumberOfElements; j++)
         {
             if (isVertexInsideList(iterator, P.data[j]))
@@ -553,7 +553,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         // X ⋂ N(v)
         struct Vector xAndVEdges;
         createVector(&xAndVEdges, X.size);
-        iterator = graph->adjacencyLists[P.data[i]];
+        iterator = graph->adjacencyLists[toIterateOver.data[i]];
         for (int j = 0; j < X.currentNumberOfElements; j++)
         {
             if (isVertexInsideList(iterator, X.data[j]))
@@ -571,11 +571,12 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph);
 
         // X := X ⋃ {v}
-        pushBackVector(&X, P.data[i]);
+        pushBackVector(&X, toIterateOver.data[i]);
 
         // P := P \ {v}
 /*         printf("Removed: %d\n", P.data[i]); */
-        removeElementVector(&P, P.data[i]);
+removeElementVector(&P, P.data[i]);
+        removeElementVector(&toIterateOver, toIterateOver.data[i]);
 /*         printVector(P);
         printf("\n"); */
     }
