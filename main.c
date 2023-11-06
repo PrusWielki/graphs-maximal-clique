@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 struct Node
 {
     int vertex;
@@ -491,7 +490,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
 #endif
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
     {
-        printf("Final: ");
+        printf("Maximal Clique: ");
         printVector(R);
         return;
     }
@@ -577,15 +576,15 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         printf("Removed: %d\n", P.data[i]);
 #endif
         // P := P \ {v}
-        removeElementVector(&P, P.data[i]);
+        removeElementVector(&P, toIterateOver.data[i]);
         removeElementVector(&toIterateOver, toIterateOver.data[i]);
 #ifdef dbg
         printVector(P);
         printf("\n");
 #endif
     }
+    // free(toIterateOver.data);
     return;
-    free(toIterateOver.data);
 }
 
 void dbgTests(struct Graph directedGraph)
@@ -650,8 +649,8 @@ void dbgTests(struct Graph directedGraph)
 int main(int argc, char *argv[])
 {
     /*
-        1. Read all input graphs from a single file.
-        2. Iterate over them and for each print maximal cliques.
+        1. DONE: Read all input graphs from a single file.
+        2. DONE: Iterate over them and for each print maximal cliques.
         3. Multiply all of them and find maximal clique - that will be a maximal common subgraph.
     */
 
@@ -680,7 +679,33 @@ int main(int argc, char *argv[])
 
     // Print graphs
     printGraphs(graphs, noOfGraphs);
+    printf("-------------------------------------------------\n");
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        printf("-------------------------------------------------\n");
+        printf("Printing maximal cliques for graph %d\n", i);
+        struct Vector R;
+        createVector(&R, 1);
+        struct Vector P;
+        createVector(&P, graphs[i].noOfVertices);
+#ifdef dbg
+        printf("graph size: %d\n", graphs[i].noOfVertices);
+#endif
+        for (int j = 0; j < graphs[i].noOfVertices; j++)
+        {
+            pushBackVector(&P, j);
+#ifdef dbg
+            printVector(P);
+#endif
+        }
 
+        struct Vector X;
+        createVector(&X, 1);
+        struct Graph undirectedGraph = toUndirectedGraph(graphs[i]);
+        // printGraph(undirectedGraph);
+        bronKerbosch(R, P, X, &undirectedGraph);
+    }
+    printf("-------------------------------------------------\n");
     // Modular Graph Product
     struct Graph *GH = NULL;
     if (1 < noOfGraphs)
