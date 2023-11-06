@@ -683,7 +683,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < noOfGraphs; i++)
     {
         printf("-------------------------------------------------\n");
-        printf("Printing maximal cliques for graph %d\n", i);
+        printf("Maximal cliques for graph %d\n", i);
         struct Vector R;
         createVector(&R, 1);
         struct Vector P;
@@ -702,30 +702,44 @@ int main(int argc, char *argv[])
         struct Vector X;
         createVector(&X, 1);
         struct Graph undirectedGraph = toUndirectedGraph(graphs[i]);
-        // printGraph(undirectedGraph);
         bronKerbosch(R, P, X, &undirectedGraph);
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
-    struct Graph *GH = NULL;
-    if (1 < noOfGraphs)
-        GH = modularProduct(graphs, graphs + 1);
-    if (NULL != GH)
-    {
-        printGraph(*GH);
-        struct Vector R;
-        createVector(&R, 1);
-        struct Vector P;
-        createVector(&P, 1);
-        for (int i = 0; i < GH->noOfVertices; i++)
-        {
-            pushBackVector(&P, i);
-        }
-        struct Vector X;
-        createVector(&X, 1);
-        bronKerbosch(R, P, X, GH);
-    }
 
+    struct Graph *GH = NULL;
+
+    if (1 < noOfGraphs)
+    {
+
+        GH = graphs;
+        for (int i = 1; i < noOfGraphs; i++)
+        {
+            GH = modularProduct(GH, graphs + i);
+        }
+
+        if (NULL != GH)
+        {
+            printf("-------------------------------------------------\n");
+            printf("Modular product graph of all input graphs:\n");
+            printGraph(*GH);
+            struct Vector R;
+            createVector(&R, 1);
+            struct Vector P;
+            createVector(&P, 1);
+            for (int i = 0; i < GH->noOfVertices; i++)
+            {
+                pushBackVector(&P, i);
+            }
+            struct Vector X;
+            createVector(&X, 1);
+
+            printf("-------------------------------------------------\n");
+            printf("Maximal common subgraph candidates of all input graphs:\n");
+
+            bronKerbosch(R, P, X, GH);
+        }
+    }
 #ifdef dbg
     dbgTests(graphs[0]);
 #endif // dbg
