@@ -583,7 +583,6 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         printf("\n");
 #endif
     }
-    // free(toIterateOver.data);
     return;
 }
 
@@ -763,7 +762,7 @@ int main(int argc, char *argv[])
         free(graphs[i].adjacencyLists);
         free(graphs[i].description);
     }
-    free(graphs);
 
+    free(graphs);
     return 0;
 }
