@@ -479,14 +479,16 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
     /*
         1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
         2. DONE: Write needed datastructures to hold vertices, I guess we could use a List to dynamically store a list of vertices, or we could implement a vector.
-        3. TODO: Write the Bron-Kerbosch
+        3. DONE: Write the Bron-Kerbosch
         4. TODO: Test it.
-        5. TODO: Free memory :)
+        5. TODO: Free memory, use valgrind :)
     */
-    /*  printVector(R);
-      printVector(P);
-       printVector(X);
-       printf("\n"); */
+#ifdef dbg
+    printVector(R);
+    printVector(P);
+    printVector(X);
+    printf("\n");
+#endif
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
     {
         printf("Final: ");
@@ -494,14 +496,12 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         return;
     }
     struct Node *iterator = NULL;
-     int pivot = -1;
+    int pivot = -1;
     if (0 < P.currentNumberOfElements)
         pivot = P.data[0];
 
     else if (0 < X.currentNumberOfElements)
         pivot = X.data[0];
-
-
 
     struct Vector toIterateOver;
     createVector(&toIterateOver, P.currentNumberOfElements);
@@ -518,7 +518,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
             iterator = iterator->nextNode;
         }
     }
- 
+
     int i = 0;
     while (0 < toIterateOver.currentNumberOfElements)
     {
@@ -531,13 +531,12 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         }
 
         pushBackVector(&rPlusV, toIterateOver.data[i]);
-
-/*         printVector(R);
+#ifdef dbg
+        printVector(R);
         printVector(P);
         printVector(X);
-        printf("%d\n", P.data[i]); */
-        // pushBackVector(&R, P.data[i]);
-
+        printf("%d\n", P.data[i]);
+#endif
         // P ⋂ N(v)
         struct Vector pAndVEdges;
         createVector(&pAndVEdges, P.size);
@@ -561,27 +560,32 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
                 pushBackVector(&xAndVEdges, X.data[j]);
             }
         }
-        // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-/* 
+
+#ifdef dbg
         printVector(rPlusV);
         printVector(pAndVEdges);
         printVector(xAndVEdges);
-        printf("\n"); */
-
+        printf("\n");
+#endif
+        // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
         bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph);
 
         // X := X ⋃ {v}
         pushBackVector(&X, toIterateOver.data[i]);
 
+#ifdef dbg
+        printf("Removed: %d\n", P.data[i]);
+#endif
         // P := P \ {v}
-/*         printf("Removed: %d\n", P.data[i]); */
-removeElementVector(&P, P.data[i]);
+        removeElementVector(&P, P.data[i]);
         removeElementVector(&toIterateOver, toIterateOver.data[i]);
-/*         printVector(P);
-        printf("\n"); */
+#ifdef dbg
+        printVector(P);
+        printf("\n");
+#endif
     }
     return;
-    // free(toIterateOver.data);
+    free(toIterateOver.data);
 }
 
 void dbgTests(struct Graph directedGraph)
@@ -671,7 +675,6 @@ int main(int argc, char *argv[])
     // Print graphs
     printGraphs(graphs, noOfGraphs);
 
-
     // Modular Graph Product
     struct Graph *GH = NULL;
     if (1 < noOfGraphs)
@@ -679,17 +682,17 @@ int main(int argc, char *argv[])
     if (NULL != GH)
     {
         printGraph(*GH);
-            struct Vector R;
-    createVector(&R, 1);
-    struct Vector P;
-    createVector(&P, 1);
-    for (int i = 0; i < GH->noOfVertices; i++)
-    {
-        pushBackVector(&P, i);
-    }
-    struct Vector X;
-    createVector(&X, 1);
-    bronKerbosch(R, P, X, GH);
+        struct Vector R;
+        createVector(&R, 1);
+        struct Vector P;
+        createVector(&P, 1);
+        for (int i = 0; i < GH->noOfVertices; i++)
+        {
+            pushBackVector(&P, i);
+        }
+        struct Vector X;
+        createVector(&X, 1);
+        bronKerbosch(R, P, X, GH);
     }
 
 #ifdef dbg
