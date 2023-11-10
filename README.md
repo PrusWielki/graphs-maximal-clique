@@ -1,10 +1,13 @@
+#HOW TO COMPTILE AND RUN FOR ALL THE FILES IN INPUT 
+  ./all.sh 
+  might need before chmod +x all.sh
 # How to compile
 
-`gcc main.c -o main`
+`gcc main.c -o program`
 
 # How to run with example file
 
-` ./main input/example.txt`
+` ./program input/example.txt`
 
 # TODO
 
