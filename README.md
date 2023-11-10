@@ -1,4 +1,4 @@
-#HOW TO COMPTILE AND RUN FOR ALL THE FILES IN INPUT 
+# HOW TO COMPTILE AND RUN FOR ALL THE FILES IN INPUT 
   ./all.sh 
   might need before chmod +x all.sh
 # How to compile
