@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 struct Node
 {
     int vertex;
@@ -713,25 +712,27 @@ int main(int argc, char *argv[])
     */
 
     // Initialization
-    if (2 != argc)
+    if (2 > argc)
     {
-        printf("Usage \n");
-        return 1;
-    }
-    FILE *filePtr = fopen(argv[1], "rb");
-
-    if (NULL == filePtr)
-    {
-        printf("Error: could not open file %s", argv[1]);
+        printf("Usage: input existing file names separated by space. Example: main.exe file1.txt file2.txt\n");
         return 1;
     }
 
     // Read graphs from file
     struct Vector graphs;
-    createVector_Graph(&graphs, argc - 1);
+    createVector_Graph(&graphs,  1);
     int noOfGraphs = 0;
+    for (int i = 0; i < argc - 1; i++)
+    {
+        FILE *filePtr = fopen(argv[i+1], "rb");
 
-    readGraphsFromFile(filePtr, &noOfGraphs, &graphs);
+        if (NULL == filePtr)
+        {
+            printf("Error: could not open file %s", argv[i+1]);
+            return 1;
+        }
+        readGraphsFromFile(filePtr, &noOfGraphs, &graphs);
+    }
 
     if (0 == graphs.currentNumberOfElements)
         return -1;
@@ -746,11 +747,11 @@ int main(int argc, char *argv[])
         struct Vector R;
         createVector_Int(&R, 1);
         struct Vector P;
-        createVector_Int(&P, ((struct Graph*)(graphs.data)+i)->noOfVertices);
+        createVector_Int(&P, ((struct Graph *)(graphs.data) + i)->noOfVertices);
 #ifdef dbg
-        printf("graph size: %d\n", ((struct Graph*)(graphs.data)+i)->noOfVertices);
+        printf("graph size: %d\n", ((struct Graph *)(graphs.data) + i)->noOfVertices);
 #endif
-        for (int j = 0; j < ((struct Graph*)(graphs.data)+i)->noOfVertices; j++)
+        for (int j = 0; j < ((struct Graph *)(graphs.data) + i)->noOfVertices; j++)
         {
             pushBackVector_Int(&P, j);
 #ifdef dbg
@@ -760,7 +761,7 @@ int main(int argc, char *argv[])
 
         struct Vector X;
         createVector_Int(&X, 1);
-        struct Graph undirectedGraph = toUndirectedGraph(*((struct Graph*)(graphs.data)+i));
+        struct Graph undirectedGraph = toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
         bronKerbosch(R, P, X, &undirectedGraph);
     }
     printf("-------------------------------------------------\n");
@@ -774,7 +775,7 @@ int main(int argc, char *argv[])
         GH = graphs.data;
         for (int i = 1; i < noOfGraphs; i++)
         {
-            GH = modularProduct(GH, ((struct Graph*)(graphs.data)+i));
+            GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
         }
 
         if (NULL != GH)
@@ -800,7 +801,7 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef dbg
-    dbgTests(*((struct Graph*)(graphs.data)));
+    dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
 
     // TODO: Free memory from product graph
@@ -808,20 +809,20 @@ int main(int argc, char *argv[])
     for (int i = 0; i < noOfGraphs; i++)
     {
         struct Node *temporaryNode = NULL;
-        for (int j = 0; j < ((struct Graph*)(graphs.data)+i)->noOfVertices; j++)
+        for (int j = 0; j < ((struct Graph *)(graphs.data) + i)->noOfVertices; j++)
         {
 
-            while (NULL != ((struct Graph*)(graphs.data)+i)->adjacencyLists[j])
+            while (NULL != ((struct Graph *)(graphs.data) + i)->adjacencyLists[j])
             {
-                temporaryNode = ((struct Graph*)(graphs.data)+i)->adjacencyLists[j];
-                ((struct Graph*)(graphs.data)+i)->adjacencyLists[j] = ((struct Graph*)(graphs.data)+i)->adjacencyLists[j]->nextNode;
+                temporaryNode = ((struct Graph *)(graphs.data) + i)->adjacencyLists[j];
+                ((struct Graph *)(graphs.data) + i)->adjacencyLists[j] = ((struct Graph *)(graphs.data) + i)->adjacencyLists[j]->nextNode;
                 free(temporaryNode);
             }
         }
-        free(((struct Graph*)(graphs.data)+i)->adjacencyLists);
-        free(((struct Graph*)(graphs.data)+i)->description);
+        free(((struct Graph *)(graphs.data) + i)->adjacencyLists);
+        free(((struct Graph *)(graphs.data) + i)->description);
     }
 
-    free(((struct Graph*)(graphs.data)));
+    free(((struct Graph *)(graphs.data)));
     return 0;
 }
