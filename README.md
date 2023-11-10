@@ -18,4 +18,4 @@
 - [ ] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also
 - [ ] Run tests, measure the times.
 - [ ] Check and prepare for edge cases, such as empty graph description, vertex with no edges.
-- [ ] Support for multiple input files.
+- [x] Support for multiple input files.
