@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define dbg
+
 struct Node
 {
     int vertex;
@@ -36,6 +39,22 @@ int createVector_Int(struct Vector *newVector, int size)
     newVector->size = size;
     return 1;
 }
+
+int createVector_Graph(struct Vector *newVector, int size)
+{
+    /*
+        Accepts a pointer to already allocated memory for struct Vector
+    */
+    if (NULL == newVector)
+        return -1;
+    newVector->data = malloc(size * sizeof(struct Graph));
+    if (NULL == newVector->data)
+        return -1;
+    newVector->currentNumberOfElements = 0;
+    newVector->size = size;
+    return 1;
+}
+
 int pushBackVector_Int(struct Vector *vector, int value)
 {
     if (NULL == vector || NULL == vector->data)
@@ -49,7 +68,6 @@ int pushBackVector_Int(struct Vector *vector, int value)
         for (int i = 0; i < vector->currentNumberOfElements; i++)
         {
             newArray[i] = *((int *)vector->data + i);
-            
         }
 
         free(vector->data);
@@ -58,7 +76,34 @@ int pushBackVector_Int(struct Vector *vector, int value)
     }
     if (NULL != vector->data)
     {
-       *((int *)vector->data + vector->currentNumberOfElements) = value;
+        *((int *)vector->data + vector->currentNumberOfElements) = value;
+        vector->currentNumberOfElements = vector->currentNumberOfElements + 1;
+    }
+    return 1;
+}
+
+int pushBackVector_Graph(struct Vector *vector, struct Graph value)
+{
+    if (NULL == vector || NULL == vector->data)
+        return -1;
+    if (vector->currentNumberOfElements == vector->size)
+    {
+        struct Graph *newArray = malloc(sizeof(struct Graph) * 2 * vector->size);
+        if (NULL == newArray)
+            return -1;
+
+        for (int i = 0; i < vector->currentNumberOfElements; i++)
+        {
+            newArray[i] = *((struct Graph *)vector->data + i);
+        }
+
+        free(vector->data);
+        vector->data = newArray;
+        vector->size = 2 * vector->size;
+    }
+    if (NULL != vector->data)
+    {
+        *((struct Graph *)vector->data + vector->currentNumberOfElements) = value;
         vector->currentNumberOfElements = vector->currentNumberOfElements + 1;
     }
     return 1;
@@ -74,7 +119,7 @@ int removeElementVector_Int(struct Vector *vector, int value)
         {
             for (int j = i; j < vector->currentNumberOfElements - 1; j++)
             {
-                *((int *)vector->data + j) = *((int *)vector->data + j+1);
+                *((int *)vector->data + j) = *((int *)vector->data + j + 1);
             }
             vector->currentNumberOfElements = vector->currentNumberOfElements - 1;
             return 1;
@@ -507,7 +552,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
     createVector_Int(&toIterateOver, P.currentNumberOfElements);
     for (int i = 0; i < P.currentNumberOfElements; i++)
     {
-        
+
         pushBackVector_Int(&toIterateOver, *((int *)P.data + i));
     }
     if (-1 != pivot)
@@ -645,6 +690,15 @@ void dbgTests(struct Graph directedGraph)
 
     printf("Element %d found at index %d\n", 2, findElementVector_Int(newVector, 2));
     printf("Element %d found at index %d\n", 3, findElementVector_Int(newVector, 3));
+
+    struct Vector graphVector;
+    createVector_Graph(&graphVector, 1);
+    pushBackVector_Graph(&graphVector, undirectedGraph);
+    printf("Printing Graph Vector [0]\n");
+    printGraph(*(struct Graph *)graphVector.data);
+    pushBackVector_Graph(&graphVector, undirectedGraph);
+    printf("Printing Graph Vector [1]\n");
+    printGraph(*((struct Graph *)graphVector.data + 1));
 }
 
 int main(int argc, char *argv[])
