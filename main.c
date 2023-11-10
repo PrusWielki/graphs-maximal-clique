@@ -237,6 +237,54 @@ void printVector_Vector_Max(struct Vector vector)
         printf("]\n");
     }
 }
+
+int saveToFileVector_Vector(struct Vector vector, FILE *fptr)
+{
+
+    if (NULL == vector.data || NULL == fptr)
+        return -1;
+
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+        fprintf(fptr, "[ ");
+        for (int j = 0; j < ((struct Vector *)(vector.data) + i)->currentNumberOfElements; j++)
+        {
+            fprintf(fptr, "%d ", *(((int *)((struct Vector *)(vector.data) + i)->data) + j));
+        }
+
+        fprintf(fptr, "]\n");
+    }
+
+    return 1;
+}
+
+int saveToFileVector_Vector_Max(struct Vector vector, FILE *fptr)
+{
+
+    if (NULL == vector.data || NULL == fptr)
+        return -1;
+    int max = 0;
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+
+        if (max < ((struct Vector *)(vector.data) + i)->currentNumberOfElements)
+            max = ((struct Vector *)(vector.data) + i)->currentNumberOfElements;
+    }
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+        if (max != ((struct Vector *)(vector.data) + i)->currentNumberOfElements)
+            continue;
+        fprintf(fptr, "[ ");
+        for (int j = 0; j < ((struct Vector *)(vector.data) + i)->currentNumberOfElements; j++)
+        {
+            fprintf(fptr, "%d ", *(((int *)((struct Vector *)(vector.data) + i)->data) + j));
+        }
+
+        fprintf(fptr, "]\n");
+    }
+
+    return 1;
+}
 struct Node *newNode(int vertex, int weight)
 {
     struct Node *node = malloc(sizeof(struct Node));
@@ -822,6 +870,10 @@ int main(int argc, char *argv[])
     if (0 == graphs.currentNumberOfElements)
         return -1;
 
+    FILE *outputFile;
+
+    outputFile = fopen("output.txt", "w");
+
     // Print graphs
     printGraphs(graphs.data, noOfGraphs);
     printf("-------------------------------------------------\n");
@@ -857,6 +909,8 @@ int main(int argc, char *argv[])
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
         bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
         printVector_Vector(bronResult);
+        fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
+        saveToFileVector_Vector(bronResult, outputFile);
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
@@ -894,6 +948,8 @@ int main(int argc, char *argv[])
             createVector_Vector(&bronResult, 1);
             bronKerbosch(R, P, X, GH, &bronResult);
             printVector_Vector_Max(bronResult);
+            fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
+            saveToFileVector_Vector_Max(bronResult, outputFile);
         }
     }
 #ifdef dbg
