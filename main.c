@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define dbg
 
 struct Node
 {
@@ -241,60 +240,58 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
         printGraph(graphs[i]);
     }
 }
-struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
+void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVector)
 {
 
     size_t lineLength = 0;
     char *line = NULL;
     int bytesRead = 0;
     int noOfVertices = 0;
+    int noOfGraphsInFile = 0;
 
     // Read number of graphs in a file
     bytesRead = getline(&line, &lineLength, filePtr);
 
     if (0 < bytesRead)
     {
-        *noOfGraphs = strtol(line, NULL, 10);
+        noOfGraphsInFile = strtol(line, NULL, 10);
 
 #ifdef dbg
         printf("file: %s\n", line);
-        printf("Graphs: %d\n", *noOfGraphs);
+        printf("Graphs: %d\n", noOfGraphsInFile);
 #endif // dbg
     }
 
-    struct Graph *graphs = malloc(*noOfGraphs * sizeof(Graph));
-    if (NULL == graphs)
+    // struct Graph *graphs = malloc(noOfGraphsInFile * sizeof(Graph));
+
+    for (int i = 0; i < noOfGraphsInFile; i++)
     {
-        printf("Error: Couldn't allocate memory for graphs\n");
-        return NULL;
-    }
-    for (int i = 0; i < *noOfGraphs; i++)
-    {
+
         bytesRead = getline(&line, &lineLength, filePtr);
 
         if (0 >= bytesRead)
             continue;
-
+        struct Graph newGraph;
         noOfVertices = strtol(line, NULL, 10);
-        graphs[i].noOfVertices = noOfVertices;
+        newGraph.noOfVertices = noOfVertices;
 #ifdef dbg
         printf("file: %s\n", line);
-        printf("Vertices in graph %d: %d \n", i, graphs[i].noOfVertices);
+        printf("Vertices in graph %d: %d \n", i, newGraph.noOfVertices);
 #endif // dbg
 
-        graphs[i].adjacencyLists = malloc(noOfVertices * sizeof(struct Node *));
-        if (NULL == graphs[i].adjacencyLists)
+        newGraph.adjacencyLists = malloc(noOfVertices * sizeof(struct Node *));
+        if (NULL == newGraph.adjacencyLists)
         {
             printf("Error: Couldn't allocate memory for new adjacency lists\n");
-            return NULL;
+            return;
         }
 
 #ifdef dbg
-        printf("New adj list[0]: %d\n", graphs[i].adjacencyLists[0]);
+        printf("New adj list[0]: %d\n", newGraph.adjacencyLists[0]);
 #endif // dbg
         for (int j = 0; j < noOfVertices; j++)
         {
-            graphs[i].adjacencyLists[j] = NULL;
+            newGraph.adjacencyLists[j] = NULL;
             bytesRead = getline(&line, &lineLength, filePtr);
             if (0 < bytesRead)
             {
@@ -311,15 +308,15 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
                         if (NULL == node)
                         {
                             printf("Error: Couldn't add a new node\n");
-                            return NULL;
+                            return;
                         }
-                        node->nextNode = graphs[i].adjacencyLists[j];
-                        graphs[i].adjacencyLists[j] = node;
+                        node->nextNode = newGraph.adjacencyLists[j];
+                        newGraph.adjacencyLists[j] = node;
                     }
 
 #ifdef dbg
                     printf("file: %s\n", ptr);
-                    printf("new vertex in adj list: %d\n", graphs[i].adjacencyLists[j * graphs[i].noOfVertices + k]);
+                    printf("new vertex in adj list: %d\n", newGraph.adjacencyLists[j * newGraph.noOfVertices + k]);
 #endif // dbg
                     ptr = strtok(NULL, " ");
                     k++;
@@ -330,34 +327,36 @@ struct Graph *readGraphsFromFile(FILE *filePtr, int *noOfGraphs)
         bytesRead = getline(&line, &lineLength, filePtr);
         if (0 < bytesRead)
         {
-            graphs[i].description = malloc(sizeof(char) * (bytesRead + 1));
-            if (NULL == graphs[i].description)
+            newGraph.description = malloc(sizeof(char) * (bytesRead + 1));
+            if (NULL == newGraph.description)
             {
                 printf("Error: Couldn't allocate memory for graph description\n");
-                return NULL;
+                return;
             }
 
-            strncpy(graphs[i].description, line, bytesRead);
-            graphs[i].description[bytesRead] = '\0';
-            if (graphs[i].description[bytesRead - 1] == '\n')
-                graphs[i].description[bytesRead - 1] = '\0';
+            strncpy(newGraph.description, line, bytesRead);
+            newGraph.description[bytesRead] = '\0';
+            if (newGraph.description[bytesRead - 1] == '\n')
+                newGraph.description[bytesRead - 1] = '\0';
 
 #ifdef dbg
-            printf("Additional graph information: %s\n", graphs[i].description);
+            printf("Additional graph information: %s\n", newGraph.description);
 #endif // dbg
         }
         else
         {
-            graphs[i].description = malloc(sizeof(char));
-            if (NULL == graphs[i].description)
+            newGraph.description = malloc(sizeof(char));
+            if (NULL == newGraph.description)
             {
                 printf("Error: Couldn't allocate memory for graph description\n");
-                return NULL;
+                return;
             }
-            graphs[i].description[0] = '\0';
+            newGraph.description[0] = '\0';
         }
+
+        pushBackVector_Graph(graphsVector, newGraph);
     }
-    return graphs;
+    *noOfGraphs = *noOfGraphs + noOfGraphsInFile;
 }
 
 int isVertexInsideList(struct Node *iterator, int desiredVertex)
@@ -728,16 +727,17 @@ int main(int argc, char *argv[])
     }
 
     // Read graphs from file
-    struct Graph *graphs = NULL;
+    struct Vector graphs;
+    createVector_Graph(&graphs, argc - 1);
     int noOfGraphs = 0;
 
-    graphs = readGraphsFromFile(filePtr, &noOfGraphs);
+    readGraphsFromFile(filePtr, &noOfGraphs, &graphs);
 
-    if (NULL == graphs)
+    if (0 == graphs.currentNumberOfElements)
         return -1;
 
     // Print graphs
-    printGraphs(graphs, noOfGraphs);
+    printGraphs(graphs.data, noOfGraphs);
     printf("-------------------------------------------------\n");
     for (int i = 0; i < noOfGraphs; i++)
     {
@@ -746,11 +746,11 @@ int main(int argc, char *argv[])
         struct Vector R;
         createVector_Int(&R, 1);
         struct Vector P;
-        createVector_Int(&P, graphs[i].noOfVertices);
+        createVector_Int(&P, ((struct Graph*)(graphs.data)+i)->noOfVertices);
 #ifdef dbg
-        printf("graph size: %d\n", graphs[i].noOfVertices);
+        printf("graph size: %d\n", ((struct Graph*)(graphs.data)+i)->noOfVertices);
 #endif
-        for (int j = 0; j < graphs[i].noOfVertices; j++)
+        for (int j = 0; j < ((struct Graph*)(graphs.data)+i)->noOfVertices; j++)
         {
             pushBackVector_Int(&P, j);
 #ifdef dbg
@@ -760,7 +760,7 @@ int main(int argc, char *argv[])
 
         struct Vector X;
         createVector_Int(&X, 1);
-        struct Graph undirectedGraph = toUndirectedGraph(graphs[i]);
+        struct Graph undirectedGraph = toUndirectedGraph(*((struct Graph*)(graphs.data)+i));
         bronKerbosch(R, P, X, &undirectedGraph);
     }
     printf("-------------------------------------------------\n");
@@ -771,10 +771,10 @@ int main(int argc, char *argv[])
     if (1 < noOfGraphs)
     {
 
-        GH = graphs;
+        GH = graphs.data;
         for (int i = 1; i < noOfGraphs; i++)
         {
-            GH = modularProduct(GH, graphs + i);
+            GH = modularProduct(GH, ((struct Graph*)(graphs.data)+i));
         }
 
         if (NULL != GH)
@@ -800,7 +800,7 @@ int main(int argc, char *argv[])
         }
     }
 #ifdef dbg
-    dbgTests(graphs[0]);
+    dbgTests(*((struct Graph*)(graphs.data)));
 #endif // dbg
 
     // TODO: Free memory from product graph
@@ -808,20 +808,20 @@ int main(int argc, char *argv[])
     for (int i = 0; i < noOfGraphs; i++)
     {
         struct Node *temporaryNode = NULL;
-        for (int j = 0; j < graphs[i].noOfVertices; j++)
+        for (int j = 0; j < ((struct Graph*)(graphs.data)+i)->noOfVertices; j++)
         {
 
-            while (NULL != graphs[i].adjacencyLists[j])
+            while (NULL != ((struct Graph*)(graphs.data)+i)->adjacencyLists[j])
             {
-                temporaryNode = graphs[i].adjacencyLists[j];
-                graphs[i].adjacencyLists[j] = graphs[i].adjacencyLists[j]->nextNode;
+                temporaryNode = ((struct Graph*)(graphs.data)+i)->adjacencyLists[j];
+                ((struct Graph*)(graphs.data)+i)->adjacencyLists[j] = ((struct Graph*)(graphs.data)+i)->adjacencyLists[j]->nextNode;
                 free(temporaryNode);
             }
         }
-        free(graphs[i].adjacencyLists);
-        free(graphs[i].description);
+        free(((struct Graph*)(graphs.data)+i)->adjacencyLists);
+        free(((struct Graph*)(graphs.data)+i)->description);
     }
 
-    free(graphs);
+    free(((struct Graph*)(graphs.data)));
     return 0;
 }
