@@ -790,8 +790,8 @@ int main(int argc, char *argv[])
         1. DONE: Read all input graphs from a single file.
         2. DONE: Iterate over them and for each print maximal cliques.
         3. DONE: Multiply all of them and find maximal clique - that will be a maximal common subgraph.
-        4. TODO: Instead of printing all the results in BronKerbosch, store them in a pointer and then process it.
-        5. TODO: Handle multiple input files.
+        4. DONE: Instead of printing all the results in BronKerbosch, store them in a pointer and then process it.
+        5. DONE: Handle multiple input files.
             1. Iterate over argc - 1.
             2. Modify file loading function to append a vector with graphs.
     */
