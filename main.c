@@ -438,7 +438,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     return GH;
 };
 
-struct Graph toUndirectedGraph(struct Graph G)
+void toUndirectedGraph(struct Graph G)
 {
 
     /*
@@ -460,7 +460,7 @@ struct Graph toUndirectedGraph(struct Graph G)
 #ifdef dbg
             printf("List: %d, vertex: %d\n", i, iterator->vertex);
 #endif
-            if (NULL == G.adjacencyLists[iterator->vertex] || !isVertexInsideList(G.adjacencyLists[iterator->vertex], i))
+            if (i == iterator->vertex || NULL == G.adjacencyLists[iterator->vertex] || !isVertexInsideList(G.adjacencyLists[iterator->vertex], i))
             {
 #ifdef dbg
                 printf("Removing vertex %d from list %d\n", iterator->vertex, i);
@@ -470,7 +470,6 @@ struct Graph toUndirectedGraph(struct Graph G)
             iterator = iterator->nextNode;
         }
     }
-    return G;
 }
 
 void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph)
@@ -613,8 +612,8 @@ void dbgTests(struct Graph directedGraph)
     // ----------------------------
 
     // To undirected graph
-    struct Graph undirectedGraph = toUndirectedGraph(directedGraph);
-    printGraph(undirectedGraph);
+    toUndirectedGraph(directedGraph);
+    printGraph(directedGraph);
 
     // ----------------------------
 
@@ -701,8 +700,13 @@ int main(int argc, char *argv[])
 
         struct Vector X;
         createVector(&X, 1);
-        struct Graph undirectedGraph = toUndirectedGraph(graphs[i]);
-        bronKerbosch(R, P, X, &undirectedGraph);
+
+        /*
+            (I removed the copying of the graph since it doesn't really do anything here. If we would need to somehow retireve the data of the originally removed single edges or edges to self then we need implement a deep copy of a graph in toUndirectedGraph)
+            1. toUndirectedGraph actually modifies the graph, because even though it copies the graph it also copies the memory address for the adjacency list, so it just modifies the adjacency list of the original graph.
+        */
+        toUndirectedGraph(graphs[i]);
+        bronKerbosch(R, P, X, &graphs[i]);
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
