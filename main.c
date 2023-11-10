@@ -482,7 +482,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     return GH;
 };
 
-struct Graph toUndirectedGraph(struct Graph G)
+void toUndirectedGraph(struct Graph G)
 {
 
     /*
@@ -504,7 +504,7 @@ struct Graph toUndirectedGraph(struct Graph G)
 #ifdef dbg
             printf("List: %d, vertex: %d\n", i, iterator->vertex);
 #endif
-            if (NULL == G.adjacencyLists[iterator->vertex] || !isVertexInsideList(G.adjacencyLists[iterator->vertex], i))
+            if (i == iterator->vertex || NULL == G.adjacencyLists[iterator->vertex] || !isVertexInsideList(G.adjacencyLists[iterator->vertex], i))
             {
 #ifdef dbg
                 printf("Removing vertex %d from list %d\n", iterator->vertex, i);
@@ -514,7 +514,6 @@ struct Graph toUndirectedGraph(struct Graph G)
             iterator = iterator->nextNode;
         }
     }
-    return G;
 }
 
 void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph)
@@ -658,8 +657,8 @@ void dbgTests(struct Graph directedGraph)
     // ----------------------------
 
     // To undirected graph
-    struct Graph undirectedGraph = toUndirectedGraph(directedGraph);
-    printGraph(undirectedGraph);
+    toUndirectedGraph(directedGraph);
+    printGraph(directedGraph);
 
     // ----------------------------
 
@@ -691,10 +690,10 @@ void dbgTests(struct Graph directedGraph)
 
     struct Vector graphVector;
     createVector_Graph(&graphVector, 1);
-    pushBackVector_Graph(&graphVector, undirectedGraph);
+    pushBackVector_Graph(&graphVector, directedGraph);
     printf("Printing Graph Vector [0]\n");
     printGraph(*(struct Graph *)graphVector.data);
-    pushBackVector_Graph(&graphVector, undirectedGraph);
+    pushBackVector_Graph(&graphVector, directedGraph);
     printf("Printing Graph Vector [1]\n");
     printGraph(*((struct Graph *)graphVector.data + 1));
 }
@@ -720,15 +719,15 @@ int main(int argc, char *argv[])
 
     // Read graphs from file
     struct Vector graphs;
-    createVector_Graph(&graphs,  1);
+    createVector_Graph(&graphs, 1);
     int noOfGraphs = 0;
     for (int i = 0; i < argc - 1; i++)
     {
-        FILE *filePtr = fopen(argv[i+1], "rb");
+        FILE *filePtr = fopen(argv[i + 1], "rb");
 
         if (NULL == filePtr)
         {
-            printf("Error: could not open file %s", argv[i+1]);
+            printf("Error: could not open file %s", argv[i + 1]);
             return 1;
         }
         readGraphsFromFile(filePtr, &noOfGraphs, &graphs);
@@ -761,8 +760,13 @@ int main(int argc, char *argv[])
 
         struct Vector X;
         createVector_Int(&X, 1);
-        struct Graph undirectedGraph = toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
-        bronKerbosch(R, P, X, &undirectedGraph);
+
+        /*
+            (I removed the copying of the graph since it doesn't really do anything here. If we would need to somehow retireve the data of the originally removed single edges or edges to self then we need implement a deep copy of a graph in toUndirectedGraph)
+            1. toUndirectedGraph actually modifies the graph, because even though it copies the graph it also copies the memory address for the adjacency list, so it just modifies the adjacency list of the original graph.
+        */
+        toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
+        bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i));
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
