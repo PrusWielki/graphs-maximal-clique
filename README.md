@@ -1,6 +1,6 @@
 # HOW TO COMPTILE AND RUN FOR ALL THE FILES IN INPUT 
-  ./all.sh 
-  might need before chmod +x all.sh
+  `./all.sh `
+  you might need before `chmod +x all.sh`
 # How to compile
 
 `gcc main.c -o program`
