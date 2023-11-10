@@ -211,6 +211,32 @@ void printVector_Vector(struct Vector vector)
         printf("]\n");
     }
 }
+void printVector_Vector_Max(struct Vector vector)
+{
+    if (NULL == vector.data)
+        return;
+
+    int max = 0;
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+
+        if (max < ((struct Vector *)(vector.data) + i)->currentNumberOfElements)
+            max = ((struct Vector *)(vector.data) + i)->currentNumberOfElements;
+    }
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+        if (max != ((struct Vector *)(vector.data) + i)->currentNumberOfElements)
+            continue;
+        printf("[ ");
+
+        for (int j = 0; j < ((struct Vector *)(vector.data) + i)->currentNumberOfElements; j++)
+        {
+            printf("%d ", *(((int *)((struct Vector *)(vector.data) + i)->data) + j));
+        }
+
+        printf("]\n");
+    }
+}
 struct Node *newNode(int vertex, int weight)
 {
     struct Node *node = malloc(sizeof(struct Node));
@@ -863,11 +889,11 @@ int main(int argc, char *argv[])
             createVector_Int(&X, 1);
 
             printf("-------------------------------------------------\n");
-            printf("Maximal common subgraph candidates of all input graphs:\n");
+            printf("Maximal common subgraphs of all input graphs:\n");
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
             bronKerbosch(R, P, X, GH, &bronResult);
-            printVector_Vector(bronResult);
+            printVector_Vector_Max(bronResult);
         }
     }
 #ifdef dbg
