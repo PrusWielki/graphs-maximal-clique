@@ -53,6 +53,21 @@ int createVector_Graph(struct Vector *newVector, int size)
     return 1;
 }
 
+int createVector_Vector(struct Vector *newVector, int size)
+{
+    /*
+        Accepts a pointer to already allocated memory for struct Vector
+    */
+    if (NULL == newVector)
+        return -1;
+    newVector->data = malloc(size * sizeof(struct Vector));
+    if (NULL == newVector->data)
+        return -1;
+    newVector->currentNumberOfElements = 0;
+    newVector->size = size;
+    return 1;
+}
+
 int pushBackVector_Int(struct Vector *vector, int value)
 {
     if (NULL == vector || NULL == vector->data)
@@ -75,6 +90,33 @@ int pushBackVector_Int(struct Vector *vector, int value)
     if (NULL != vector->data)
     {
         *((int *)vector->data + vector->currentNumberOfElements) = value;
+        vector->currentNumberOfElements = vector->currentNumberOfElements + 1;
+    }
+    return 1;
+}
+
+int pushBackVector_Vector(struct Vector *vector, struct Vector value)
+{
+    if (NULL == vector || NULL == vector->data)
+        return -1;
+    if (vector->currentNumberOfElements == vector->size)
+    {
+        struct Vector *newArray = malloc(sizeof(struct Vector) * 2 * vector->size);
+        if (NULL == newArray)
+            return -1;
+
+        for (int i = 0; i < vector->currentNumberOfElements; i++)
+        {
+            newArray[i] = *((struct Vector *)vector->data + i);
+        }
+
+        free(vector->data);
+        vector->data = newArray;
+        vector->size = 2 * vector->size;
+    }
+    if (NULL != vector->data)
+    {
+        *((struct Vector *)vector->data + vector->currentNumberOfElements) = value;
         vector->currentNumberOfElements = vector->currentNumberOfElements + 1;
     }
     return 1;
@@ -151,6 +193,23 @@ void printVector_Int(struct Vector vector)
         printf("%d ", *((int *)vector.data + i));
     }
     printf("]\n");
+}
+
+void printVector_Vector(struct Vector vector)
+{
+    if (NULL == vector.data)
+        return;
+
+    for (int i = 0; i < vector.currentNumberOfElements; i++)
+    {
+        printf("[ ");
+        for (int j = 0; j < ((struct Vector *)(vector.data) + i)->currentNumberOfElements; j++)
+        {
+            printf("%d ", *(((int *)((struct Vector *)(vector.data) + i)->data) + j));
+        }
+
+        printf("]\n");
+    }
 }
 struct Node *newNode(int vertex, int weight)
 {
@@ -516,7 +575,7 @@ void toUndirectedGraph(struct Graph G)
     }
 }
 
-void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph)
+void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 {
     /*
         1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
@@ -533,8 +592,9 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
 #endif
     if (0 == P.currentNumberOfElements && 0 == X.currentNumberOfElements)
     {
-        printf("Maximal Clique: ");
-        printVector_Int(R);
+        // printf("Maximal Clique: ");
+        // printVector_Int(R);
+        pushBackVector_Vector(bronResult, R);
         return;
     }
     struct Node *iterator = NULL;
@@ -611,7 +671,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         printf("\n");
 #endif
         // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-        bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph);
+        bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph, bronResult);
 
         // X := X ⋃ {v}
         pushBackVector_Int(&X, *((int *)toIterateOver.data + i));
@@ -761,12 +821,16 @@ int main(int argc, char *argv[])
         struct Vector X;
         createVector_Int(&X, 1);
 
+        struct Vector bronResult;
+        createVector_Vector(&bronResult, 1);
+
         /*
             (I removed the copying of the graph since it doesn't really do anything here. If we would need to somehow retireve the data of the originally removed single edges or edges to self then we need implement a deep copy of a graph in toUndirectedGraph)
             1. toUndirectedGraph actually modifies the graph, because even though it copies the graph it also copies the memory address for the adjacency list, so it just modifies the adjacency list of the original graph.
         */
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
-        bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i));
+        bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
+        printVector_Vector(bronResult);
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
@@ -800,8 +864,10 @@ int main(int argc, char *argv[])
 
             printf("-------------------------------------------------\n");
             printf("Maximal common subgraph candidates of all input graphs:\n");
-
-            bronKerbosch(R, P, X, GH);
+            struct Vector bronResult;
+            createVector_Vector(&bronResult, 1);
+            bronKerbosch(R, P, X, GH, &bronResult);
+            printVector_Vector(bronResult);
         }
     }
 #ifdef dbg
