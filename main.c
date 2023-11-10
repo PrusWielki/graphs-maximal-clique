@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 struct Node
 {
     int vertex;
@@ -702,7 +703,14 @@ int main(int argc, char *argv[])
         struct Vector X;
         createVector(&X, 1);
         struct Graph undirectedGraph = toUndirectedGraph(graphs[i]);
+
+        clock_t start = clock();
         bronKerbosch(R, P, X, &undirectedGraph);
+        clock_t end = clock();
+
+        double timeItTook = (double)(end - start) / CLOCKS_PER_SEC;
+        printf("bronKerbosch took %f \n", timeItTook);
+
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
@@ -715,7 +723,12 @@ int main(int argc, char *argv[])
         GH = graphs;
         for (int i = 1; i < noOfGraphs; i++)
         {
+            clock_t start = clock();
             GH = modularProduct(GH, graphs + i);
+            clock_t end = clock();
+
+            double timeItTook = (double)(end - start) / CLOCKS_PER_SEC;
+            printf("modularProduct took %f \n", timeItTook);
         }
 
         if (NULL != GH)
@@ -737,7 +750,14 @@ int main(int argc, char *argv[])
             printf("-------------------------------------------------\n");
             printf("Maximal common subgraph candidates of all input graphs:\n");
 
+           
+
+            clock_t start = clock();
             bronKerbosch(R, P, X, GH);
+            clock_t end = clock();
+
+            double timeItTook = (double)(end - start) / CLOCKS_PER_SEC;
+            printf("bronKerbosch took %f \n", timeItTook);
         }
     }
 #ifdef dbg
