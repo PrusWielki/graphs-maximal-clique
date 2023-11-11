@@ -544,7 +544,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         return NULL;
     }
 
-    struct Graph *GH = malloc(sizeof(struct Graph ));
+    struct Graph *GH = malloc(sizeof(struct Graph));
 
     if (NULL == GH)
     {
@@ -779,7 +779,11 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         printVector_Int(P);
         printf("\n");
 #endif
+        free(pAndVEdges.data);
+        free(rPlusV.data);
+        free(xAndVEdges.data);
     }
+free(toIterateOver.data);
     return;
 }
 
@@ -973,13 +977,24 @@ int main(int argc, char *argv[])
             printVector_Vector_Max(bronResult);
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
+
+            free((int*)R.data);
+            free((int*)X.data);
+            free((int*)P.data);
+
+            for(int i=0;i<bronResult.currentNumberOfElements;i++){
+                free(((struct Vector*)bronResult.data+i)->data);
+            }
+            free(bronResult.data);
         }
     }
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
 
-    // TODO: Free memory from product graph
+
+    
+    
     freeGraph(GH);
 
     for (int i = 0; i < noOfGraphs; i++)
