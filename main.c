@@ -544,7 +544,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
         return NULL;
     }
 
-    struct Graph *GH = malloc(sizeof(struct Graph *));
+    struct Graph *GH = malloc(sizeof(struct Graph ));
 
     if (NULL == GH)
     {
@@ -979,6 +979,7 @@ int main(int argc, char *argv[])
 #endif // dbg
 
     // TODO: Free memory from product graph
+    freeGraph(GH);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
