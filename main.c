@@ -668,7 +668,7 @@ void toUndirectedGraph(struct Graph G)
     }
 }
 
-void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
+int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 {
     /*
         1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
@@ -688,7 +688,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         // printf("Maximal Clique: ");
         // printVector_Int(R);
         pushBackVector_Vector(bronResult, R);
-        return;
+        return 1;
     }
     struct Node *iterator = NULL;
     int pivot = -1;
@@ -764,7 +764,7 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         printf("\n");
 #endif
         // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-        bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph, bronResult);
+        int result = bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph, bronResult);
 
         // X := X ⋃ {v}
         pushBackVector_Int(&X, *((int *)toIterateOver.data + i));
@@ -780,11 +780,12 @@ void bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Grap
         printf("\n");
 #endif
         free(pAndVEdges.data);
-        // free(rPlusV.data);
+        if (!result)
+            free(rPlusV.data);
         free(xAndVEdges.data);
     }
     free(toIterateOver.data);
-    return;
+    return 0;
 }
 
 void dbgTests(struct Graph directedGraph)
@@ -935,6 +936,9 @@ int main(int argc, char *argv[])
         printVector_Vector(bronResult);
         fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
         saveToFileVector_Vector(bronResult, outputFile);
+        free(R.data);
+        free(P.data);
+        free(X.data);
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
