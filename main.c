@@ -374,6 +374,8 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
 }
 void freeGraph(struct Graph *graph)
 {
+    if (NULL == graph)
+        return;
 
     struct Node *temporaryNode = NULL;
     for (int j = 0; j < graph->noOfVertices; j++)
@@ -933,6 +935,7 @@ int main(int argc, char *argv[])
     // Modular Graph Product
 
     struct Graph *GH = NULL;
+    struct Graph *GH_prev = NULL;
 
     if (1 < noOfGraphs)
     {
@@ -941,6 +944,8 @@ int main(int argc, char *argv[])
         for (int i = 1; i < noOfGraphs; i++)
         {
             GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
+            freeGraph(GH_prev);
+            GH_prev = GH;
         }
 
         if (NULL != GH)
@@ -978,7 +983,6 @@ int main(int argc, char *argv[])
     for (int i = 0; i < noOfGraphs; i++)
     {
         freeGraph(((struct Graph *)(graphs.data) + i));
-        
     }
 
     free(((struct Graph *)(graphs.data)));
