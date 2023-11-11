@@ -372,6 +372,23 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
         printGraph(graphs[i]);
     }
 }
+void freeGraph(struct Graph *graph)
+{
+
+    struct Node *temporaryNode = NULL;
+    for (int j = 0; j < graph->noOfVertices; j++)
+    {
+
+        while (NULL != graph->adjacencyLists[j])
+        {
+            temporaryNode = graph->adjacencyLists[j];
+            graph->adjacencyLists[j] = graph->adjacencyLists[j]->nextNode;
+            free(temporaryNode);
+        }
+    }
+    free(graph->adjacencyLists);
+    free(graph->description);
+}
 void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVector)
 {
 
@@ -960,19 +977,8 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < noOfGraphs; i++)
     {
-        struct Node *temporaryNode = NULL;
-        for (int j = 0; j < ((struct Graph *)(graphs.data) + i)->noOfVertices; j++)
-        {
-
-            while (NULL != ((struct Graph *)(graphs.data) + i)->adjacencyLists[j])
-            {
-                temporaryNode = ((struct Graph *)(graphs.data) + i)->adjacencyLists[j];
-                ((struct Graph *)(graphs.data) + i)->adjacencyLists[j] = ((struct Graph *)(graphs.data) + i)->adjacencyLists[j]->nextNode;
-                free(temporaryNode);
-            }
-        }
-        free(((struct Graph *)(graphs.data) + i)->adjacencyLists);
-        free(((struct Graph *)(graphs.data) + i)->description);
+        freeGraph(((struct Graph *)(graphs.data) + i));
+        
     }
 
     free(((struct Graph *)(graphs.data)));
