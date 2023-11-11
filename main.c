@@ -884,6 +884,7 @@ int main(int argc, char *argv[])
             return 1;
         }
         readGraphsFromFile(filePtr, &noOfGraphs, &graphs);
+        fclose(filePtr);
     }
 
     if (0 == graphs.currentNumberOfElements)
@@ -987,5 +988,6 @@ int main(int argc, char *argv[])
     }
 
     free(((struct Graph *)(graphs.data)));
+    fclose(outputFile);
     return 0;
 }
