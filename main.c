@@ -508,6 +508,7 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
         pushBackVector_Graph(graphsVector, newGraph);
     }
     *noOfGraphs = *noOfGraphs + noOfGraphsInFile;
+    free(line);
 }
 
 int isVertexInsideList(struct Node *iterator, int desiredVertex)
@@ -998,6 +999,7 @@ int main(int argc, char *argv[])
 #endif // dbg
 
     freeGraph(GH);
+    free(GH);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
