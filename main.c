@@ -782,7 +782,7 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
 #endif
         // free(pAndVEdges.data);
         // if (!result)
-            // free(rPlusV.data);
+        // free(rPlusV.data);
         // free(xAndVEdges.data);
     }
     // free(toIterateOver.data);
@@ -998,15 +998,15 @@ int main(int argc, char *argv[])
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
 
-     freeGraph(GH);
-     free(GH);
+    freeGraph(GH);
+    free(GH);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
-        // freeGraph(((struct Graph *)(graphs.data) + i));
+        freeGraph(((struct Graph *)(graphs.data) + i));
     }
 
-    // free(((struct Graph *)(graphs.data)));
+    free(((struct Graph *)(graphs.data)));
     fclose(outputFile);
     return 0;
 }
