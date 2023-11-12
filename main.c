@@ -954,7 +954,7 @@ int main(int argc, char *argv[])
         for (int i = 1; i < noOfGraphs; i++)
         {
             GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
-            // freeGraph(GH_prev);
+            freeGraph(GH_prev);
             GH_prev = GH;
         }
 
