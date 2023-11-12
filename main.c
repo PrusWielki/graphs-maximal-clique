@@ -320,13 +320,13 @@ void removeNode(struct Node **head, int vertexToRemove)
         if (0 == index && vertexToRemove == previous->vertex)
         {
             *head = previous->nextNode;
-            free(previous);
+            // free(previous);
             break;
         }
         if (vertexToRemove == current->vertex)
         {
             previous->nextNode = current->nextNode;
-            free(current);
+            // free(current);
             break;
         }
 
@@ -385,11 +385,11 @@ void freeGraph(struct Graph *graph)
         {
             temporaryNode = graph->adjacencyLists[j];
             graph->adjacencyLists[j] = graph->adjacencyLists[j]->nextNode;
-            free(temporaryNode);
+            // free(temporaryNode);
         }
     }
-    free(graph->adjacencyLists);
-    free(graph->description);
+    // free(graph->adjacencyLists);
+    // free(graph->description);
 }
 void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVector)
 {
@@ -508,7 +508,7 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
         pushBackVector_Graph(graphsVector, newGraph);
     }
     *noOfGraphs = *noOfGraphs + noOfGraphsInFile;
-    free(line);
+    // free(line);
 }
 
 int isVertexInsideList(struct Node *iterator, int desiredVertex)
@@ -780,12 +780,12 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         printVector_Int(P);
         printf("\n");
 #endif
-        free(pAndVEdges.data);
-        if (!result)
-            free(rPlusV.data);
-        free(xAndVEdges.data);
+        // free(pAndVEdges.data);
+        // if (!result)
+            // free(rPlusV.data);
+        // free(xAndVEdges.data);
     }
-    free(toIterateOver.data);
+    // free(toIterateOver.data);
     return 0;
 }
 
@@ -937,9 +937,9 @@ int main(int argc, char *argv[])
         printVector_Vector(bronResult);
         fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
         saveToFileVector_Vector(bronResult, outputFile);
-        free(R.data);
-        free(P.data);
-        free(X.data);
+        // free(R.data);
+        // free(P.data);
+        // free(X.data);
     }
     printf("-------------------------------------------------\n");
     // Modular Graph Product
@@ -954,7 +954,7 @@ int main(int argc, char *argv[])
         for (int i = 1; i < noOfGraphs; i++)
         {
             GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
-            freeGraph(GH_prev);
+            // freeGraph(GH_prev);
             GH_prev = GH;
         }
 
@@ -983,30 +983,30 @@ int main(int argc, char *argv[])
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
-            free((int *)R.data);
-            free((int *)X.data);
-            free((int *)P.data);
+            // free((int *)R.data);
+            // free((int *)X.data);
+            // free((int *)P.data);
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
-                free(((struct Vector *)bronResult.data + i)->data);
+                // free(((struct Vector *)bronResult.data + i)->data);
             }
-            free(bronResult.data);
+            // free(bronResult.data);
         }
     }
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
 
-    freeGraph(GH);
-    free(GH);
+    // freeGraph(GH);
+    // free(GH);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
-        freeGraph(((struct Graph *)(graphs.data) + i));
+        // freeGraph(((struct Graph *)(graphs.data) + i));
     }
 
-    free(((struct Graph *)(graphs.data)));
+    // free(((struct Graph *)(graphs.data)));
     fclose(outputFile);
     return 0;
 }
