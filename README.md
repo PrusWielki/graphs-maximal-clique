@@ -6,6 +6,14 @@
 
 ` ./main input/example.txt`
 
+# If You want to see debug information
+
+Add #define dbg to the start of the main.c
+
+# If You want to print the results of the program to the console.
+
+Add #define PRINTTOCMD to the beginning of the main.c
+
 # TODO
 
 - [x] Write data parsing from file in agreed format.
@@ -16,6 +24,7 @@
 - [x] Write a function to find maximal cliques of matrices (Bronn Kerbosch probably).
 - [x] Write a function to find maximum common induced subgraph.
 - [ ] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also
-- [ ] Run tests, measure the times.
+- [ ] Run tests.
+- [x] Add time measurments inside the program.
 - [ ] Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [x] Support for multiple input files.

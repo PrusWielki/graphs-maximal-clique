@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 
+// #define PRINTTOCMD
+// #define dbg
 struct Node
 {
     int vertex;
@@ -878,6 +880,8 @@ int main(int argc, char *argv[])
     clock_t time_begin;
     clock_t time_end;
 
+    clock_t time_all_begin=clock();
+
     // Initialization
     if (2 > argc)
     {
@@ -910,15 +914,20 @@ int main(int argc, char *argv[])
 
     outputFile = fopen("output.txt", "w");
 
-    // Print graphs
+// Print graphs
+#ifdef PRINTTOCMD
     printGraphs(graphs.data, noOfGraphs);
-
+#endif
     time_begin = clock();
+#ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
+#endif
     for (int i = 0; i < noOfGraphs; i++)
     {
+#ifdef PRINTTOCMD
         printf("-------------------------------------------------\n");
         printf("Maximal cliques for graph %d\n", i);
+#endif
         struct Vector R;
         createVector_Int(&R, 1);
         struct Vector P;
@@ -946,7 +955,9 @@ int main(int argc, char *argv[])
         */
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
         bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
+#ifdef PRINTTOCMD
         printVector_Vector(bronResult);
+#endif
         fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
         saveToFileVector_Vector(bronResult, outputFile);
 
@@ -965,7 +976,9 @@ int main(int argc, char *argv[])
     double maximal_cliques_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
     double modular_product_time = -1;
     double maximal_clique_modular_product_time = -1;
+#ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
+#endif
     // Modular Graph Product
 
     struct Graph *GH = NULL;
@@ -987,9 +1000,11 @@ int main(int argc, char *argv[])
         modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
         if (NULL != GH)
         {
+#ifdef PRINTTOCMD
             printf("-------------------------------------------------\n");
             printf("Modular product graph of all input graphs:\n");
             printGraph(*GH);
+#endif
             struct Vector R;
             createVector_Int(&R, 1);
             struct Vector P;
@@ -1000,16 +1015,21 @@ int main(int argc, char *argv[])
             }
             struct Vector X;
             createVector_Int(&X, 1);
-            time_begin = clock();
+            
+#ifdef PRINTTOCMD
             printf("-------------------------------------------------\n");
             printf("Maximal common subgraphs of all input graphs:\n");
+#endif
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
+            time_begin = clock();
             bronKerbosch(R, P, X, GH, &bronResult);
             time_end = clock();
 
             maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+#ifdef PRINTTOCMD
             printVector_Vector_Max(bronResult);
+#endif
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
@@ -1027,14 +1047,20 @@ int main(int argc, char *argv[])
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
-    printf("Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
+    clock_t time_all_end=clock();
+
+    printf("Time of calculating maximal cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
     fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
 
     printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
     fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
 
-    printf("Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_clique_modular_product_time);
-    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    printf("Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    fprintf(outputFile, "Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+
+    printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
+    fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
+
 
     freeGraph(GH);
     free(GH);
