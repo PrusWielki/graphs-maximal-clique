@@ -937,8 +937,8 @@ int main(int argc, char *argv[])
         printVector_Vector(bronResult);
         fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
         saveToFileVector_Vector(bronResult, outputFile);
-        // free(R.data);
-        // free(P.data);
+        free(R.data);
+        free(P.data);
         // free(X.data);
     }
     printf("-------------------------------------------------\n");
@@ -983,9 +983,9 @@ int main(int argc, char *argv[])
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
-            // free((int *)R.data);
+            free(R.data);
             // free((int *)X.data);
-            // free((int *)P.data);
+            free(P.data);
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
