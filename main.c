@@ -785,7 +785,7 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         // free(rPlusV.data);
         // free(xAndVEdges.data);
     }
-    // free(toIterateOver.data);
+    free(toIterateOver.data);
     return 0;
 }
 
