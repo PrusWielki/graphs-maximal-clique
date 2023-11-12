@@ -28,3 +28,4 @@ Add #define PRINTTOCMD to the beginning of the main.c
 - [x] Add time measurments inside the program.
 - [ ] Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [x] Support for multiple input files.
+- [ ] Fix GH leak, and improper node removal.
