@@ -880,7 +880,7 @@ int main(int argc, char *argv[])
     clock_t time_begin;
     clock_t time_end;
 
-    clock_t time_all_begin=clock();
+    clock_t time_all_begin = clock();
 
     // Initialization
     if (2 > argc)
@@ -1015,7 +1015,7 @@ int main(int argc, char *argv[])
             }
             struct Vector X;
             createVector_Int(&X, 1);
-            
+
 #ifdef PRINTTOCMD
             printf("-------------------------------------------------\n");
             printf("Maximal common subgraphs of all input graphs:\n");
@@ -1047,7 +1047,7 @@ int main(int argc, char *argv[])
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
-    clock_t time_all_end=clock();
+    clock_t time_all_end = clock();
 
     printf("Time of calculating maximal cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
     fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
@@ -1060,7 +1060,6 @@ int main(int argc, char *argv[])
 
     printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
     fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
-
 
     freeGraph(GH);
     free(GH);
