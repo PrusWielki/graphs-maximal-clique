@@ -8,11 +8,11 @@
 
 # If You want to see debug information
 
-Add #define dbg to the start of the main.c
+Add `#define dbg` to the start of the main.c
 
 # If You want to print the results of the program to the console.
 
-Add #define PRINTTOCMD to the beginning of the main.c
+Add `#define PRINTTOCMD` to the beginning of the main.c
 
 # TODO
 
