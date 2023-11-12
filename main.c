@@ -385,11 +385,11 @@ void freeGraph(struct Graph *graph)
         {
             temporaryNode = graph->adjacencyLists[j];
             graph->adjacencyLists[j] = graph->adjacencyLists[j]->nextNode;
-            // free(temporaryNode);
+            free(temporaryNode);
         }
     }
-    // free(graph->adjacencyLists);
-    // free(graph->description);
+    free(graph->adjacencyLists);
+    free(graph->description);
 }
 void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVector)
 {
