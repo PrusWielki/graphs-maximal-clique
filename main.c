@@ -998,8 +998,8 @@ int main(int argc, char *argv[])
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
 
-    // freeGraph(GH);
-    // free(GH);
+     freeGraph(GH);
+     free(GH);
 
     for (int i = 0; i < noOfGraphs; i++)
     {
