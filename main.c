@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct Node
 {
@@ -874,6 +875,8 @@ int main(int argc, char *argv[])
             1. Iterate over argc - 1.
             2. Modify file loading function to append a vector with graphs.
     */
+    clock_t time_begin;
+    clock_t time_end;
 
     // Initialization
     if (2 > argc)
@@ -883,6 +886,7 @@ int main(int argc, char *argv[])
     }
 
     // Read graphs from file
+
     struct Vector graphs;
     createVector_Graph(&graphs, 1);
     int noOfGraphs = 0;
@@ -908,6 +912,8 @@ int main(int argc, char *argv[])
 
     // Print graphs
     printGraphs(graphs.data, noOfGraphs);
+
+    time_begin = clock();
     printf("-------------------------------------------------\n");
     for (int i = 0; i < noOfGraphs; i++)
     {
@@ -953,6 +959,12 @@ int main(int argc, char *argv[])
         // free(P.data);
         // free(X.data);
     }
+
+    time_end = clock();
+
+    double maximal_cliques_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+    double modular_product_time = -1;
+    double maximal_clique_modular_product_time = -1;
     printf("-------------------------------------------------\n");
     // Modular Graph Product
 
@@ -961,7 +973,7 @@ int main(int argc, char *argv[])
 
     if (1 < noOfGraphs)
     {
-
+        time_begin = clock();
         GH = graphs.data;
         for (int i = 1; i < noOfGraphs; i++)
         {
@@ -970,6 +982,9 @@ int main(int argc, char *argv[])
             GH_prev = GH;
         }
 
+        time_end = clock();
+
+        modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
         if (NULL != GH)
         {
             printf("-------------------------------------------------\n");
@@ -985,12 +1000,15 @@ int main(int argc, char *argv[])
             }
             struct Vector X;
             createVector_Int(&X, 1);
-
+            time_begin = clock();
             printf("-------------------------------------------------\n");
             printf("Maximal common subgraphs of all input graphs:\n");
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
             bronKerbosch(R, P, X, GH, &bronResult);
+            time_end = clock();
+
+            maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
             printVector_Vector_Max(bronResult);
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
@@ -1009,6 +1027,14 @@ int main(int argc, char *argv[])
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
+    printf("Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
+    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
+
+    printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+    fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+
+    printf("Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_clique_modular_product_time);
 
     freeGraph(GH);
     free(GH);
