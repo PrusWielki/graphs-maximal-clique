@@ -989,9 +989,9 @@ int main(int argc, char *argv[])
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
-                // free(((struct Vector *)bronResult.data + i)->data);
+                 free(((struct Vector *)bronResult.data + i)->data);
             }
-            // free(bronResult.data);
+             free(bronResult.data);
         }
     }
 #ifdef dbg
