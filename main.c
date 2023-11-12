@@ -689,6 +689,9 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         // printf("Maximal Clique: ");
         // printVector_Int(R);
         pushBackVector_Vector(bronResult, R);
+        free(P.data);
+
+        free(X.data);
         return 1;
     }
     struct Node *iterator = NULL;
@@ -765,7 +768,7 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         printf("\n");
 #endif
         // BronKerbosch2(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-        int result = bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph, bronResult);
+        bronKerbosch(rPlusV, pAndVEdges, xAndVEdges, graph, bronResult);
 
         // X := X ⋃ {v}
         pushBackVector_Int(&X, *((int *)toIterateOver.data + i));
@@ -785,7 +788,10 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         // free(rPlusV.data);
         // free(xAndVEdges.data);
     }
-    // free(toIterateOver.data);
+    free(P.data);
+    free(R.data);
+    free(X.data);
+    free(toIterateOver.data);
     return 0;
 }
 
@@ -937,6 +943,12 @@ int main(int argc, char *argv[])
         printVector_Vector(bronResult);
         fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
         saveToFileVector_Vector(bronResult, outputFile);
+
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
+            free(((struct Vector *)bronResult.data + i)->data);
+        }
+        free(bronResult.data);
         // free(R.data);
         // free(P.data);
         // free(X.data);
@@ -983,15 +995,15 @@ int main(int argc, char *argv[])
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
-            // free((int *)R.data);
+            // free(R.data);
             // free((int *)X.data);
-            // free((int *)P.data);
+            // free(P.data);
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
-                // free(((struct Vector *)bronResult.data + i)->data);
+                free(((struct Vector *)bronResult.data + i)->data);
             }
-            // free(bronResult.data);
+            free(bronResult.data);
         }
     }
 #ifdef dbg
