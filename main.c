@@ -785,6 +785,9 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         // free(rPlusV.data);
         // free(xAndVEdges.data);
     }
+    free(P.data);
+    free(R.data);
+    free(X.data);
     free(toIterateOver.data);
     return 0;
 }
@@ -937,8 +940,8 @@ int main(int argc, char *argv[])
         printVector_Vector(bronResult);
         fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
         saveToFileVector_Vector(bronResult, outputFile);
-        free(R.data);
-        free(P.data);
+        // free(R.data);
+        // free(P.data);
         // free(X.data);
     }
     printf("-------------------------------------------------\n");
@@ -983,15 +986,15 @@ int main(int argc, char *argv[])
             fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
-            free(R.data);
+            // free(R.data);
             // free((int *)X.data);
-            free(P.data);
+            // free(P.data);
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
-                 free(((struct Vector *)bronResult.data + i)->data);
+                free(((struct Vector *)bronResult.data + i)->data);
             }
-             free(bronResult.data);
+            free(bronResult.data);
         }
     }
 #ifdef dbg
