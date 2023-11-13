@@ -890,6 +890,10 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
                 }
             }
 
+
+// copy R!!
+            struct 
+
             pushBackVector_Vector(&stack, R);
             pushBackVector_Vector(&stack, pNotV);
             pushBackVector_Vector(&stack, xAndV);
@@ -899,10 +903,13 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
 
             removeElementVector_Int(&currentP, *(int *)currentP.data);
         }
+        free(currentX.data);
+        free(currentP.data);
+        
 
     }
 
-    
+    free(R.data);
     return 0;
 }
 void dbgTests(struct Graph directedGraph)
