@@ -1008,7 +1008,7 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
             }
             struct Vector xAndV;
             createVector_Int(&xAndV, currentX.currentNumberOfElements + 1);
-            for (int j = 1; j < currentX.currentNumberOfElements; j++)
+            for (int j = 0; j < currentX.currentNumberOfElements; j++)
             {
                 pushBackVector_Int(&xAndV, *((int *)currentX.data + j));
             }
@@ -1046,10 +1046,10 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
 
             // copy R!!
             struct Vector newR;
-            createVector_Int(&newR, R.currentNumberOfElements);
-            for (int i = 0; i < R.currentNumberOfElements; i++)
+            createVector_Int(&newR, currentR.currentNumberOfElements);
+            for (int i = 0; i < currentR.currentNumberOfElements; i++)
             {
-                *((int *)newR.data + i) = *((int *)R.data + i);
+                pushBackVector_Int(&newR, *((int *)currentR.data + i));
             }
 
             pushBackVector_Vector(&stack, newR);
@@ -1059,8 +1059,6 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
             pushBackVector_Vector(&stack, pAndVEdges);
             pushBackVector_Vector(&stack, xAndVEdges);
 
-            removeElementVector_Int(&currentP, *(int *)toIterateOver.data);
-            removeElementVector_Int(&toIterateOver, *(int *)toIterateOver.data);
         }
         free(currentR.data);
         free(currentX.data);
