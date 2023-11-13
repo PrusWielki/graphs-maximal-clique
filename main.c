@@ -892,9 +892,13 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
 
 
 // copy R!!
-            struct 
+            struct Vector newR;
+            createVector_Int(&newR,R.currentNumberOfElements);
+            for(int i=0;i<R.currentNumberOfElements;i++){
+               *((int*) newR.data+i)=*((int*) R.data+i);
+            }
 
-            pushBackVector_Vector(&stack, R);
+            pushBackVector_Vector(&stack, newR);
             pushBackVector_Vector(&stack, pNotV);
             pushBackVector_Vector(&stack, xAndV);
             pushBackVector_Vector(&stack, rPlusV);
@@ -903,6 +907,7 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
 
             removeElementVector_Int(&currentP, *(int *)currentP.data);
         }
+        free(currentR.data);
         free(currentX.data);
         free(currentP.data);
         
