@@ -947,6 +947,7 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
             // printf("Maximal Clique: ");
             // printVector_Int(R);
             pushBackVector_Vector(bronResult, currentR);
+            continue;
         }
         struct Node *iterator = NULL;
         int pivot = -1;
