@@ -29,3 +29,4 @@ Add `#define PRINTTOCMD` to the beginning of the main.c
 - [ ] Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [x] Support for multiple input files.
 - [x] Fix GH leak, and improper node removal.
+- [ ] Switch Bron Kerbosch to iterative approach instead (recursion causes stack overflow for large graphs)
