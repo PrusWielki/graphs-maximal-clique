@@ -690,7 +690,7 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
         2. DONE: Write needed datastructures to hold vertices, I guess we could use a List to dynamically store a list of vertices, or we could implement a vector.
         3. DONE: Write the Bron-Kerbosch
         4. TODO: Test it.
-        5. TODO: Free memory, use valgrind :)
+        5. DONE: Free memory, use valgrind :)
     */
 #ifdef dbg
     printVector_Int(R);
@@ -811,19 +811,8 @@ int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph
 int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 {
     /*
-        1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
-        2. DONE: Write needed datastructures to hold vertices, I guess we could use a List to dynamically store a list of vertices, or we could implement a vector.
-        3. DONE: Write the Bron-Kerbosch
-        4. TODO: Test it.
-        5. TODO: Free memory, use valgrind :)
-    */
-#ifdef dbg
-    printVector_Int(R);
-    printVector_Int(P);
-    printVector_Int(X);
-    printf("\n");
-#endif
-
+    1. TODO: Test it.
+*/
     struct Vector stack;
     createVector_Vector(&stack, 3);
     pushBackVector_Vector(&stack, R);
@@ -941,18 +930,8 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
 int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 {
     /*
-    1. DONE: Write a function to transform a directed graph to undirected graph (just remove the single edges)
-    2. DONE: Write needed datastructures to hold vertices, I guess we could use a List to dynamically store a list of vertices, or we could implement a vector.
-    3. DONE: Write the Bron-Kerbosch
-    4. TODO: Test it.
-    5. TODO: Free memory, use valgrind :)
+    1. TODO: Test it.
 */
-#ifdef dbg
-    printVector_Int(R);
-    printVector_Int(P);
-    printVector_Int(X);
-    printf("\n");
-#endif
 
     struct Vector stack;
     createVector_Vector(&stack, 3);
