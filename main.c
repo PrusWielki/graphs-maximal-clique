@@ -1206,7 +1206,7 @@ int main(int argc, char *argv[])
             1. toUndirectedGraph actually modifies the graph, because even though it copies the graph it also copies the memory address for the adjacency list, so it just modifies the adjacency list of the original graph.
         */
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
-        iterBronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
+        bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
 #ifdef PRINTTOCMD
         printVector_Vector(bronResult);
 #endif
@@ -1276,7 +1276,7 @@ int main(int argc, char *argv[])
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
             time_begin = clock();
-            iterBronKerbosch(R, P, X, GH, &bronResult);
+            bronKerbosch(R, P, X, GH, &bronResult);
             time_end = clock();
 
             maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
