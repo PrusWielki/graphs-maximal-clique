@@ -17,16 +17,17 @@ Add `#define PRINTTOCMD` to the beginning of the main.c
 # TODO
 
 - [x] Write data parsing from file in agreed format.
-- [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
 - [x] Implement the representation of graphs in a form of adjacency list.
 - [x] Write a function to find a modular product of matrices.
-- [ ] Test the product function against some example online.
 - [x] Write a function to find maximal cliques of matrices (Bronn Kerbosch probably).
 - [x] Write a function to find maximum common induced subgraph.
-- [ ] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also
-- [ ] Run tests.
 - [x] Add time measurments inside the program.
-- [ ] Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [x] Support for multiple input files.
 - [x] Fix GH leak, and improper node removal.
-- [ ] Switch Bron Kerbosch to iterative approach instead (recursion causes stack overflow for large graphs)
+- [x] Switch Bron Kerbosch to iterative approach instead (recursion causes stack overflow for large graphs)
+- [ ] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also
+- [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
+- [ ] OPTIONAL: Add pivoting to iterative Bron Kerbosch
+- [ ] Run tests, time it to put something to docs.
+- [ ] OPTIONAL: Check and prepare for edge cases, such as empty graph description, vertex with no edges.
+- [ ] OPTIONAL: Test the product function against some example online.
