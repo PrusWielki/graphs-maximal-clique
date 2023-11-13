@@ -992,6 +992,7 @@ int main(int argc, char *argv[])
         {
             GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
             freeGraph(GH_prev);
+            free(GH_prev);
             GH_prev = GH;
         }
 
