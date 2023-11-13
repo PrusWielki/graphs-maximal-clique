@@ -836,6 +836,13 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
         struct Vector currentX = popVector_Vector(&stack);
         struct Vector currentP = popVector_Vector(&stack);
         struct Vector currentR = popVector_Vector(&stack);
+        /*
+        printVector_Int(currentR);
+        printVector_Int(currentP);
+        printVector_Int(currentX);
+        printf("\n");
+                 */
+
         if (0 == currentP.currentNumberOfElements && 0 == currentX.currentNumberOfElements)
         {
             // printf("Maximal Clique: ");
@@ -859,7 +866,7 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
                 }
                 struct Vector xAndV;
                 createVector_Int(&xAndV, currentX.currentNumberOfElements + 1);
-                for (int j = 1; j < currentX.currentNumberOfElements; j++)
+                for (int j = 0; j < currentX.currentNumberOfElements; j++)
                 {
                     pushBackVector_Int(&xAndV, *((int *)currentX.data + j));
                 }
@@ -897,18 +904,31 @@ int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct G
 
                 // copy R!!
                 struct Vector newR;
-                createVector_Int(&newR, R.currentNumberOfElements);
-                for (int i = 0; i < R.currentNumberOfElements; i++)
+                createVector_Int(&newR, currentR.currentNumberOfElements);
+                for (int i = 0; i < currentR.currentNumberOfElements; i++)
                 {
-                    *((int *)newR.data + i) = *((int *)R.data + i);
+                    pushBackVector_Int(&newR, *((int *)currentR.data + i));
                 }
 
                 pushBackVector_Vector(&stack, newR);
                 pushBackVector_Vector(&stack, pNotV);
                 pushBackVector_Vector(&stack, xAndV);
+                /*
+                printf("pushed:\n");
+                printVector_Int(newR);printVector_Int(pNotV);
+                printVector_Int(xAndV);
+                printf("\n");
+                        */
                 pushBackVector_Vector(&stack, rPlusV);
                 pushBackVector_Vector(&stack, pAndVEdges);
                 pushBackVector_Vector(&stack, xAndVEdges);
+                /*
+                printf("pushed:\n");
+                printVector_Int(rPlusV);
+                printVector_Int(pAndVEdges);
+                printVector_Int(xAndVEdges);
+                printf("\n");
+                             */
             }
             free(currentR.data);
             free(currentX.data);
@@ -1206,7 +1226,7 @@ int main(int argc, char *argv[])
             1. toUndirectedGraph actually modifies the graph, because even though it copies the graph it also copies the memory address for the adjacency list, so it just modifies the adjacency list of the original graph.
         */
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
-        bronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
+        iterBronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
 #ifdef PRINTTOCMD
         printVector_Vector(bronResult);
 #endif
@@ -1276,7 +1296,7 @@ int main(int argc, char *argv[])
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
             time_begin = clock();
-            bronKerbosch(R, P, X, GH, &bronResult);
+            iterBronKerbosch(R, P, X, GH, &bronResult);
             time_end = clock();
 
             maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
