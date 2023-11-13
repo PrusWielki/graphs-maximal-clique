@@ -323,13 +323,13 @@ void removeNode(struct Node **head, int vertexToRemove)
         if (0 == index && vertexToRemove == previous->vertex)
         {
             *head = previous->nextNode;
-            // free(previous);
+             free(previous);
             break;
         }
         if (vertexToRemove == current->vertex)
         {
             previous->nextNode = current->nextNode;
-            // free(current);
+             free(current);
             break;
         }
 
@@ -655,6 +655,7 @@ void toUndirectedGraph(struct Graph G)
         if (NULL == G.adjacencyLists[i])
             continue;
         struct Node *iterator = G.adjacencyLists[i];
+        struct Node *next_iterator=NULL;
         while (NULL != iterator)
         {
 #ifdef dbg
@@ -665,8 +666,11 @@ void toUndirectedGraph(struct Graph G)
 #ifdef dbg
                 printf("Removing vertex %d from list %d\n", iterator->vertex, i);
 #endif
+next_iterator=iterator->nextNode;
                 removeNode(&G.adjacencyLists[i], iterator->vertex);
+                iterator=next_iterator;
             }
+         else
             iterator = iterator->nextNode;
         }
     }
