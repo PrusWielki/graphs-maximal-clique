@@ -277,55 +277,6 @@ int saveToFileVector_Vector_Max(struct Vector vector, FILE *fptr)
 
     return 1;
 }
-// struct Node *newNode(int vertex, int weight)
-// {
-//     struct Node *node = malloc(sizeof(struct Node));
-//     if (NULL == node)
-//     {
-//         printf("Error: Couldn't allocate memory for a new node\n");
-//         return NULL;
-//     }
-//     node->vertex = vertex;
-//     node->weight = weight;
-//     node->nextNode = NULL;
-//     return node;
-// }
-
-// void removeNode(struct Node **head, int vertexToRemove)
-// {
-
-//     /*
-//         DONE
-//         1. Two variables, current and previous.
-//         2. Special case when the vertexToRemove is the first in the list.
-//             1. Point head to the next element and free the memory.
-//         3. Previous should point to the next, and current should be freed.
-//     */
-
-//     struct Node *current = *head;
-//     struct Node *previous = *head;
-
-//     int index = 0;
-//     while (NULL != current)
-//     {
-//         current = current->nextNode;
-//         if (0 == index && vertexToRemove == previous->vertex)
-//         {
-//             *head = previous->nextNode;
-//             free(previous);
-//             break;
-//         }
-//         if (vertexToRemove == current->vertex)
-//         {
-//             previous->nextNode = current->nextNode;
-//             free(current);
-//             break;
-//         }
-
-//         previous = previous->nextNode;
-//         index++;
-//     }
-// }
 
 void printGraph(struct Graph graph)
 {
@@ -387,8 +338,6 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
         printf("Graphs: %d\n", noOfGraphsInFile);
 #endif // dbg
     }
-
-    // struct Graph *graphs = malloc(noOfGraphsInFile * sizeof(Graph));
 
     for (int i = 0; i < noOfGraphsInFile; i++)
     {
@@ -503,7 +452,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
             2. The way I would do this is to:
                 1. Iterate over all vertices of GH, by creating two for loops iterating over vertices of G and H
                 2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
-        5. TODO: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
+        5. DONE: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
         6. DONE: Handle directed graphs. Edges should be in both directions.
     */
     if (NULL == G || NULL == H || NULL == G->adjacencyMatrix || NULL == H->adjacencyMatrix)
@@ -584,12 +533,13 @@ void toUndirectedGraph(struct Graph G)
 
     for (int i = 0; i < G.noOfVertices; i++)
     {
-        for(int j=0;j<G.noOfVertices;j++){
+        for (int j = 0; j < G.noOfVertices; j++)
+        {
 
-if(G.adjacencyMatrix[i*G.noOfVertices+j]!=0&&G.adjacencyMatrix[j*G.noOfVertices+i]==0){
-    G.adjacencyMatrix[i*G.noOfVertices+j]=0;
-}
-
+            if (G.adjacencyMatrix[i * G.noOfVertices + j] != 0 && G.adjacencyMatrix[j * G.noOfVertices + i] == 0)
+            {
+                G.adjacencyMatrix[i * G.noOfVertices + j] = 0;
+            }
         }
     }
 }
