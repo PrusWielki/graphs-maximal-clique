@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#define PRINTTOCMD
+// #define PRINTTOCMD
 // #define dbg
 
 struct Node
