@@ -77,16 +77,9 @@ int pushBackVector_Int(struct Vector *vector, int value)
         return -1;
     if (vector->currentNumberOfElements == vector->size)
     {
-        int *newArray = malloc(sizeof(int) * 2 * vector->size);
+        int *newArray = realloc(vector->data,2*sizeof(int)*vector->size);
         if (NULL == newArray)
             return -1;
-
-        for (int i = 0; i < vector->currentNumberOfElements; i++)
-        {
-            newArray[i] = *((int *)vector->data + i);
-        }
-
-        free(vector->data);
         vector->data = newArray;
         vector->size = 2 * vector->size;
     }
@@ -104,16 +97,10 @@ int pushBackVector_Vector(struct Vector *vector, struct Vector value)
         return -1;
     if (vector->currentNumberOfElements == vector->size)
     {
-        struct Vector *newArray = malloc(sizeof(struct Vector) * 2 * vector->size);
+        struct Vector *newArray = realloc(vector->data,sizeof(struct Vector) * 2 * vector->size);
         if (NULL == newArray)
             return -1;
 
-        for (int i = 0; i < vector->currentNumberOfElements; i++)
-        {
-            newArray[i] = *((struct Vector *)vector->data + i);
-        }
-
-        free(vector->data);
         vector->data = newArray;
         vector->size = 2 * vector->size;
     }
@@ -131,16 +118,10 @@ int pushBackVector_Graph(struct Vector *vector, struct Graph value)
         return -1;
     if (vector->currentNumberOfElements == vector->size)
     {
-        struct Graph *newArray = malloc(sizeof(struct Graph) * 2 * vector->size);
+        struct Graph *newArray = realloc(vector->data,sizeof(struct Graph) * 2 * vector->size);
         if (NULL == newArray)
             return -1;
 
-        for (int i = 0; i < vector->currentNumberOfElements; i++)
-        {
-            newArray[i] = *((struct Graph *)vector->data + i);
-        }
-
-        free(vector->data);
         vector->data = newArray;
         vector->size = 2 * vector->size;
     }
