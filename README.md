@@ -31,3 +31,4 @@ Add `#define PRINTTOCMD` to the beginning of the main.c
 - [ ] Run tests, time it to put something to docs.
 - [ ] OPTIONAL: Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [ ] OPTIONAL: Test the product function against some example online.
+- [ ] OPTIONAL: Implement Adjacency Matrix implementation to improve time complexity at the cost of space complexity.
