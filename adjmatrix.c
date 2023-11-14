@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-// #define PRINTTOCMD
+#define PRINTTOCMD
 // #define dbg
-#define adj
-
 
 struct Node
 {
@@ -346,38 +345,27 @@ void printGraph(struct Graph graph)
     printf("-------------------------------------------------\n\n");
 }
 
-// void printGraphs(struct Graph *graphs, int noOfGraphs)
-// {
+void printGraphs(struct Graph *graphs, int noOfGraphs)
+{
 
-//     printf("-------------------------------------------------\n");
-//     printf("Printing graphs in the following format:\n");
+    printf("-------------------------------------------------\n");
+    printf("Printing graphs in the following format:\n");
 
-//     printf("{vertex}: {(vertex, weight)}\n\n");
-//     for (int i = 0; i < noOfGraphs; i++)
-//     {
-//         printf("------------------Graph %d----------------------\n", i);
-//         printGraph(graphs[i]);
-//     }
-// }
-// void freeGraph(struct Graph *graph)
-// {
-//     if (NULL == graph)
-//         return;
+    printf("{vertex}: {(vertex, weight)}\n\n");
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        printf("------------------Graph %d----------------------\n", i);
+        printGraph(graphs[i]);
+    }
+}
+void freeGraph(struct Graph *graph)
+{
+    if (NULL == graph)
+        return;
 
-//     struct Node *temporaryNode = NULL;
-//     for (int j = 0; j < graph->noOfVertices; j++)
-//     {
-
-//         while (NULL != graph->adjacencyLists[j])
-//         {
-//             temporaryNode = graph->adjacencyLists[j];
-//             graph->adjacencyLists[j] = graph->adjacencyLists[j]->nextNode;
-//             free(temporaryNode);
-//         }
-//     }
-//     free(graph->adjacencyLists);
-//     free(graph->description);
-// }
+    free(graph->adjacencyMatrix);
+    free(graph->description);
+}
 void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVector)
 {
 
@@ -501,156 +489,110 @@ int isVertexInsideList(struct Node *iterator, int desiredVertex)
     return 0;
 }
 
-// struct Graph *modularProduct(struct Graph *G, struct Graph *H)
-// {
-//     /*
-//         DONE
-//         1. Iterate over matrix G, over it's adjacencyLists
-//         2. For each AdjacencyList of graph G:
-//             1. Iterate over AdjacencyLists from graph H
-//             2. Take element from Adjacency list from graph G, for each element from adjacency list from graph H it will have an edge, Push it to graph's GxH adjacency list
-//         3. So far we would have all multiplied elements with condition 1. "u is adjacent with u' and v is adjacent with v'"
-//         4. The above is DONE, what's left is: Need to figure out a way to add edges that satisfy the second condition: 'u is not adjacent with u' and v is not adjacent with v''
-//             1. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
-//             2. The way I would do this is to:
-//                 1. Iterate over all vertices of GH, by creating two for loops iterating over vertices of G and H
-//                 2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
-//         5. TODO: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
-//         6. DONE: Handle directed graphs. Edges should be in both directions.
-//     */
-//     if (NULL == G || NULL == H || NULL == G->adjacencyLists || NULL == H->adjacencyLists)
-//     {
-//         printf("Error: Couldn't multiply matrices, given matrices don't contain enough information\n");
-//         return NULL;
-//     }
+struct Graph *modularProduct(struct Graph *G, struct Graph *H)
+{
+    /*
+        DONE
+        1. Iterate over matrix G, over it's adjacencyLists
+        2. For each AdjacencyList of graph G:
+            1. Iterate over AdjacencyLists from graph H
+            2. Take element from Adjacency list from graph G, for each element from adjacency list from graph H it will have an edge, Push it to graph's GxH adjacency list
+        3. So far we would have all multiplied elements with condition 1. "u is adjacent with u' and v is adjacent with v'"
+        4. The above is DONE, what's left is: Need to figure out a way to add edges that satisfy the second condition: 'u is not adjacent with u' and v is not adjacent with v''
+            1. Keeping in mind that: Any two vertices (u, v) and (u' , v' ) are adjacent in the modular product of G and H if and only if u is distinct from u', v is distinct from v'
+            2. The way I would do this is to:
+                1. Iterate over all vertices of GH, by creating two for loops iterating over vertices of G and H
+                2. If vertex from GH (indexed  by the two new for loops) corresponding to given graph is not present in that graphs's adjacency list and same for the other graph then add that vertex to adjacency list as long as it satisfies the distinct condition (4.1)
+        5. TODO: Only potentially: Efficiency perhaps could be improved. When we check if a vertex is not in given adjacency list then also maybe one could check if it's in both instead of doing it separately.
+        6. DONE: Handle directed graphs. Edges should be in both directions.
+    */
+    if (NULL == G || NULL == H || NULL == G->adjacencyMatrix || NULL == H->adjacencyMatrix)
+    {
+        printf("Error: Couldn't multiply matrices, given matrices don't contain enough information\n");
+        return NULL;
+    }
 
-//     struct Graph *GH = malloc(sizeof(struct Graph));
+    struct Graph *GH = malloc(sizeof(struct Graph));
 
-//     if (NULL == GH)
-//     {
-//         printf("Error: Couldn't allocate memory for graph product\n");
-//         return NULL;
-//     }
-//     GH->description = malloc(sizeof(char));
-//     if (NULL == GH->description)
-//     {
-//         printf("Error: Couldn't allocate memory for graph product description\n");
-//         return NULL;
-//     }
-//     GH->description[0] = '\0';
-//     GH->noOfVertices = G->noOfVertices * H->noOfVertices;
+    if (NULL == GH)
+    {
+        printf("Error: Couldn't allocate memory for graph product\n");
+        return NULL;
+    }
+    GH->description = malloc(sizeof(char));
+    if (NULL == GH->description)
+    {
+        printf("Error: Couldn't allocate memory for graph product description\n");
+        return NULL;
+    }
+    GH->description[0] = '\0';
+    GH->noOfVertices = G->noOfVertices * H->noOfVertices;
 
-//     GH->adjacencyLists = malloc(GH->noOfVertices * sizeof(struct Node *));
+    GH->adjacencyMatrix = calloc(GH->noOfVertices * GH->noOfVertices, sizeof(int));
 
-//     if (NULL == GH->adjacencyLists)
-//     {
-//         printf("Error: Couldn't allocate memory for graph product adjacency lists\n");
-//         return NULL;
-//     }
+    if (NULL == GH->adjacencyMatrix)
+    {
+        printf("Error: Couldn't allocate memory for graph product adjacency lists\n");
+        return NULL;
+    }
 
-//     for (int i = 0; i < G->noOfVertices; i++) // 1. 2.
-//     {
-//         for (int j = 0; j < H->noOfVertices; j++) // 2.1
-//         {
-//             GH->adjacencyLists[i * H->noOfVertices + j] = NULL;
-//             for (int k = 0; k < G->noOfVertices; k++) // 4.1.2
-//             {
-//                 if (k != i && !isVertexInsideList(G->adjacencyLists[i], k) && !isVertexInsideList(G->adjacencyLists[k], i))
-//                 {
-//                     for (int l = 0; l < H->noOfVertices; l++)
-//                     {
+    for (int i = 0; i < G->noOfVertices; i++) // 1. 2.
+    {
+        for (int j = 0; j < H->noOfVertices; j++) // 2.1
+        {
+            for (int k = 0; k < G->noOfVertices; k++) // 4.1.2
+            {
+                if (k != i && G->adjacencyMatrix[i * G->noOfVertices + k] == 0 && G->adjacencyMatrix[k * G->noOfVertices + i] == 0)
+                {
+                    for (int l = 0; l < H->noOfVertices; l++)
+                    {
 
-//                         if (j != l && !isVertexInsideList(H->adjacencyLists[j], l) && !isVertexInsideList(H->adjacencyLists[l], j))
-//                         {
-//                             struct Node *node = newNode(k * H->noOfVertices + l, 1);
-//                             if (NULL == node)
-//                             {
-//                                 printf("Error: Couldn't add a new node\n");
-//                                 return NULL;
-//                             }
-//                             node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
-//                             GH->adjacencyLists[i * H->noOfVertices + j] = node;
-//                         }
-//                     }
-//                 }
-//             }
+                        if (j != l && H->adjacencyMatrix[j * H->noOfVertices + l] == 0 && H->adjacencyMatrix[l * H->noOfVertices + j] == 0)
+                        {
+                            GH->adjacencyMatrix[(i * H->noOfVertices + j) * GH->noOfVertices + k * H->noOfVertices + l] = 1;
+                        }
+                    }
+                }
+                else if (k != i && G->adjacencyMatrix[i * G->noOfVertices + k] != 0 && G->adjacencyMatrix[k * G->noOfVertices + i] != 0)
+                {
+                    for (int l = 0; l < H->noOfVertices; l++)
+                    {
 
-//             struct Node *iterator_G = G->adjacencyLists[i];
+                        if (j != l && H->adjacencyMatrix[j * H->noOfVertices + l] != 0 && H->adjacencyMatrix[l * H->noOfVertices + j] != 0)
+                        {
+                            GH->adjacencyMatrix[(i * H->noOfVertices + j) * GH->noOfVertices + k * H->noOfVertices + l] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return GH;
+};
 
-//             while (NULL != iterator_G)
-//             {
-//                 if (isVertexInsideList(G->adjacencyLists[iterator_G->vertex], i))
-//                 {
+void toUndirectedGraph(struct Graph G)
+{
 
-//                     struct Node *iterator_H = H->adjacencyLists[j];
-//                     while (NULL != iterator_H)
-//                     {
-//                         if (isVertexInsideList(H->adjacencyLists[iterator_H->vertex], j))
-//                         {
-// #ifdef dbg
-//                             // printf("Would add edge from (%d,%d) to: (%d,%d)\n", i + 1, j + 1, iterator_G->vertex + 1, iterator_H->vertex + 1);
-//                             printf("Would add edge from %d to: %d\n", i * H->noOfVertices + j, iterator_G->vertex * H->noOfVertices + iterator_H->vertex);
-// #endif
+    /*
+        DONE
+        1. DONE: Write a function to remove a node from a list.
+        2. Iterate over all adjacency lists.
+            1. For each adjacency list, for each node, check if there is an edge in the other direction.
+                1. If not remove the node.
+        3. Return the resulting new graph.
+    */
 
-//                             struct Node *node = newNode(iterator_G->vertex * H->noOfVertices + iterator_H->vertex, iterator_G->weight * iterator_H->weight); // 2.2
-//                             if (NULL == node)
-//                             {
-//                                 printf("Error: Couldn't add a new node\n");
-//                                 return NULL;
-//                             }
-//                             node->nextNode = GH->adjacencyLists[i * H->noOfVertices + j];
-//                             GH->adjacencyLists[i * H->noOfVertices + j] = node;
-//                         }
-//                         iterator_H = iterator_H->nextNode;
-//                     }
-//                 }
-//                 iterator_G = iterator_G->nextNode;
-// #ifdef dbg
-//                 printf("Value of iterator_G: %d\n", iterator_G);
-// #endif // dbg
-//             }
-//         }
-//     }
-//     return GH;
-// };
+    for (int i = 0; i < G.noOfVertices; i++)
+    {
+        for(int j=0;j<G.noOfVertices;j++){
 
-// void toUndirectedGraph(struct Graph G)
-// {
+if(G.adjacencyMatrix[i*G.noOfVertices+j]!=0&&G.adjacencyMatrix[j*G.noOfVertices+i]==0){
+    G.adjacencyMatrix[i*G.noOfVertices+j]=0;
+}
 
-//     /*
-//         DONE
-//         1. DONE: Write a function to remove a node from a list.
-//         2. Iterate over all adjacency lists.
-//             1. For each adjacency list, for each node, check if there is an edge in the other direction.
-//                 1. If not remove the node.
-//         3. Return the resulting new graph.
-//     */
-
-//     for (int i = 0; i < G.noOfVertices; i++)
-//     {
-//         if (NULL == G.adjacencyLists[i])
-//             continue;
-//         struct Node *iterator = G.adjacencyLists[i];
-//         struct Node *next_iterator = NULL;
-//         while (NULL != iterator)
-//         {
-// #ifdef dbg
-//             printf("List: %d, vertex: %d\n", i, iterator->vertex);
-// #endif
-//             if (i == iterator->vertex || NULL == G.adjacencyLists[iterator->vertex] || !isVertexInsideList(G.adjacencyLists[iterator->vertex], i))
-//             {
-// #ifdef dbg
-//                 printf("Removing vertex %d from list %d\n", iterator->vertex, i);
-// #endif
-//                 next_iterator = iterator->nextNode;
-//                 removeNode(&G.adjacencyLists[i], iterator->vertex);
-//                 iterator = next_iterator;
-//             }
-//             else
-//                 iterator = iterator->nextNode;
-//         }
-//     }
-// }
+        }
+    }
+}
 
 // int bronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 // {
@@ -896,7 +838,7 @@ int isVertexInsideList(struct Node *iterator, int desiredVertex)
 //     free(stack.data);
 //     return 0;
 // }
-int adj_iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
+int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 {
     /*
     1. TODO: Test it.
@@ -946,11 +888,11 @@ int adj_iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X,
             */
             if (-1 != pivot)
             {
-               
+
                 for (int i = 0; i < currentP.currentNumberOfElements; i++)
                 {
-                    
-                    if (graph->adjacencyMatrix[pivot*graph->noOfVertices+*((int *)currentP.data + i)]==0)
+
+                    if (graph->adjacencyMatrix[pivot * graph->noOfVertices + *((int *)currentP.data + i)] == 0)
                     {
                         q = *((int *)currentP.data + i);
                         break;
@@ -1000,8 +942,8 @@ int adj_iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X,
                 createVector_Int(&pAndVEdges, currentP.size);
                 for (int j = 0; j < currentP.currentNumberOfElements; j++)
                 {
-                   
-                    if ( graph->adjacencyMatrix[q*graph->noOfVertices+*((int *)currentP.data + j)]!=0)
+
+                    if (graph->adjacencyMatrix[q * graph->noOfVertices + *((int *)currentP.data + j)] != 0)
                     {
                         pushBackVector_Int(&pAndVEdges, *((int *)currentP.data + j));
                     }
@@ -1011,7 +953,7 @@ int adj_iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X,
                 createVector_Int(&xAndVEdges, currentX.size);
                 for (int j = 0; j < currentX.currentNumberOfElements; j++)
                 {
-                    if ( graph->adjacencyMatrix[q*graph->noOfVertices+*((int *)currentX.data + j)]!=0)
+                    if (graph->adjacencyMatrix[q * graph->noOfVertices + *((int *)currentX.data + j)] != 0)
                     {
                         pushBackVector_Int(&xAndVEdges, *((int *)currentX.data + j));
                     }
@@ -1065,7 +1007,10 @@ int main(int argc, char *argv[])
             1. Iterate over argc - 1.
             2. Modify file loading function to append a vector with graphs.
     */
+    clock_t time_begin;
+    clock_t time_end;
 
+    clock_t time_all_begin = clock();
 
     // Initialization
     if (2 > argc)
@@ -1089,15 +1034,113 @@ int main(int argc, char *argv[])
             return 1;
         }
         readGraphsFromFile(filePtr, &noOfGraphs, &graphs);
-        printGraph(*(struct Graph*)graphs.data);
         fclose(filePtr);
     }
 
+    if (0 == graphs.currentNumberOfElements)
+        return -1;
+
+    FILE *outputFile;
+
+    outputFile = fopen("output.txt", "w");
+
+// Print graphs
+#ifdef PRINTTOCMD
+    printGraphs(graphs.data, noOfGraphs);
+#endif
+    time_begin = clock();
+#ifdef PRINTTOCMD
+    printf("-------------------------------------------------\n");
+#endif
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+#ifdef PRINTTOCMD
+        printf("-------------------------------------------------\n");
+        printf("Maximal cliques for graph %d\n", i);
+#endif
+        struct Vector R;
+        createVector_Int(&R, 1);
+        struct Vector P;
+        createVector_Int(&P, ((struct Graph *)(graphs.data) + i)->noOfVertices);
+#ifdef dbg
+        printf("graph size: %d\n", ((struct Graph *)(graphs.data) + i)->noOfVertices);
+#endif
+        for (int j = 0; j < ((struct Graph *)(graphs.data) + i)->noOfVertices; j++)
+        {
+            pushBackVector_Int(&P, j);
+#ifdef dbg
+            printVector_Int(P);
+#endif
+        }
+
+        struct Vector X;
+        createVector_Int(&X, 1);
+
+        struct Vector bronResult;
+        createVector_Vector(&bronResult, 1);
+
+        /*
+            (I removed the copying of the graph since it doesn't really do anything here. If we would need to somehow retireve the data of the originally removed single edges or edges to self then we need implement a deep copy of a graph in toUndirectedGraph)
+            1. toUndirectedGraph actually modifies the graph, because even though it copies the graph it also copies the memory address for the adjacency list, so it just modifies the adjacency list of the original graph.
+        */
+        toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
+        iterPivotBronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
+#ifdef PRINTTOCMD
+        printVector_Vector(bronResult);
+#endif
+        fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
+        saveToFileVector_Vector(bronResult, outputFile);
+
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
+            free(((struct Vector *)bronResult.data + i)->data);
+        }
+        free(bronResult.data);
+        // free(R.data);
+        // free(P.data);
+        // free(X.data);
+    }
+
+    time_end = clock();
+
+    double maximal_cliques_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+    double modular_product_time = -1;
+    double maximal_clique_modular_product_time = -1;
+#ifdef PRINTTOCMD
+    printf("-------------------------------------------------\n");
+#endif
+    // Modular Graph Product
+
+    struct Graph *GH = NULL;
+    struct Graph *GH_prev = NULL;
+
+    if (1 < noOfGraphs)
+    {
+        time_begin = clock();
+        GH = graphs.data;
+        for (int i = 1; i < noOfGraphs; i++)
+        {
+            GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
+            freeGraph(GH_prev);
+            free(GH_prev);
+            GH_prev = GH;
+        }
+
+        time_end = clock();
+
+        modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+        if (NULL != GH)
+        {
+#ifdef PRINTTOCMD
+            printf("-------------------------------------------------\n");
+            printf("Modular product graph of all input graphs:\n");
+            printGraph(*GH);
+#endif
             struct Vector R;
             createVector_Int(&R, 1);
             struct Vector P;
             createVector_Int(&P, 1);
-            for (int i = 0; i < (*(struct Graph*)graphs.data).noOfVertices; i++)
+            for (int i = 0; i < GH->noOfVertices; i++)
             {
                 pushBackVector_Int(&P, i);
             }
@@ -1110,9 +1153,54 @@ int main(int argc, char *argv[])
 #endif
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
+            time_begin = clock();
+            iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+            time_end = clock();
 
-            adj_iterPivotBronKerbosch(R, P, X, (struct Graph*)graphs.data, &bronResult);
-            printVector_Vector(bronResult);
- 
+            maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+#ifdef PRINTTOCMD
+            printVector_Vector_Max(bronResult);
+#endif
+            fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
+            saveToFileVector_Vector_Max(bronResult, outputFile);
+
+            // free(R.data);
+            // free((int *)X.data);
+            // free(P.data);
+
+            for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+            {
+                free(((struct Vector *)bronResult.data + i)->data);
+            }
+            free(bronResult.data);
+        }
+    }
+#ifdef dbg
+    dbgTests(*((struct Graph *)(graphs.data)));
+#endif // dbg
+    clock_t time_all_end = clock();
+
+    printf("Time of calculating maximal cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
+    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
+
+    printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+    fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+
+    printf("Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    fprintf(outputFile, "Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+
+    printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
+    fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
+
+    freeGraph(GH);
+    free(GH);
+
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        freeGraph(((struct Graph *)(graphs.data) + i));
+    }
+
+    free(((struct Graph *)(graphs.data)));
+    fclose(outputFile);
     return 0;
 }
