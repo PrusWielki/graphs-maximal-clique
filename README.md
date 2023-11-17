@@ -42,3 +42,4 @@ Add `#define PRINTTOCMD` to the beginning of the main.c. Regardless of that, pro
 - [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
 - [ ] Run tests, time it to put something to docs.
 - [ ] OPTIONAL: Check and prepare for edge cases, such as empty graph description, vertex with no edges.
+- [ ] OPTIONAL: Find a way to measure maximal memory usage.
