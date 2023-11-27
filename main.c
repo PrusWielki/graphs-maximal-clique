@@ -722,125 +722,122 @@ void toUndirectedGraph(struct Graph G)
 //     free(toIterateOver.data);
 //     return 0;
 // }
-// int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
-// {
-//     /*
-//     1. TODO: Test it.
-// */
-//     struct Vector stack;
-//     createVector_Vector(&stack, 3);
-//     pushBackVector_Vector(&stack, R);
-//     pushBackVector_Vector(&stack, P);
-//     pushBackVector_Vector(&stack, X);
-//     struct Node *iterator = NULL;
+int iterBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
+{
+    /*
+    1. TODO: Test it.
+*/
+    struct Vector stack;
+    createVector_Vector(&stack, 3);
+    pushBackVector_Vector(&stack, R);
+    pushBackVector_Vector(&stack, P);
+    pushBackVector_Vector(&stack, X);
 
-//     while (0 < stack.currentNumberOfElements)
-//     {
-//         struct Vector currentX = popVector_Vector(&stack);
-//         struct Vector currentP = popVector_Vector(&stack);
-//         struct Vector currentR = popVector_Vector(&stack);
-//         /*
-//         printVector_Int(currentR);
-//         printVector_Int(currentP);
-//         printVector_Int(currentX);
-//         printf("\n");
-//                  */
+    while (0 < stack.currentNumberOfElements)
+    {
+        struct Vector currentX = popVector_Vector(&stack);
+        struct Vector currentP = popVector_Vector(&stack);
+        struct Vector currentR = popVector_Vector(&stack);
+        /*
+        printVector_Int(currentR);
+        printVector_Int(currentP);
+        printVector_Int(currentX);
+        printf("\n");
+                 */
 
-//         if (0 == currentP.currentNumberOfElements && 0 == currentX.currentNumberOfElements)
-//         {
-//             // printf("Maximal Clique: ");
-//             // printVector_Int(R);
-//             // free(currentR.data);
-//             free(currentX.data);
-//             free(currentP.data);
-//             pushBackVector_Vector(bronResult, currentR);
-//         }
+        if (0 == currentP.currentNumberOfElements && 0 == currentX.currentNumberOfElements)
+        {
+            // printf("Maximal Clique: ");
+            // printVector_Int(R);
+            // free(currentR.data);
+            free(currentX.data);
+            free(currentP.data);
+            pushBackVector_Vector(bronResult, currentR);
+        }
 
-//         else
-//         {
-//             if (0 < currentP.currentNumberOfElements)
-//             {
+        else
+        {
+            if (0 < currentP.currentNumberOfElements)
+            {
 
-//                 struct Vector pNotV;
-//                 createVector_Int(&pNotV, currentP.currentNumberOfElements - 1);
-//                 for (int j = 1; j < currentP.currentNumberOfElements; j++)
-//                 {
-//                     pushBackVector_Int(&pNotV, *((int *)currentP.data + j));
-//                 }
-//                 struct Vector xAndV;
-//                 createVector_Int(&xAndV, currentX.currentNumberOfElements + 1);
-//                 for (int j = 0; j < currentX.currentNumberOfElements; j++)
-//                 {
-//                     pushBackVector_Int(&xAndV, *((int *)currentX.data + j));
-//                 }
-//                 pushBackVector_Int(&xAndV, *((int *)currentP.data));
+                struct Vector pNotV;
+                createVector_Int(&pNotV, currentP.currentNumberOfElements - 1);
+                for (int j = 1; j < currentP.currentNumberOfElements; j++)
+                {
+                    pushBackVector_Int(&pNotV, *((int *)currentP.data + j));
+                }
+                struct Vector xAndV;
+                createVector_Int(&xAndV, currentX.currentNumberOfElements + 1);
+                for (int j = 0; j < currentX.currentNumberOfElements; j++)
+                {
+                    pushBackVector_Int(&xAndV, *((int *)currentX.data + j));
+                }
+                pushBackVector_Int(&xAndV, *((int *)currentP.data));
 
-//                 struct Vector rPlusV;
-//                 createVector_Int(&rPlusV, currentR.currentNumberOfElements + 1);
-//                 for (int j = 0; j < currentR.currentNumberOfElements; j++)
-//                 {
-//                     pushBackVector_Int(&rPlusV, *((int *)currentR.data + j));
-//                 }
+                struct Vector rPlusV;
+                createVector_Int(&rPlusV, currentR.currentNumberOfElements + 1);
+                for (int j = 0; j < currentR.currentNumberOfElements; j++)
+                {
+                    pushBackVector_Int(&rPlusV, *((int *)currentR.data + j));
+                }
 
-//                 pushBackVector_Int(&rPlusV, *((int *)currentP.data));
-//                 struct Vector pAndVEdges;
-//                 createVector_Int(&pAndVEdges, currentP.size);
-//                 iterator = graph->adjacencyLists[*((int *)currentP.data)];
-//                 for (int j = 0; j < currentP.currentNumberOfElements; j++)
-//                 {
-//                     if (isVertexInsideList(iterator, *((int *)currentP.data + j)))
-//                     {
-//                         pushBackVector_Int(&pAndVEdges, *((int *)currentP.data + j));
-//                     }
-//                 }
+                pushBackVector_Int(&rPlusV, *((int *)currentP.data));
+                struct Vector pAndVEdges;
+                createVector_Int(&pAndVEdges, currentP.size);
+                for (int j = 0; j < currentP.currentNumberOfElements; j++)
+                {
+                    if (graph->adjacencyMatrix[*((int *)currentP.data) * graph->noOfVertices + *((int *)currentP.data + j)] != 0)
+                    {
+                        pushBackVector_Int(&pAndVEdges, *((int *)currentP.data + j));
+                    }
+                }
 
-//                 struct Vector xAndVEdges;
-//                 createVector_Int(&xAndVEdges, currentX.size);
-//                 iterator = graph->adjacencyLists[*((int *)currentP.data)];
-//                 for (int j = 0; j < currentX.currentNumberOfElements; j++)
-//                 {
-//                     if (isVertexInsideList(iterator, *((int *)currentX.data + j)))
-//                     {
-//                         pushBackVector_Int(&xAndVEdges, *((int *)currentX.data + j));
-//                     }
-//                 }
+                struct Vector xAndVEdges;
+                createVector_Int(&xAndVEdges, currentX.size);
+                for (int j = 0; j < currentX.currentNumberOfElements; j++)
+                {
+                    if (graph->adjacencyMatrix[*((int *)currentP.data) * graph->noOfVertices + *((int *)currentX.data + j)] != 0)
+                    {
+                        pushBackVector_Int(&xAndVEdges, *((int *)currentX.data + j));
+                    }
+                }
 
-//                 // copy R!!
-//                 struct Vector newR;
-//                 createVector_Int(&newR, currentR.currentNumberOfElements);
-//                 for (int i = 0; i < currentR.currentNumberOfElements; i++)
-//                 {
-//                     pushBackVector_Int(&newR, *((int *)currentR.data + i));
-//                 }
+                // copy R!!
+                struct Vector newR;
+                createVector_Int(&newR, currentR.currentNumberOfElements);
+                for (int i = 0; i < currentR.currentNumberOfElements; i++)
+                {
+                    pushBackVector_Int(&newR, *((int *)currentR.data + i));
+                }
 
-//                 pushBackVector_Vector(&stack, newR);
-//                 pushBackVector_Vector(&stack, pNotV);
-//                 pushBackVector_Vector(&stack, xAndV);
-//                 /*
-//                 printf("pushed:\n");
-//                 printVector_Int(newR);printVector_Int(pNotV);
-//                 printVector_Int(xAndV);
-//                 printf("\n");
-//                         */
-//                 pushBackVector_Vector(&stack, rPlusV);
-//                 pushBackVector_Vector(&stack, pAndVEdges);
-//                 pushBackVector_Vector(&stack, xAndVEdges);
-//                 /*
-//                 printf("pushed:\n");
-//                 printVector_Int(rPlusV);
-//                 printVector_Int(pAndVEdges);
-//                 printVector_Int(xAndVEdges);
-//                 printf("\n");
-//                              */
-//             }
-//             free(currentR.data);
-//             free(currentX.data);
-//             free(currentP.data);
-//         }
-//     }
-//     free(stack.data);
-//     return 0;
-// }
+                pushBackVector_Vector(&stack, newR);
+                pushBackVector_Vector(&stack, pNotV);
+                pushBackVector_Vector(&stack, xAndV);
+                /*
+                printf("pushed:\n");
+                printVector_Int(newR);printVector_Int(pNotV);
+                printVector_Int(xAndV);
+                printf("\n");
+                        */
+                pushBackVector_Vector(&stack, rPlusV);
+                pushBackVector_Vector(&stack, pAndVEdges);
+                pushBackVector_Vector(&stack, xAndVEdges);
+                /*
+                printf("pushed:\n");
+                printVector_Int(rPlusV);
+                printVector_Int(pAndVEdges);
+                printVector_Int(xAndVEdges);
+                printf("\n");
+                             */
+            }
+            free(currentR.data);
+            free(currentX.data);
+            free(currentP.data);
+        }
+    }
+    free(stack.data);
+    return 0;
+}
 int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, struct Graph *graph, struct Vector *bronResult)
 {
     /*
