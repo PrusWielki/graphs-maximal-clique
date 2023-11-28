@@ -588,7 +588,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
 
                         if (j != l && H->adjacencyMatrix[j * H->noOfVertices + l] != 0 && H->adjacencyMatrix[l * H->noOfVertices + j] != 0)
                         {
-                            GH->adjacencyMatrix[(i * H->noOfVertices + j) * GH->noOfVertices + k * H->noOfVertices + l] = 1;
+                            GH->adjacencyMatrix[(i * H->noOfVertices + j) * GH->noOfVertices + k * H->noOfVertices + l] = H->adjacencyMatrix[j * H->noOfVertices + l] * H->adjacencyMatrix[l * H->noOfVertices + j];
                         }
                     }
                 }
