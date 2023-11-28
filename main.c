@@ -96,7 +96,10 @@ int createVector_Int(struct Vector *newVector, int size)
         return -1;
     newVector->data = malloc(size * sizeof(int));
     if (NULL == newVector->data)
-        return -1;
+    {
+        printf("Error allocating memory for Int Vector");
+        exit(EXIT_FAILURE);
+    }
     newVector->currentNumberOfElements = 0;
     newVector->size = size;
     return 1;
@@ -111,7 +114,10 @@ int createVector_Graph(struct Vector *newVector, int size)
         return -1;
     newVector->data = malloc(size * sizeof(struct Graph));
     if (NULL == newVector->data)
-        return -1;
+    {
+        printf("Error allocating memory for Graph Vector");
+        exit(EXIT_FAILURE);
+    }
     newVector->currentNumberOfElements = 0;
     newVector->size = size;
     return 1;
@@ -126,7 +132,10 @@ int createVector_Vector(struct Vector *newVector, int size)
         return -1;
     newVector->data = malloc(size * sizeof(struct Vector));
     if (NULL == newVector->data)
-        return -1;
+    {
+        printf("Error allocating memory for Vector Vector");
+        exit(EXIT_FAILURE);
+    }
     newVector->currentNumberOfElements = 0;
     newVector->size = size;
     return 1;
@@ -140,7 +149,10 @@ int pushBackVector_Int(struct Vector *vector, int value)
     {
         int *newArray = realloc(vector->data, 2 * sizeof(int) * vector->size);
         if (NULL == newArray)
-            return -1;
+        {
+            printf("Error allocating memory when adding new value to int Vector");
+            exit(EXIT_FAILURE);
+        }
         vector->data = newArray;
         vector->size = 2 * vector->size;
     }
@@ -160,7 +172,10 @@ int pushBackVector_Vector(struct Vector *vector, struct Vector value)
     {
         struct Vector *newArray = realloc(vector->data, sizeof(struct Vector) * 2 * vector->size);
         if (NULL == newArray)
-            return -1;
+        {
+            printf("Error allocating memory when adding new value to Vector Vector");
+            exit(EXIT_FAILURE);
+        }
 
         vector->data = newArray;
         vector->size = 2 * vector->size;
@@ -181,7 +196,10 @@ int pushBackVector_Graph(struct Vector *vector, struct Graph value)
     {
         struct Graph *newArray = realloc(vector->data, sizeof(struct Graph) * 2 * vector->size);
         if (NULL == newArray)
-            return -1;
+        {
+            printf("Error allocating memory when adding new value to Graph Vector");
+            exit(EXIT_FAILURE);
+        }
 
         vector->data = newArray;
         vector->size = 2 * vector->size;
@@ -418,7 +436,7 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
         if (NULL == newGraph.adjacencyMatrix)
         {
             printf("Error: Couldn't allocate memory for new adjacency lists\n");
-            return;
+            exit(EXIT_FAILURE);
         }
 
 #ifdef dbg
@@ -457,8 +475,9 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
             newGraph.description = malloc(sizeof(char) * (bytesRead + 1));
             if (NULL == newGraph.description)
             {
+
                 printf("Error: Couldn't allocate memory for graph description\n");
-                return;
+                exit(EXIT_FAILURE);
             }
 
             strncpy(newGraph.description, line, bytesRead);
@@ -476,7 +495,7 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
             if (NULL == newGraph.description)
             {
                 printf("Error: Couldn't allocate memory for graph description\n");
-                return;
+                exit(EXIT_FAILURE);
             }
             newGraph.description[0] = '\0';
         }
@@ -526,13 +545,13 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     if (NULL == GH)
     {
         printf("Error: Couldn't allocate memory for graph product\n");
-        return NULL;
+        exit(EXIT_FAILURE);
     }
     GH->description = malloc(sizeof(char));
     if (NULL == GH->description)
     {
         printf("Error: Couldn't allocate memory for graph product description\n");
-        return NULL;
+        exit(EXIT_FAILURE);
     }
     GH->description[0] = '\0';
     GH->noOfVertices = G->noOfVertices * H->noOfVertices;
@@ -542,7 +561,7 @@ struct Graph *modularProduct(struct Graph *G, struct Graph *H)
     if (NULL == GH->adjacencyMatrix)
     {
         printf("Error: Couldn't allocate memory for graph product adjacency lists\n");
-        return NULL;
+        exit(EXIT_FAILURE);
     }
 
     for (int i = 0; i < G->noOfVertices; i++) // 1. 2.
