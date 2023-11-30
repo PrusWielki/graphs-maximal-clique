@@ -4,8 +4,8 @@
 #include <time.h>
 #include <errno.h>
 #include <stdint.h>
-#define PRINTTOCMD
-#define dbg
+// #define PRINTTOCMD
+// #define dbg
 
 typedef intptr_t ssize_t;
 
