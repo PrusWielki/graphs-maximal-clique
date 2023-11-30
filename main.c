@@ -1029,28 +1029,36 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
     return 0;
 }
 
-void maximalCliqueApproximation(struct Graph* graph, struct Vector* result) {
+void maximalCliqueApproximation(struct Graph *graph, struct Vector *result)
+{
     // Init sub and rest sets
     struct Vector rest;
     createVector_Int(&rest, 1);
-    for (int i = 0; i < graph->noOfVertices; i++) {
+    for (int i = 0; i < graph->noOfVertices; i++)
+    {
         pushBackVector_Int(&rest, i);
     }
 
-    while (rest.currentNumberOfElements > 0) {
+    while (rest.currentNumberOfElements > 0)
+    {
         // Get maximal degree vertex in rest subgraph
         int maxEdges = -1;
         int maxEdgesVertex = -1;
-        for(int i = 0; i < graph->noOfVertices; i++) {
+        for (int i = 0; i < graph->noOfVertices; i++)
+        {
             int edges = 0;
-            if (findElementVector_Int(&rest, i) != -1) {
-                for(int j = 0; j < graph->noOfVertices; j++) {
+            if (findElementVector_Int(&rest, i) != -1)
+            {
+                for (int j = 0; j < graph->noOfVertices; j++)
+                {
                     int weight = graph->adjacencyMatrix[graph->noOfVertices * i + j];
-                    if (weight > 0 && findElementVector_Int(&rest, j) != -1) {
+                    if (weight > 0 && findElementVector_Int(&rest, j) != -1)
+                    {
                         edges++;
                     }
                 }
-                if (edges > maxEdges) {
+                if (edges > maxEdges)
+                {
                     maxEdges = edges;
                     maxEdgesVertex = i;
                 }
@@ -1058,12 +1066,15 @@ void maximalCliqueApproximation(struct Graph* graph, struct Vector* result) {
         }
         pushBackVector_Int(result, maxEdgesVertex);
         removeElementVector_Int(&rest, maxEdgesVertex);
-        for (int i = 0; i < graph->noOfVertices; i++) {
-            if (graph->adjacencyMatrix[graph->noOfVertices * i + maxEdgesVertex] == 0) {
+        for (int i = 0; i < graph->noOfVertices; i++)
+        {
+            if (graph->adjacencyMatrix[graph->noOfVertices * i + maxEdgesVertex] == 0)
+            {
                 removeElementVector_Int(&rest, i);
             }
         }
     }
+    free(rest.data);
 }
 
 int main(int argc, char *argv[])
@@ -1182,11 +1193,12 @@ int main(int argc, char *argv[])
     struct Vector approximationResult;
     createVector_Vector(&approximationResult, noOfGraphs);
     time_begin = clock();
-    for (int i = 0; i < noOfGraphs; i++) {
+    for (int i = 0; i < noOfGraphs; i++)
+    {
         struct Vector approximation;
         createVector_Int(&approximation, 1);
         pushBackVector_Vector(&approximationResult, approximation);
-        maximalCliqueApproximation((struct Graph* )graphs.data + i, (struct Vector*)approximationResult.data + i);
+        maximalCliqueApproximation((struct Graph *)graphs.data + i, (struct Vector *)approximationResult.data + i);
     }
     time_end = clock();
     maximal_clique_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
@@ -1194,14 +1206,16 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
 #endif
-    for (int i = 0; i < noOfGraphs; i++) {
-        struct Vector currentResult = *((struct Vector*)approximationResult.data + i);
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        struct Vector currentResult = *((struct Vector *)approximationResult.data + i);
 #ifdef PRINTTOCMD
         printf("-------------------------------------------------\n");
         printf("Maximal clique approximation for graph %d\n", i);
         printVector_Int(currentResult);
         // printVector_Vector(approximationResult);
 #endif
+
         fprintf(outputFile, "Maximal Clique approximation for graph %d: \n", i);
         fprintf(outputFile, "[ ");
         for (int j = 0; j < currentResult.currentNumberOfElements; j++)
@@ -1212,6 +1226,11 @@ int main(int argc, char *argv[])
         fprintf(outputFile, "]\n");
     }
 
+    for (int i = 0; i < approximationResult.currentNumberOfElements; i++)
+    {
+        free(((struct Vector *)approximationResult.data + i)->data);
+    }
+    free(approximationResult.data);
 #ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
 #endif
