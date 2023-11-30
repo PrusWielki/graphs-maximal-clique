@@ -1150,6 +1150,57 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
     free(stack.data);
     return 0;
 }
+void maximalCliqueApproximation(struct Graph *graph, struct Vector *result)
+{
+    // Init sub and rest sets
+    struct Vector rest;
+    createVector_Int(&rest, 1);
+    for (int i = 0; i < graph->noOfVertices; i++)
+    {
+        pushBackVector_Int(&rest, i);
+    }
+
+    while (rest.currentNumberOfElements > 0)
+    {
+        // Get maximal degree vertex in rest subgraph
+        int maxEdges = -1;
+        int maxEdgesVertex = -1;
+        for (int i = 0; i < graph->noOfVertices; i++)
+        {
+            int edges = 0;
+            if (findElementVector_Int(&rest, i) != -1)
+            {
+                // instead of this loop create an iterator and iterate over it
+
+                struct Node *iterator = graph->adjacencyLists[i];
+                while (NULL != iterator)
+                {
+                    if (findElementVector_Int(&rest, iterator->vertex) != -1)
+                    {
+                        edges++;
+                    }
+                }
+
+                if (edges > maxEdges)
+                {
+                    maxEdges = edges;
+                    maxEdgesVertex = i;
+                }
+            }
+        }
+        pushBackVector_Int(result, maxEdgesVertex);
+        removeElementVector_Int(&rest, maxEdgesVertex);
+        for (int i = 0; i < graph->noOfVertices; i++)
+        {
+            if (!isVertexInsideList(graph->adjacencyLists[i], maxEdgesVertex))
+            {
+                removeElementVector_Int(&rest, i);
+            }
+        }
+    }
+    free(rest.data);
+}
+
 void dbgTests(struct Graph directedGraph)
 {
 
@@ -1328,6 +1379,7 @@ int main(int argc, char *argv[])
     double maximal_cliques_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
     double modular_product_time = -1;
     double maximal_clique_modular_product_time = -1;
+
 #ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
 #endif
