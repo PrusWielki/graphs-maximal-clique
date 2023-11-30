@@ -1094,6 +1094,7 @@ int main(int argc, char *argv[])
     double maximal_clique_approximation_time = -1;
     double modular_product_time = -1;
     double maximal_clique_modular_product_time = -1;
+    double maximal_common_subgraph_approximation_time = -1;
 
     clock_t time_all_begin = clock();
 
@@ -1300,22 +1301,52 @@ int main(int argc, char *argv[])
             free(bronResult.data);
         }
     }
+
+    // Approximation
+    struct Vector modularProductApproximationResult;
+    createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
+    time_begin = clock();
+
+    maximalCliqueApproximation(GH, &modularProductApproximationResult);
+
+    time_end = clock();
+    maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+
+#ifdef PRINTTOCMD
+    printf("-------------------------------------------------\n");
+    printf("Maximum common subgraph approximation for all graphs\n");
+    printVector_Int(modularProductApproximationResult);
+    // printVector_Vector(approximationResult);
+#endif
+
+    fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
+    fprintf(outputFile, "[ ");
+    for (int j = 0; j < modularProductApproximationResult.currentNumberOfElements; j++)
+    {
+        fprintf(outputFile, "%d ", *((int *)modularProductApproximationResult.data + j));
+    }
+
+    fprintf(outputFile, "]\n");
+    free(modularProductApproximationResult.data);
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
     clock_t time_all_end = clock();
 
-    printf("Time of calculating maximal cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
-    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
+    printf("Time of calculating maximum cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
+    fprintf(outputFile, "Time of calculating maximum cliques for for all input graphs: %fs\n", maximal_cliques_time);
 
-    printf("Time of calculating maximal clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
-    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_clique_approximation_time);
+    printf("Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
+    fprintf(outputFile, "Time of calculating maximum cliques for for all input graphs: %fs\n", maximal_clique_approximation_time);
 
     printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
     fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
 
-    printf("Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
-    fprintf(outputFile, "Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    printf("Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    fprintf(outputFile, "Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+
+    printf("Time of approximating maximum common subgraph for all input graphs: %fs\n", maximal_common_subgraph_approximation_time);
+    fprintf(outputFile, "Time of approximating maximum common subgraph for all input graphs: %fs\n", maximal_common_subgraph_approximation_time);
 
     printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
     fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
