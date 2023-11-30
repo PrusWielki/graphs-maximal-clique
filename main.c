@@ -1029,28 +1029,36 @@ int iterPivotBronKerbosch(struct Vector R, struct Vector P, struct Vector X, str
     return 0;
 }
 
-void maximalCliqueApproximation(struct Graph* graph, struct Vector* result) {
+void maximalCliqueApproximation(struct Graph *graph, struct Vector *result)
+{
     // Init sub and rest sets
     struct Vector rest;
     createVector_Int(&rest, 1);
-    for (int i = 0; i < graph->noOfVertices; i++) {
+    for (int i = 0; i < graph->noOfVertices; i++)
+    {
         pushBackVector_Int(&rest, i);
     }
 
-    while (rest.currentNumberOfElements > 0) {
+    while (rest.currentNumberOfElements > 0)
+    {
         // Get maximal degree vertex in rest subgraph
         int maxEdges = -1;
         int maxEdgesVertex = -1;
-        for(int i = 0; i < graph->noOfVertices; i++) {
+        for (int i = 0; i < graph->noOfVertices; i++)
+        {
             int edges = 0;
-            if (findElementVector_Int(&rest, i) != -1) {
-                for(int j = 0; j < graph->noOfVertices; j++) {
+            if (findElementVector_Int(&rest, i) != -1)
+            {
+                for (int j = 0; j < graph->noOfVertices; j++)
+                {
                     int weight = graph->adjacencyMatrix[graph->noOfVertices * i + j];
-                    if (weight > 0 && findElementVector_Int(&rest, j) != -1) {
+                    if (weight > 0 && findElementVector_Int(&rest, j) != -1)
+                    {
                         edges++;
                     }
                 }
-                if (edges > maxEdges) {
+                if (edges > maxEdges)
+                {
                     maxEdges = edges;
                     maxEdgesVertex = i;
                 }
@@ -1058,12 +1066,15 @@ void maximalCliqueApproximation(struct Graph* graph, struct Vector* result) {
         }
         pushBackVector_Int(result, maxEdgesVertex);
         removeElementVector_Int(&rest, maxEdgesVertex);
-        for (int i = 0; i < graph->noOfVertices; i++) {
-            if (graph->adjacencyMatrix[graph->noOfVertices * i + maxEdgesVertex] == 0) {
+        for (int i = 0; i < graph->noOfVertices; i++)
+        {
+            if (graph->adjacencyMatrix[graph->noOfVertices * i + maxEdgesVertex] == 0)
+            {
                 removeElementVector_Int(&rest, i);
             }
         }
     }
+    free(rest.data);
 }
 
 int main(int argc, char *argv[])
@@ -1083,6 +1094,7 @@ int main(int argc, char *argv[])
     double maximal_clique_approximation_time = -1;
     double modular_product_time = -1;
     double maximal_clique_modular_product_time = -1;
+    double maximal_common_subgraph_approximation_time = -1;
 
     clock_t time_all_begin = clock();
 
@@ -1130,7 +1142,7 @@ int main(int argc, char *argv[])
     {
 #ifdef PRINTTOCMD
         printf("-------------------------------------------------\n");
-        printf("Maximal cliques for graph %d\n", i);
+        printf("Maximum cliques for graph %d\n", i);
 #endif
         struct Vector R;
         createVector_Int(&R, 1);
@@ -1162,8 +1174,8 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
         printVector_Vector(bronResult);
 #endif
-        fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
-        saveToFileVector_Vector(bronResult, outputFile);
+        fprintf(outputFile, "Maximum Cliques for graph %d: \n", i);
+        saveToFileVector_Vector_Max(bronResult, outputFile);
 
         for (int i = 0; i < bronResult.currentNumberOfElements; i++)
         {
@@ -1182,11 +1194,12 @@ int main(int argc, char *argv[])
     struct Vector approximationResult;
     createVector_Vector(&approximationResult, noOfGraphs);
     time_begin = clock();
-    for (int i = 0; i < noOfGraphs; i++) {
+    for (int i = 0; i < noOfGraphs; i++)
+    {
         struct Vector approximation;
         createVector_Int(&approximation, 1);
         pushBackVector_Vector(&approximationResult, approximation);
-        maximalCliqueApproximation((struct Graph* )graphs.data + i, (struct Vector*)approximationResult.data + i);
+        maximalCliqueApproximation((struct Graph *)graphs.data + i, (struct Vector *)approximationResult.data + i);
     }
     time_end = clock();
     maximal_clique_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
@@ -1194,15 +1207,17 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
 #endif
-    for (int i = 0; i < noOfGraphs; i++) {
-        struct Vector currentResult = *((struct Vector*)approximationResult.data + i);
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        struct Vector currentResult = *((struct Vector *)approximationResult.data + i);
 #ifdef PRINTTOCMD
         printf("-------------------------------------------------\n");
-        printf("Maximal clique approximation for graph %d\n", i);
+        printf("Maximum clique approximation for graph %d\n", i);
         printVector_Int(currentResult);
         // printVector_Vector(approximationResult);
 #endif
-        fprintf(outputFile, "Maximal Clique approximation for graph %d: \n", i);
+
+        fprintf(outputFile, "Maximum Clique approximation for graph %d: \n", i);
         fprintf(outputFile, "[ ");
         for (int j = 0; j < currentResult.currentNumberOfElements; j++)
         {
@@ -1212,6 +1227,11 @@ int main(int argc, char *argv[])
         fprintf(outputFile, "]\n");
     }
 
+    for (int i = 0; i < approximationResult.currentNumberOfElements; i++)
+    {
+        free(((struct Vector *)approximationResult.data + i)->data);
+    }
+    free(approximationResult.data);
 #ifdef PRINTTOCMD
     printf("-------------------------------------------------\n");
 #endif
@@ -1255,7 +1275,7 @@ int main(int argc, char *argv[])
 
 #ifdef PRINTTOCMD
             printf("-------------------------------------------------\n");
-            printf("Maximal common subgraphs of all input graphs:\n");
+            printf("Maximum common subgraphs of all input graphs:\n");
 #endif
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
@@ -1267,7 +1287,7 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
             printVector_Vector_Max(bronResult);
 #endif
-            fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
+            fprintf(outputFile, "Maximum common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
             // free(R.data);
@@ -1281,22 +1301,52 @@ int main(int argc, char *argv[])
             free(bronResult.data);
         }
     }
+
+    // Approximation
+    struct Vector modularProductApproximationResult;
+    createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
+    time_begin = clock();
+
+    maximalCliqueApproximation(GH, &modularProductApproximationResult);
+
+    time_end = clock();
+    maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+
+#ifdef PRINTTOCMD
+    printf("-------------------------------------------------\n");
+    printf("Maximum common subgraph approximation for all graphs\n");
+    printVector_Int(modularProductApproximationResult);
+    // printVector_Vector(approximationResult);
+#endif
+
+    fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
+    fprintf(outputFile, "[ ");
+    for (int j = 0; j < modularProductApproximationResult.currentNumberOfElements; j++)
+    {
+        fprintf(outputFile, "%d ", *((int *)modularProductApproximationResult.data + j));
+    }
+
+    fprintf(outputFile, "]\n");
+    free(modularProductApproximationResult.data);
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
     clock_t time_all_end = clock();
 
-    printf("Time of calculating maximal cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
-    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_cliques_time);
+    printf("Time of calculating maximum cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
+    fprintf(outputFile, "Time of calculating maximum cliques for for all input graphs: %fs\n", maximal_cliques_time);
 
-    printf("Time of calculating maximal clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
-    fprintf(outputFile, "Time of calculating maximal cliques for for all input graphs: %fs\n", maximal_clique_approximation_time);
+    printf("Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
+    fprintf(outputFile, "Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
 
     printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
     fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
 
-    printf("Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
-    fprintf(outputFile, "Time of calculating maximal common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    printf("Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    fprintf(outputFile, "Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+
+    printf("Time of approximating maximum common subgraph for all input graphs: %fs\n", maximal_common_subgraph_approximation_time);
+    fprintf(outputFile, "Time of approximating maximum common subgraph for all input graphs: %fs\n", maximal_common_subgraph_approximation_time);
 
     printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
     fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);

@@ -38,8 +38,8 @@ Add `#define PRINTTOCMD` to the beginning of the main.c. Regardless of that, pro
 - [x] OPTIONAL: Test the product function against some example online.
 - [x] OPTIONAL: Implement Adjacency Matrix implementation to improve time complexity at the cost of space complexity.
 - [x] OPTIONAL: Add pivoting to iterative Bron Kerbosch.
-- [ ] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also.
+- [x] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also.
 - [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
 - [ ] Run tests, time it to put something to docs.
-- [ ] OPTIONAL: Check and prepare for edge cases, such as empty graph description, vertex with no edges.
+- [x] OPTIONAL: Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [ ] OPTIONAL: Find a way to measure maximal memory usage.
