@@ -1431,6 +1431,7 @@ int main(int argc, char *argv[])
 
     struct Graph *GH = NULL;
     struct Graph *GH_prev = NULL;
+    double maximal_common_subgraph_approximation_time = -1;
 
     if (1 < noOfGraphs)
     {
@@ -1492,34 +1493,34 @@ int main(int argc, char *argv[])
             }
             free(bronResult.data);
         }
-    }
-    // Approximation
-    double maximal_common_subgraph_approximation_time = -1;
-    struct Vector modularProductApproximationResult;
-    createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
-    time_begin = clock();
 
-    maximalCliqueApproximation(GH, &modularProductApproximationResult);
+        // Approximation
+        struct Vector modularProductApproximationResult;
+        createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
+        time_begin = clock();
 
-    time_end = clock();
-    maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+        maximalCliqueApproximation(GH, &modularProductApproximationResult);
+
+        time_end = clock();
+        maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
 
 #ifdef PRINTTOCMD
-    printf("-------------------------------------------------\n");
-    printf("Maximum common subgraph approximation for all graphs\n");
-    printVector_Int(modularProductApproximationResult);
-    // printVector_Vector(approximationResult);
+        printf("-------------------------------------------------\n");
+        printf("Maximum common subgraph approximation for all graphs\n");
+        printVector_Int(modularProductApproximationResult);
+        // printVector_Vector(approximationResult);
 #endif
 
-    fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
-    fprintf(outputFile, "[ ");
-    for (int j = 0; j < modularProductApproximationResult.currentNumberOfElements; j++)
-    {
-        fprintf(outputFile, "%d ", *((int *)modularProductApproximationResult.data + j));
-    }
+        fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
+        fprintf(outputFile, "[ ");
+        for (int j = 0; j < modularProductApproximationResult.currentNumberOfElements; j++)
+        {
+            fprintf(outputFile, "%d ", *((int *)modularProductApproximationResult.data + j));
+        }
 
-    fprintf(outputFile, "]\n");
-    free(modularProductApproximationResult.data);
+        fprintf(outputFile, "]\n");
+        free(modularProductApproximationResult.data);
+    }
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
 #endif // dbg
