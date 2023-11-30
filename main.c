@@ -1337,7 +1337,7 @@ int main(int argc, char *argv[])
     fprintf(outputFile, "Time of calculating maximum cliques for for all input graphs: %fs\n", maximal_cliques_time);
 
     printf("Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
-    fprintf(outputFile, "Time of calculating maximum cliques for for all input graphs: %fs\n", maximal_clique_approximation_time);
+    fprintf(outputFile, "Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
 
     printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
     fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
