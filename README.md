@@ -43,3 +43,8 @@ Add `#define PRINTTOCMD` to the beginning of the main.c. Regardless of that, pro
 - [ ] Run tests, time it to put something to docs.
 - [x] OPTIONAL: Check and prepare for edge cases, such as empty graph description, vertex with no edges.
 - [ ] OPTIONAL: Find a way to measure maximal memory usage.
+
+# Possible improvements
+
+- [ ] If let's say graphs can have the edge weight of no more than 256 then instead of using int we could use int8_t to cut down memory usage by around 40%.
+- [ ] Improve size data type, size_t instead of int should be used and proper casting should be added.
