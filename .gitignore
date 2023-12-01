@@ -54,3 +54,5 @@ dkms.conf
 output.txt
 main
 valgrind-out.txt
+
+tests/
