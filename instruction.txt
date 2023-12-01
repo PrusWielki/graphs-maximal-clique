@@ -1,0 +1,15 @@
+A prerequisite is a Windows machine with gcc installed. Preferably 64-bit.
+
+1. Open cmd and navigate to folder with executables.
+2. Run the executable with example file (examples are located in the "input" folder)
+    main.exe ./input/example.txt
+
+Alternatively to compile the program and run it:
+1. Open cmd and navigate to folder with executables.
+2. Compile the program:
+    gcc main.c -o main
+2. Run the executable with example file (examples are located in the "input" folder)
+    main.exe ./input/example.txt
+
+The program accepts multiple input files and multiple input graphs in each file:
+    main.exe ./input/example.txt ./input/example.txt
