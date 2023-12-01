@@ -495,6 +495,17 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
             continue;
         struct Graph newGraph;
         noOfVertices = strtol(line, NULL, 10);
+        if (0 == noOfVertices)
+        {
+            bytesRead = getline(&line, &lineLength, filePtr);
+
+            if (0 >= bytesRead)
+            {
+                printf("Input file is not in a accepted format\n");
+                exit(EXIT_FAILURE);
+            }
+            noOfVertices = strtol(line, NULL, 10);
+        }
         newGraph.noOfVertices = noOfVertices;
 #ifdef dbg
         printf("file: %s\n", line);
