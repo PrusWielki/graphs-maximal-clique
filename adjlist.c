@@ -1371,10 +1371,10 @@ int main(int argc, char *argv[])
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
         iterPivotBronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
 #ifdef PRINTTOCMD
-        printVector_Vector(bronResult);
+        printVector_Vector_Max(bronResult);
 #endif
-        fprintf(outputFile, "Maximal Cliques for graph %d: \n", i);
-        saveToFileVector_Vector(bronResult, outputFile);
+        fprintf(outputFile, "Maximum Cliques for graph %d: \n", i);
+        saveToFileVector_Vector_Max(bronResult, outputFile);
 
         for (int i = 0; i < bronResult.currentNumberOfElements; i++)
         {
@@ -1491,7 +1491,7 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
             printVector_Vector_Max(bronResult);
 #endif
-            fprintf(outputFile, "Maximal common induced subgraphs for all input graphs: \n");
+            fprintf(outputFile, "Maximum common induced subgraphs for all input graphs: \n");
             saveToFileVector_Vector_Max(bronResult, outputFile);
 
             // free(R.data);
