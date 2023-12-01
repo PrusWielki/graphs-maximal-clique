@@ -3,8 +3,10 @@
 0 1 0
 1 0 1
 0 1 0
-more graph description
+wikipedia example
+
 3
 0 1 0
 1 0 1
 0 1 0
+wikipedia example
