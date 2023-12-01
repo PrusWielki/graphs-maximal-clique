@@ -387,6 +387,36 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
         printGraph(graphs[i]);
     }
 }
+void saveToFileGraph(struct Graph *graph, FILE *output_file)
+{
+    for (int i = 0; i < graph->noOfVertices; i++)
+    {
+
+        for (int j = 0; j < graph->noOfVertices; j++)
+        {
+            fprintf(output_file, "%d ", graph->adjacencyMatrix[i * graph->noOfVertices + j]);
+        }
+        fprintf(output_file, "\n");
+    }
+    fprintf(output_file, "Additional information: %s\n", graph->description);
+    fprintf(output_file, "-------------------------------------------------\n\n");
+}
+
+int countGraphEdges(struct Graph *graph)
+{
+
+    int noOfEdges = 0;
+    for (int i = 0; i < graph->noOfVertices; i++)
+    {
+
+        for (int j = 0; j < graph->noOfVertices; j++)
+        {
+            if (graph->adjacencyMatrix[i * graph->noOfVertices + j] != 0)
+                noOfEdges++;
+        }
+    }
+    return noOfEdges;
+}
 void freeGraph(struct Graph *graph)
 {
     if (NULL == graph)
@@ -1141,6 +1171,17 @@ int main(int argc, char *argv[])
 
     outputFile = fopen("output.txt", "w");
 
+    // Save read graphs to file
+
+    int noOfEdges = 0;
+    for (int i = 0; i < graphs.currentNumberOfElements; i++)
+    {
+        noOfEdges = countGraphEdges(((struct Graph *)(graphs.data) + i));
+        fprintf(outputFile, "------------------Graph %d----------------------\n", i);
+        fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + ((struct Graph *)(graphs.data) + i)->noOfVertices, ((struct Graph *)(graphs.data) + i)->noOfVertices, noOfEdges);
+        fprintf(outputFile, "Adjacency matrix:\n");
+        saveToFileGraph(((struct Graph *)(graphs.data) + i), outputFile);
+    }
 // Print graphs
 #ifdef PRINTTOCMD
     printGraphs(graphs.data, noOfGraphs);
@@ -1266,8 +1307,13 @@ int main(int argc, char *argv[])
         time_end = clock();
 
         modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+
         if (NULL != GH)
         {
+            noOfEdges = countGraphEdges(GH);
+            fprintf(outputFile, "-------------------------------------------------\n");
+            fprintf(outputFile, "Modular product graph of all input graphs is of size %d with %d vertices and %d edges\n", noOfEdges + GH->noOfVertices, GH->noOfVertices, noOfEdges);
+            fprintf(outputFile, "-------------------------------------------------\n");
 #ifdef PRINTTOCMD
             printf("-------------------------------------------------\n");
             printf("Modular product graph of all input graphs:\n");
