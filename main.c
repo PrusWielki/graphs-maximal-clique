@@ -1176,6 +1176,106 @@ void retrieveOriginalVertices(struct Vector maximumCommonSubgraph, struct Vector
     free(result.data);
 }
 
+struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, struct Vector inputGraphs)
+{
+    /*
+        1. Purpose of this function is to map maximum clique from modular graph product to original graphs.
+        2. To do that notice that:
+            1. In the case of two graphs to retrieve the original vertices one needs to: divide the vertex number from modular graph product
+            by the amount of vertices in graph 1, the int result is the index of vertex in 1, then multply the result by the amount of vertices in 1
+            and subtract that from the amount of vertices in graph 2 to get the index of vertex from graph 2.
+            2. Repeat this process until you get to the first original graph, so repeat n - 1 times, where n is the amount of original graphs.
+    */
+    struct Graph toreturn;
+    toreturn.noOfVertices = maximumCommonSubgraph.currentNumberOfElements;
+    toreturn.adjacencyMatrix = calloc(maximumCommonSubgraph.currentNumberOfElements * maximumCommonSubgraph.currentNumberOfElements, sizeof(int));
+    if (NULL == toreturn.adjacencyMatrix)
+    {
+        printf("Error allocating memory when retrieving original graph");
+        exit(EXIT_FAILURE);
+    }
+    toreturn.description = malloc(sizeof(char));
+    if (NULL == toreturn.description)
+    {
+        printf("Error allocating memory when retrieving original graph");
+        exit(EXIT_FAILURE);
+    }
+    toreturn.description[0] = '\0';
+    struct Vector result;
+    createVector_Vector(&result, inputGraphs.currentNumberOfElements);
+
+    for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
+    {
+        createVector_Int((struct Vector *)result.data + i, maximumCommonSubgraph.currentNumberOfElements);
+    }
+
+    int currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
+
+    for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
+    {
+        currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
+    }
+
+    for (int j = 0; j < maximumCommonSubgraph.currentNumberOfElements; j++)
+    {
+        int currentVertexIndex = *((int *)maximumCommonSubgraph.data + j);
+        int row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1)->noOfVertices;
+        for (int i = 0; i < inputGraphs.currentNumberOfElements - 1; i++)
+        {
+
+            int column = currentVertexIndex - (row * ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices);
+            *((int *)(((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->data) + j) = column;
+            ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements = ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements + 1;
+            if (i < inputGraphs.currentNumberOfElements - 2)
+            {
+                currentLeftHandGraphSize = currentLeftHandGraphSize / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+                currentVertexIndex = row;
+                row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+            }
+        }
+        *((int *)(((struct Vector *)result.data)->data) + j) = row;
+        ((struct Vector *)result.data)->currentNumberOfElements = ((struct Vector *)result.data)->currentNumberOfElements + 1;
+        currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
+
+        for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
+        {
+            currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
+        }
+    }
+    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements - 1; i++)
+    {
+        for (int j = i + 1; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
+        {
+
+            if (((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data)->data) + j)] != 0)
+            {
+
+                toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] = ((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data)->data) + j)];
+            }
+        }
+    }
+
+    for (int i = 0; i < toreturn.noOfVertices; i++)
+    {
+        for (int j = 0; j < toreturn.noOfVertices; j++)
+        {
+            if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
+            {
+                toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
+            }
+        }
+    }
+    printGraph(toreturn);
+
+    return toreturn;
+    for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
+    {
+        printVector_Int(*((struct Vector *)result.data + i));
+        free(((struct Vector *)result.data + i)->data);
+    }
+    free(result.data);
+}
+
 int main(int argc, char *argv[])
 {
     /*
@@ -1348,7 +1448,6 @@ int main(int argc, char *argv[])
     // Modular Graph Product
 
     struct Graph *GH = NULL;
-    struct Graph *GH_prev = NULL;
     maximal_clique_modular_product_time = 0;
     modular_product_time = 0;
 
@@ -1364,9 +1463,9 @@ int main(int argc, char *argv[])
             createVector_Int(&R, 1);
             struct Vector P;
             createVector_Int(&P, 1);
-            for (int i = 0; i < GH->noOfVertices; i++)
+            for (int j = 0; j < GH->noOfVertices; j++)
             {
-                pushBackVector_Int(&P, i);
+                pushBackVector_Int(&P, j);
             }
             struct Vector X;
             createVector_Int(&X, 1);
@@ -1379,17 +1478,16 @@ int main(int argc, char *argv[])
 
             maximal_clique_modular_product_time = maximal_clique_modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
 
+            // Multiply resulting graph with mapped found maximum common subgraph (just choose one maximum), one can check the weights during mapping
 
+            retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), graphs);
+            // GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
                 free(((struct Vector *)bronResult.data + i)->data);
             }
             free(bronResult.data);
-
-            // Multiply resulting graph with mapped found maximum common subgraph (just choose one maximum), one can check the weights during mapping
-            GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
-
         }
 
         // Approximation
@@ -1409,7 +1507,7 @@ int main(int argc, char *argv[])
         // printVector_Vector(approximationResult);
 #endif
 
-        retrieveOriginalVertices(modularProductApproximationResult, graphs);
+        // retrieveOriginalVertices(modularProductApproximationResult, graphs);
 
         fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
         fprintf(outputFile, "[ ");
