@@ -1137,28 +1137,32 @@ void retrieveOriginalVertices(struct Vector maximumCommonSubgraph, struct Vector
 
     int currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
 
-    for (int i = 1; i < inputGraphs.currentNumberOfElements-1; i++)
+    for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
     {
         currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
     }
 
     for (int j = 0; j < maximumCommonSubgraph.currentNumberOfElements; j++)
     {
-        int row = *((int *)maximumCommonSubgraph.data + j) / currentLeftHandGraphSize;
+        int currentVertexIndex = *((int *)maximumCommonSubgraph.data + j);
+        int row = currentVertexIndex / currentLeftHandGraphSize;
         for (int i = 0; i < inputGraphs.currentNumberOfElements - 1; i++)
         {
 
-            int column = *((int *)maximumCommonSubgraph.data + j) - (row * currentLeftHandGraphSize);
+            int column = currentVertexIndex - (row * currentLeftHandGraphSize);
             *((int *)(((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->data) + j) = column;
             ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements = ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements + 1;
-            currentLeftHandGraphSize = currentLeftHandGraphSize / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
-            row = *((int *)maximumCommonSubgraph.data + j) / currentLeftHandGraphSize;
+            if (i < inputGraphs.currentNumberOfElements - 2)
+            {
+                currentLeftHandGraphSize = currentLeftHandGraphSize / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+                row = currentVertexIndex / currentLeftHandGraphSize;
+            }
         }
         *((int *)(((struct Vector *)result.data)->data) + j) = row;
         ((struct Vector *)result.data)->currentNumberOfElements = ((struct Vector *)result.data)->currentNumberOfElements + 1;
         currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
 
-        for (int i = 1; i < inputGraphs.currentNumberOfElements; i++)
+        for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
         {
             currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
         }
