@@ -1171,7 +1171,9 @@ void retrieveOriginalVertices(struct Vector maximumCommonSubgraph, struct Vector
     for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
     {
         printVector_Int(*((struct Vector *)result.data + i));
+        free(((struct Vector *)result.data + i)->data);
     }
+    free(result.data);
 }
 
 int main(int argc, char *argv[])
@@ -1355,6 +1357,7 @@ int main(int argc, char *argv[])
         for (int i = 1; i < noOfGraphs; i++)
         {
             GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
+            printGraph(*GH);
             freeGraph(GH_prev);
             free(GH_prev);
             GH_prev = GH;
