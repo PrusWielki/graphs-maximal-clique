@@ -1514,8 +1514,8 @@ int main(int argc, char *argv[])
         time_begin = clock();
         iterPivotBronKerbosch(R, P, X, GH, &bronResult);
         time_end = clock();
-        *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
-        *((struct Graph *)(toRetrieveGraphs.data) + 1) = originalSubgraph;
+        *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
+        *((struct Graph *)(toRetrieveGraphs.data) + 1) = *(struct Graph *)graphs.data;
         originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
 
         fprintf(outputFile, "Maximum common subgraph: \n");
