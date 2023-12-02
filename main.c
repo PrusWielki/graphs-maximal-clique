@@ -1349,35 +1349,17 @@ int main(int argc, char *argv[])
 
     struct Graph *GH = NULL;
     struct Graph *GH_prev = NULL;
+    maximal_clique_modular_product_time = 0;
+    modular_product_time = 0;
 
     if (1 < noOfGraphs)
     {
         time_begin = clock();
-        GH = graphs.data;
+        GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
+        time_end = clock();
+        modular_product_time = modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
         for (int i = 1; i < noOfGraphs; i++)
         {
-            GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
-            printGraph(*GH);
-            freeGraph(GH_prev);
-            free(GH_prev);
-            GH_prev = GH;
-        }
-
-        time_end = clock();
-
-        modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-
-        if (NULL != GH)
-        {
-            noOfEdges = countGraphEdges(GH);
-            fprintf(outputFile, "-------------------------------------------------\n");
-            fprintf(outputFile, "Modular product graph of all input graphs is of size %d with %d vertices and %d edges\n", noOfEdges + GH->noOfVertices, GH->noOfVertices, noOfEdges);
-            fprintf(outputFile, "-------------------------------------------------\n");
-#ifdef PRINTTOCMD
-            printf("-------------------------------------------------\n");
-            printf("Modular product graph of all input graphs:\n");
-            printGraph(*GH);
-#endif
             struct Vector R;
             createVector_Int(&R, 1);
             struct Vector P;
@@ -1389,32 +1371,25 @@ int main(int argc, char *argv[])
             struct Vector X;
             createVector_Int(&X, 1);
 
-#ifdef PRINTTOCMD
-            printf("-------------------------------------------------\n");
-            printf("Maximum common subgraphs of all input graphs:\n");
-#endif
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
             time_begin = clock();
             iterPivotBronKerbosch(R, P, X, GH, &bronResult);
             time_end = clock();
 
-            maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-#ifdef PRINTTOCMD
-            printVector_Vector_Max(bronResult);
-#endif
-            fprintf(outputFile, "Maximum common induced subgraphs for all input graphs: \n");
-            saveToFileVector_Vector_Max(bronResult, outputFile);
+            maximal_clique_modular_product_time = maximal_clique_modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
 
-            // free(R.data);
-            // free((int *)X.data);
-            // free(P.data);
+
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
                 free(((struct Vector *)bronResult.data + i)->data);
             }
             free(bronResult.data);
+
+            // Multiply resulting graph with mapped found maximum common subgraph (just choose one maximum), one can check the weights during mapping
+            GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
+
         }
 
         // Approximation
