@@ -1265,15 +1265,15 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
             }
         }
     }
-    printGraph(toreturn);
 
-    return toreturn;
     for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
     {
         printVector_Int(*((struct Vector *)result.data + i));
         free(((struct Vector *)result.data + i)->data);
     }
     free(result.data);
+
+    return toreturn;
 }
 
 int main(int argc, char *argv[])
@@ -1453,11 +1453,17 @@ int main(int argc, char *argv[])
 
     if (1 < noOfGraphs)
     {
+        struct Vector toRetrieveGraphs;
+        createVector_Graph(&toRetrieveGraphs, 2);
+        *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
+        *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
+        toRetrieveGraphs.currentNumberOfElements = 2;
         time_begin = clock();
         GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
         time_end = clock();
         modular_product_time = modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-        for (int i = 1; i < noOfGraphs; i++)
+        struct Graph originalSubgraph;
+        for (int i = 2; i < noOfGraphs; i++)
         {
             struct Vector R;
             createVector_Int(&R, 1);
@@ -1480,15 +1486,40 @@ int main(int argc, char *argv[])
 
             // Multiply resulting graph with mapped found maximum common subgraph (just choose one maximum), one can check the weights during mapping
 
-            retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), graphs);
-            // GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
+            originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
+            // printGraph(originalSubgraph);
+            GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + i));
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
             {
                 free(((struct Vector *)bronResult.data + i)->data);
             }
             free(bronResult.data);
+            *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
+            *((struct Graph *)(toRetrieveGraphs.data) + 1) = *GH;
         }
+        struct Vector R;
+        createVector_Int(&R, 1);
+        struct Vector P;
+        createVector_Int(&P, 1);
+        for (int j = 0; j < GH->noOfVertices; j++)
+        {
+            pushBackVector_Int(&P, j);
+        }
+        struct Vector X;
+        createVector_Int(&X, 1);
+
+        struct Vector bronResult;
+        createVector_Vector(&bronResult, 1);
+        time_begin = clock();
+        iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+        time_end = clock();
+        *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
+        *((struct Graph *)(toRetrieveGraphs.data) + 1) = originalSubgraph;
+        originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
+
+        fprintf(outputFile, "Maximum common subgraph: \n");
+        saveToFileGraph(&originalSubgraph, outputFile);
 
         // Approximation
         struct Vector modularProductApproximationResult;
@@ -1508,6 +1539,7 @@ int main(int argc, char *argv[])
 #endif
 
         // retrieveOriginalVertices(modularProductApproximationResult, graphs);
+        
 
         fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
         fprintf(outputFile, "[ ");
