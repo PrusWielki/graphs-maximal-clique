@@ -1117,6 +1117,19 @@ void maximalCliqueApproximation(struct Graph *graph, struct Vector *result)
     }
     free(rest.data);
 }
+void retrieveOriginalVertices(struct Graph modularProduct, struct Vector maximumCommonSubgraph, struct Vector inputGraphs){
+/*
+    1. Purpose of this function is to map maximum clique from modular graph product to original graphs.
+    2. To do that notice that:
+        1. In the case of two graphs to retrieve the original vertices one needs to: divide the vertex number from modular graph product
+        by the amount of vertices in graph 1, the int result is the index of vertex in 1, then multply the result by the amount of vertices in 1
+        and subtract that from the amount of vertices in graph 2 to get the index of vertex from graph 2.
+        2. Repeat this process until you get to the first original graph, so repeat n - 1 times, where n is the amount of original graphs.
+*/
+
+
+
+}
 
 int main(int argc, char *argv[])
 {
