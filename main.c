@@ -1145,17 +1145,18 @@ void retrieveOriginalVertices(struct Vector maximumCommonSubgraph, struct Vector
     for (int j = 0; j < maximumCommonSubgraph.currentNumberOfElements; j++)
     {
         int currentVertexIndex = *((int *)maximumCommonSubgraph.data + j);
-        int row = currentVertexIndex / currentLeftHandGraphSize;
+        int row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1)->noOfVertices;
         for (int i = 0; i < inputGraphs.currentNumberOfElements - 1; i++)
         {
 
-            int column = currentVertexIndex - (row * currentLeftHandGraphSize);
+            int column = currentVertexIndex - (row * ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices);
             *((int *)(((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->data) + j) = column;
             ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements = ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements + 1;
             if (i < inputGraphs.currentNumberOfElements - 2)
             {
                 currentLeftHandGraphSize = currentLeftHandGraphSize / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
-                row = currentVertexIndex / currentLeftHandGraphSize;
+                currentVertexIndex = row;
+                row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
             }
         }
         *((int *)(((struct Vector *)result.data)->data) + j) = row;
