@@ -1602,12 +1602,18 @@ int main(int argc, char *argv[])
 
         fprintf(outputFile, "-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
-
+#ifdef PRINTTOCMD
+        printf("-------------------------------------------------\n");
+        printf("Maximum common subgraph for all input graphs: \n");
+#endif
         int noOfEdges = 0;
         noOfEdges = countGraphEdges(&originalSubgraph);
         fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
         fprintf(outputFile, "Adjacency matrix:\n");
-
+#ifdef PRINTTOCMD
+        printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
+        printf("Adjacency matrix:\n");
+#endif
         saveToFileGraph(&originalSubgraph, outputFile);
         freeGraph(&newOriginalSubgraph);
         freeGraph(&originalSubgraph);
@@ -1721,12 +1727,20 @@ int main(int argc, char *argv[])
 
         fprintf(outputFile, "-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph approximation for all input graphs: \n");
+#ifdef PRINTTOCMD
+        printf("-------------------------------------------------\n");
+        printf("Maximum common subgraph approximation for all input graphs: \n");
+#endif
 
         noOfEdges = 0;
         noOfEdges = countGraphEdges(&originalSubgraph);
         fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
         fprintf(outputFile, "Adjacency matrix:\n");
+#ifdef PRINTTOCMD
+        printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
+        printf("Adjacency matrix:\n");
 
+#endif
         saveToFileGraph(&originalSubgraph, outputFile);
         freeGraph(&newOriginalSubgraph);
         freeGraph(&originalSubgraph);
