@@ -1594,6 +1594,12 @@ int main(int argc, char *argv[])
 
         fprintf(outputFile, "-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
+
+        int noOfEdges = 0;
+        noOfEdges = countGraphEdges(&originalSubgraph);
+        fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
+        fprintf(outputFile, "Adjacency matrix:\n");
+
         saveToFileGraph(&originalSubgraph, outputFile);
         freeGraph(&newOriginalSubgraph);
         freeGraph(&originalSubgraph);
