@@ -1118,6 +1118,106 @@ void maximalCliqueApproximation(struct Graph *graph, struct Vector *result)
     free(rest.data);
 }
 
+struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, struct Vector inputGraphs)
+{
+    /*
+        1. Purpose of this function is to map maximum clique from modular graph product to original graphs.
+        2. To do that notice that:
+            1. In the case of two graphs to retrieve the original vertices one needs to: divide the vertex number from modular graph product
+            by the amount of vertices in graph 1, the int result is the index of vertex in 1, then multply the result by the amount of vertices in 1
+            and subtract that from the amount of vertices in graph 2 to get the index of vertex from graph 2.
+            2. Repeat this process until you get to the first original graph, so repeat n - 1 times, where n is the amount of original graphs.
+    */
+    struct Graph toreturn;
+    toreturn.noOfVertices = maximumCommonSubgraph.currentNumberOfElements;
+    toreturn.adjacencyMatrix = calloc(maximumCommonSubgraph.currentNumberOfElements * maximumCommonSubgraph.currentNumberOfElements, sizeof(int));
+    if (NULL == toreturn.adjacencyMatrix)
+    {
+        printf("Error allocating memory when retrieving original graph");
+        exit(EXIT_FAILURE);
+    }
+    toreturn.description = malloc(sizeof(char));
+    if (NULL == toreturn.description)
+    {
+        printf("Error allocating memory when retrieving original graph");
+        exit(EXIT_FAILURE);
+    }
+    toreturn.description[0] = '\0';
+    struct Vector result;
+    createVector_Vector(&result, inputGraphs.currentNumberOfElements);
+
+    for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
+    {
+        createVector_Int((struct Vector *)result.data + i, maximumCommonSubgraph.currentNumberOfElements);
+    }
+
+    int currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
+
+    for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
+    {
+        currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
+    }
+
+    for (int j = 0; j < maximumCommonSubgraph.currentNumberOfElements; j++)
+    {
+        int currentVertexIndex = *((int *)maximumCommonSubgraph.data + j);
+        int row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1)->noOfVertices;
+        for (int i = 0; i < inputGraphs.currentNumberOfElements - 1; i++)
+        {
+
+            int column = currentVertexIndex - (row * ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices);
+            *((int *)(((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->data) + j) = column;
+            ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements = ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements + 1;
+            if (i < inputGraphs.currentNumberOfElements - 2)
+            {
+                currentLeftHandGraphSize = currentLeftHandGraphSize / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+                currentVertexIndex = row;
+                row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+            }
+        }
+        *((int *)(((struct Vector *)result.data)->data) + j) = row;
+        ((struct Vector *)result.data)->currentNumberOfElements = ((struct Vector *)result.data)->currentNumberOfElements + 1;
+        currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
+
+        for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
+        {
+            currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
+        }
+    }
+    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements - 1; i++)
+    {
+        for (int j = i + 1; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
+        {
+
+            if (((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data)->data) + j)] != 0)
+            {
+
+                toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] = ((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data)->data) + j)];
+            }
+        }
+    }
+
+    for (int i = 0; i < toreturn.noOfVertices; i++)
+    {
+        for (int j = 0; j < toreturn.noOfVertices; j++)
+        {
+            if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
+            {
+                toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
+            }
+        }
+    }
+
+    for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
+    {
+        // printVector_Int(*((struct Vector *)result.data + i));
+        free(((struct Vector *)result.data + i)->data);
+    }
+    free(result.data);
+
+    return toreturn;
+}
+
 int main(int argc, char *argv[])
 {
     /*
@@ -1294,96 +1394,102 @@ int main(int argc, char *argv[])
 
     if (1 < noOfGraphs)
     {
-        time_begin = clock();
-        GH = graphs.data;
-        for (int i = 1; i < noOfGraphs; i++)
+
+        maximal_clique_modular_product_time = 0;
+        maximal_common_subgraph_approximation_time = 0;
+        for (int i = 0; i < graphs.currentNumberOfElements - 1; i++)
         {
-            GH = modularProduct(GH, ((struct Graph *)(graphs.data) + i));
-            freeGraph(GH_prev);
-            free(GH_prev);
-            GH_prev = GH;
-        }
 
-        time_end = clock();
-
-        modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-
-        if (NULL != GH)
-        {
-            noOfEdges = countGraphEdges(GH);
-            fprintf(outputFile, "-------------------------------------------------\n");
-            fprintf(outputFile, "Modular product graph of all input graphs is of size %d with %d vertices and %d edges\n", noOfEdges + GH->noOfVertices, GH->noOfVertices, noOfEdges);
-            fprintf(outputFile, "-------------------------------------------------\n");
-#ifdef PRINTTOCMD
-            printf("-------------------------------------------------\n");
-            printf("Modular product graph of all input graphs:\n");
-            printGraph(*GH);
-#endif
-            struct Vector R;
-            createVector_Int(&R, 1);
-            struct Vector P;
-            createVector_Int(&P, 1);
-            for (int i = 0; i < GH->noOfVertices; i++)
+            for (int j = i + 1; j < graphs.currentNumberOfElements; j++)
             {
-                pushBackVector_Int(&P, i);
+                GH = modularProduct(((struct Graph *)(graphs.data) + i), ((struct Graph *)(graphs.data) + j));
+                if (NULL != GH)
+                {
+
+                    struct Vector R;
+                    createVector_Int(&R, 1);
+                    struct Vector P;
+                    createVector_Int(&P, 1);
+                    for (int l = 0; l < GH->noOfVertices; l++)
+                    {
+                        pushBackVector_Int(&P, l);
+                    }
+                    struct Vector X;
+                    createVector_Int(&X, 1);
+
+                    struct Vector bronResult;
+                    createVector_Vector(&bronResult, 1);
+
+                    time_begin = clock();
+                    iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+                    // find max from bron
+                    int max = 0;
+                    struct Vector maxBronResult;
+                    createVector_Int(&maxBronResult, GH->noOfVertices);
+                    maxBronResult.currentNumberOfElements = 1;
+                    for (int l = 0; l < bronResult.currentNumberOfElements; l++)
+                    {
+
+                        if (max < ((struct Vector *)(bronResult.data) + l)->currentNumberOfElements)
+                        {
+                            max = ((struct Vector *)(bronResult.data) + l)->currentNumberOfElements;
+                            maxBronResult.data = ((struct Vector *)(bronResult.data) + l)->data;
+                            maxBronResult.currentNumberOfElements = ((struct Vector *)(bronResult.data) + l)->currentNumberOfElements;
+                        }
+                    }
+
+                    // map it
+                    struct Graph maximumCommonSubgraph;
+                    struct Vector inputGraphs;
+                    createVector_Graph(&inputGraphs, 2);
+                    inputGraphs.currentNumberOfElements = 2;
+                    *(struct Graph *)(inputGraphs.data) = *((struct Graph *)(graphs.data) + i);
+                    *((struct Graph *)(inputGraphs.data) + 1) = *((struct Graph *)(graphs.data) + j);
+                    maximumCommonSubgraph = retrieveOriginalVerticesGraph(maxBronResult, inputGraphs);
+                    time_end = clock();
+
+                    maximal_clique_modular_product_time = maximal_clique_modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+
+                    // display it
+
+                    fprintf(outputFile, "Maximum common subgraph for graphs %d and %d:\n", i, j);
+                    int noOfEdges = countGraphEdges(&maximumCommonSubgraph);
+                    fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + maximumCommonSubgraph.noOfVertices, maximumCommonSubgraph.noOfVertices, noOfEdges);
+                    fprintf(outputFile, "Adjacency matrix:\n");
+                    saveToFileGraph(&maximumCommonSubgraph, outputFile);
+
+                    // approximate it
+
+                    struct Vector modularProductApproximationResult;
+                    createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
+                    time_begin = clock();
+
+                    maximalCliqueApproximation(GH, &modularProductApproximationResult);
+
+                    // map it
+
+                    maximumCommonSubgraph = retrieveOriginalVerticesGraph(modularProductApproximationResult, inputGraphs);
+                    time_end = clock();
+                    maximal_common_subgraph_approximation_time = maximal_common_subgraph_approximation_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+
+                    // display it
+
+                    fprintf(outputFile, "Maximum common subgraph approximation for graphs %d and %d:\n", i, j);
+                    noOfEdges = countGraphEdges(&maximumCommonSubgraph);
+                    fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + maximumCommonSubgraph.noOfVertices, maximumCommonSubgraph.noOfVertices, noOfEdges);
+                    fprintf(outputFile, "Adjacency matrix:\n");
+                    saveToFileGraph(&maximumCommonSubgraph, outputFile);
+
+                    free(modularProductApproximationResult.data);
+
+                    for (int l = 0; l < bronResult.currentNumberOfElements; l++)
+                    {
+                        free(((struct Vector *)bronResult.data + l)->data);
+                    }
+                    free(bronResult.data);
+                }
             }
-            struct Vector X;
-            createVector_Int(&X, 1);
-
-#ifdef PRINTTOCMD
-            printf("-------------------------------------------------\n");
-            printf("Maximum common subgraphs of all input graphs:\n");
-#endif
-            struct Vector bronResult;
-            createVector_Vector(&bronResult, 1);
-            time_begin = clock();
-            iterPivotBronKerbosch(R, P, X, GH, &bronResult);
-            time_end = clock();
-
-            maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-#ifdef PRINTTOCMD
-            printVector_Vector_Max(bronResult);
-#endif
-            fprintf(outputFile, "Maximum common induced subgraphs for all input graphs: \n");
-            saveToFileVector_Vector_Max(bronResult, outputFile);
-
-            // free(R.data);
-            // free((int *)X.data);
-            // free(P.data);
-
-            for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-            {
-                free(((struct Vector *)bronResult.data + i)->data);
-            }
-            free(bronResult.data);
         }
-
-        // Approximation
-        struct Vector modularProductApproximationResult;
-        createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
-        time_begin = clock();
-
-        maximalCliqueApproximation(GH, &modularProductApproximationResult);
-
-        time_end = clock();
-        maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-
-#ifdef PRINTTOCMD
-        printf("-------------------------------------------------\n");
-        printf("Maximum common subgraph approximation for all graphs\n");
-        printVector_Int(modularProductApproximationResult);
-        // printVector_Vector(approximationResult);
-#endif
-
-        fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
-        fprintf(outputFile, "[ ");
-        for (int j = 0; j < modularProductApproximationResult.currentNumberOfElements; j++)
-        {
-            fprintf(outputFile, "%d ", *((int *)modularProductApproximationResult.data + j));
-        }
-
-        fprintf(outputFile, "]\n");
-        free(modularProductApproximationResult.data);
     }
 #ifdef dbg
     dbgTests(*((struct Graph *)(graphs.data)));
@@ -1396,8 +1502,8 @@ int main(int argc, char *argv[])
     printf("Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
     fprintf(outputFile, "Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
 
-    printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
-    fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+    // printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+    // fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
 
     printf("Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
     fprintf(outputFile, "Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
