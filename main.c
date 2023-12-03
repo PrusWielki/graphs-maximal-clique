@@ -1496,7 +1496,7 @@ int main(int argc, char *argv[])
             }
             free(bronResult.data);
             *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
-            *((struct Graph *)(toRetrieveGraphs.data) + 1) = *GH;
+            *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)(graphs.data) + i);
         }
         struct Vector R;
         createVector_Int(&R, 1);
@@ -1514,13 +1514,30 @@ int main(int argc, char *argv[])
         time_begin = clock();
         iterPivotBronKerbosch(R, P, X, GH, &bronResult);
         time_end = clock();
-        *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
-        *((struct Graph *)(toRetrieveGraphs.data) + 1) = *(struct Graph *)graphs.data;
-        originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
+
+        struct Vector maxBron;
+        createVector_Int(&maxBron, GH->noOfVertices);
+        int max = 0;
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
+
+            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+            {
+                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+                maxBron.data = ((struct Vector *)(bronResult.data) + i)->data;
+                maxBron.currentNumberOfElements = max;
+            }
+        }
+
+        originalSubgraph = retrieveOriginalVerticesGraph(maxBron, toRetrieveGraphs);
 
         fprintf(outputFile, "Maximum common subgraph: \n");
         saveToFileGraph(&originalSubgraph, outputFile);
-
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
+            free(((struct Vector *)bronResult.data + i)->data);
+        }
+        free(bronResult.data);
         // Approximation
         struct Vector modularProductApproximationResult;
         createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
@@ -1539,7 +1556,6 @@ int main(int argc, char *argv[])
 #endif
 
         // retrieveOriginalVertices(modularProductApproximationResult, graphs);
-        
 
         fprintf(outputFile, "Maximum common subgraph approximation for all graphs: \n");
         fprintf(outputFile, "[ ");
