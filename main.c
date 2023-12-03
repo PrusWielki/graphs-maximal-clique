@@ -1453,15 +1453,13 @@ int main(int argc, char *argv[])
 
     if (1 < noOfGraphs)
     {
+        time_begin = clock();
         struct Vector toRetrieveGraphs;
         createVector_Graph(&toRetrieveGraphs, 2);
         *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
         *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
         toRetrieveGraphs.currentNumberOfElements = 2;
-        time_begin = clock();
         GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
-        time_end = clock();
-        modular_product_time = modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
         struct Graph originalSubgraph;
         originalSubgraph.adjacencyMatrix = NULL;
         originalSubgraph.description = NULL;
@@ -1483,11 +1481,8 @@ int main(int argc, char *argv[])
 
             struct Vector bronResult;
             createVector_Vector(&bronResult, 1);
-            time_begin = clock();
-            iterPivotBronKerbosch(R, P, X, GH, &bronResult);
-            time_end = clock();
 
-            maximal_clique_modular_product_time = maximal_clique_modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+            iterPivotBronKerbosch(R, P, X, GH, &bronResult);
 
             // Multiply resulting graph with mapped found maximum common subgraph (just choose one maximum), one can check the weights during mapping
             freeGraph(&newOriginalSubgraph);
@@ -1544,9 +1539,7 @@ int main(int argc, char *argv[])
 
         struct Vector bronResult;
         createVector_Vector(&bronResult, 1);
-        time_begin = clock();
         iterPivotBronKerbosch(R, P, X, GH, &bronResult);
-        time_end = clock();
 
         struct Vector maxBron;
         maxBron.data = NULL;
@@ -1609,6 +1602,10 @@ int main(int argc, char *argv[])
         }
         free(bronResult.data);
         free(toRetrieveGraphs.data);
+
+        time_end = clock();
+        double maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+        ;
         // Approximation
         struct Vector modularProductApproximationResult;
         createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
@@ -1649,8 +1646,8 @@ int main(int argc, char *argv[])
     printf("Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
     fprintf(outputFile, "Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
 
-    printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
-    fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+    // printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
+    // fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
 
     printf("Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
     fprintf(outputFile, "Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
