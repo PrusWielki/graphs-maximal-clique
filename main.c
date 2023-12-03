@@ -1488,6 +1488,7 @@ int main(int argc, char *argv[])
 
             originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
             // printGraph(originalSubgraph);
+            freeGraph(GH);
             GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + i));
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
@@ -1538,6 +1539,7 @@ int main(int argc, char *argv[])
             free(((struct Vector *)bronResult.data + i)->data);
         }
         free(bronResult.data);
+        free(toRetrieveGraphs.data);
         // Approximation
         struct Vector modularProductApproximationResult;
         createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
