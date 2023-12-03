@@ -1268,7 +1268,7 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
 
     for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
     {
-        printVector_Int(*((struct Vector *)result.data + i));
+        // printVector_Int(*((struct Vector *)result.data + i));
         free(((struct Vector *)result.data + i)->data);
     }
     free(result.data);
@@ -1463,6 +1463,11 @@ int main(int argc, char *argv[])
         time_end = clock();
         modular_product_time = modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
         struct Graph originalSubgraph;
+        originalSubgraph.adjacencyMatrix = NULL;
+        originalSubgraph.description = NULL;
+        struct Graph newOriginalSubgraph;
+        newOriginalSubgraph.adjacencyMatrix = NULL;
+        newOriginalSubgraph.description = NULL;
         for (int i = 2; i < noOfGraphs; i++)
         {
             struct Vector R;
@@ -1485,10 +1490,37 @@ int main(int argc, char *argv[])
             maximal_clique_modular_product_time = maximal_clique_modular_product_time + (double)(time_end - time_begin) / CLOCKS_PER_SEC;
 
             // Multiply resulting graph with mapped found maximum common subgraph (just choose one maximum), one can check the weights during mapping
+            freeGraph(&newOriginalSubgraph);
+            newOriginalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
+            freeGraph(&originalSubgraph);
+            originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
 
-            originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
+            if (NULL == originalSubgraph.adjacencyMatrix)
+            {
+
+                printf("Couldn't allocate memory for new subgraph in main\n");
+                exit(EXIT_FAILURE);
+            }
+            originalSubgraph.noOfVertices = newOriginalSubgraph.noOfVertices;
+            for (int j = 0; j < newOriginalSubgraph.noOfVertices; j++)
+            {
+
+                for (int k = 0; k < newOriginalSubgraph.noOfVertices; k++)
+                {
+                    originalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k] = newOriginalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k];
+                }
+            }
+            originalSubgraph.description = malloc(sizeof(char));
+            if (NULL == originalSubgraph.description)
+            {
+
+                printf("Couldn't allocate memory for new subgraph in main\n");
+                exit(EXIT_FAILURE);
+            }
+            originalSubgraph.description[0] = '\0';
             // printGraph(originalSubgraph);
             freeGraph(GH);
+            free(GH);
             GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + i));
 
             for (int i = 0; i < bronResult.currentNumberOfElements; i++)
@@ -1517,7 +1549,7 @@ int main(int argc, char *argv[])
         time_end = clock();
 
         struct Vector maxBron;
-        createVector_Int(&maxBron, GH->noOfVertices);
+        maxBron.data = NULL;
         int max = 0;
         for (int i = 0; i < bronResult.currentNumberOfElements; i++)
         {
@@ -1527,13 +1559,44 @@ int main(int argc, char *argv[])
                 max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
                 maxBron.data = ((struct Vector *)(bronResult.data) + i)->data;
                 maxBron.currentNumberOfElements = max;
+                maxBron.size = max;
             }
         }
+        freeGraph(&newOriginalSubgraph);
+        newOriginalSubgraph = retrieveOriginalVerticesGraph(maxBron, toRetrieveGraphs);
 
-        originalSubgraph = retrieveOriginalVerticesGraph(maxBron, toRetrieveGraphs);
+        freeGraph(&originalSubgraph);
+        originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
 
-        fprintf(outputFile, "Maximum common subgraph: \n");
+        if (NULL == originalSubgraph.adjacencyMatrix)
+        {
+
+            printf("Couldn't allocate memory for new subgraph in main\n");
+            exit(EXIT_FAILURE);
+        }
+        originalSubgraph.noOfVertices = newOriginalSubgraph.noOfVertices;
+        for (int j = 0; j < newOriginalSubgraph.noOfVertices; j++)
+        {
+
+            for (int k = 0; k < newOriginalSubgraph.noOfVertices; k++)
+            {
+                originalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k] = newOriginalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k];
+            }
+        }
+        originalSubgraph.description = malloc(sizeof(char));
+        if (NULL == originalSubgraph.description)
+        {
+
+            printf("Couldn't allocate memory for new subgraph in main\n");
+            exit(EXIT_FAILURE);
+        }
+        originalSubgraph.description[0] = '\0';
+
+        fprintf(outputFile, "-------------------------------------------------\n");
+        fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
         saveToFileGraph(&originalSubgraph, outputFile);
+        freeGraph(&newOriginalSubgraph);
+        freeGraph(&originalSubgraph);
         for (int i = 0; i < bronResult.currentNumberOfElements; i++)
         {
             free(((struct Vector *)bronResult.data + i)->data);
