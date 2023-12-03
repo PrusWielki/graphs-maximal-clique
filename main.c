@@ -1556,22 +1556,22 @@ int main(int argc, char *argv[])
         createVector_Vector(&bronResult, 1);
         iterPivotBronKerbosch(R, P, X, GH, &bronResult);
 
-        // struct Vector maxBron;
-        // maxBron.data = NULL;
-        // int max = 0;
-        // for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-        // {
+        struct Vector maxBron;
+        maxBron.data = NULL;
+        int max = 0;
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
 
-        //     if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-        //     {
-        //         max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
-        //         maxBron.data = ((struct Vector *)(bronResult.data) + i)->data;
-        //         maxBron.currentNumberOfElements = max;
-        //         maxBron.size = max;
-        //     }
-        // }
+            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+            {
+                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+                maxBron.data = ((struct Vector *)(bronResult.data) + i)->data;
+                maxBron.currentNumberOfElements = max;
+                maxBron.size = max;
+            }
+        }
         freeGraph(&newOriginalSubgraph);
-        newOriginalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)bronResult.data), toRetrieveGraphs);
+        newOriginalSubgraph = retrieveOriginalVerticesGraph(maxBron, toRetrieveGraphs);
 
         freeGraph(&originalSubgraph);
         originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
