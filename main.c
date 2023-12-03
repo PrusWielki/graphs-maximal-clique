@@ -1453,6 +1453,7 @@ int main(int argc, char *argv[])
     if (1 < noOfGraphs)
     {
         /*
+            1. Abstract
             To add backtracking:
             1. Instead of taking just the first largest bronResult, take all the max results.
             2. For each max result do the process.
@@ -1485,6 +1486,7 @@ int main(int argc, char *argv[])
                 pushBackVector_Int(&P, j);
             }
             struct Vector X;
+
             createVector_Int(&X, 1);
 
             struct Vector bronResult;
