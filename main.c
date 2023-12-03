@@ -1772,7 +1772,7 @@ int main(int argc, char *argv[])
 
     printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
     fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
-
+    printf("For results open output.txt file\n");
     freeGraph(GH);
     free(GH);
 
