@@ -1452,6 +1452,15 @@ int main(int argc, char *argv[])
 
     if (1 < noOfGraphs)
     {
+        /*
+            To add backtracking:
+            1. Instead of taking just the first largest bronResult, take all the max results.
+            2. For each max result do the process.
+            3. Repeat.
+            4. Can do this with recursion of a stack.
+                1. a stack is an array of arrays of maxbron result for each branch of computation. Also should probably store the depth of computation for each array.
+        
+        */
         time_begin = clock();
         struct Vector toRetrieveGraphs;
         createVector_Graph(&toRetrieveGraphs, 2);
