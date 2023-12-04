@@ -1302,9 +1302,9 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
             currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
         }
     }
-    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements - 1; i++)
+    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements ; i++)
     {
-        for (int j = i + 1; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
+        for (int j = 0; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
         {
 
             if (((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data)->data) + j)] != 0)
@@ -1315,16 +1315,16 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
         }
     }
 
-    for (int i = 0; i < toreturn.noOfVertices; i++)
-    {
-        for (int j = 0; j < toreturn.noOfVertices; j++)
-        {
-            if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
-            {
-                toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
-            }
-        }
-    }
+    // for (int i = 0; i < toreturn.noOfVertices; i++)
+    // {
+    //     for (int j = 0; j < toreturn.noOfVertices; j++)
+    //     {
+    //         if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
+    //         {
+    //             toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
+    //         }
+    //     }
+    // }
 
     for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
     {
@@ -1402,9 +1402,9 @@ struct Graph retrieveOriginalVerticesGraphTwo(struct Vector maximumCommonSubgrap
             currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
         }
     }
-    for (int i = 0; i < ((struct Vector *)result.data + 1)->currentNumberOfElements - 1; i++)
+    for (int i = 0; i < ((struct Vector *)result.data + 1)->currentNumberOfElements; i++)
     {
-        for (int j = i + 1; j < ((struct Vector *)result.data + 1)->currentNumberOfElements; j++)
+        for (int j = 0; j < ((struct Vector *)result.data + 1)->currentNumberOfElements; j++)
         {
 
             if (((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)] != 0)
@@ -1415,16 +1415,16 @@ struct Graph retrieveOriginalVerticesGraphTwo(struct Vector maximumCommonSubgrap
         }
     }
 
-    for (int i = 0; i < toreturn.noOfVertices; i++)
-    {
-        for (int j = 0; j < toreturn.noOfVertices; j++)
-        {
-            if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
-            {
-                toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
-            }
-        }
-    }
+    // for (int i = 0; i < toreturn.noOfVertices; i++)
+    // {
+    //     for (int j = 0; j < toreturn.noOfVertices; j++)
+    //     {
+    //         if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
+    //         {
+    //             toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
+    //         }
+    //     }
+    // }
 
     for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
     {
@@ -1872,6 +1872,9 @@ int main(int argc, char *argv[])
             for (int k = 0; k < currentMaximumCliques.currentNumberOfElements; k++)
             {
                 // 3.2.1.2
+
+                if (0 == isASubgraph(*((struct Vector *)(currentMaximumCliques.data) + k), *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
+                    continue;
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
