@@ -1495,7 +1495,8 @@ int main(int argc, char *argv[])
                         4. Else:
                             1. Push the original graph to results.
                 3. Take the results and report largest results as maximum common subgraph.
-
+            4. Check for isomorphism.
+                1. I think it's enough that after we find the mapped maximum clique, we check if it's isomorphic to both original graphs, if not dont push to stack.
         */
 
         // stack
