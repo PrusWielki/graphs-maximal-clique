@@ -1653,6 +1653,7 @@ int main(int argc, char *argv[])
         newOriginalSubgraph.description = NULL;
 
         // 3.2
+        int mainLoopIndex = 0;
         while (stackMaximumClique.currentNumberOfElements > 0)
         {
             // 3.2.1.1
@@ -1663,7 +1664,6 @@ int main(int argc, char *argv[])
             for (int k = 0; k < currentMaximumCliques.currentNumberOfElements; k++)
             {
                 // 3.2.1.2
-
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
@@ -1732,7 +1732,31 @@ int main(int argc, char *argv[])
 
                     struct Vector newToRetrieveGraphs;
                     createVector_Graph(&newToRetrieveGraphs, 2);
-                    *((struct Graph *)(newToRetrieveGraphs.data)) = originalSubgraph;
+                    struct Graph graphToPush;
+                    graphToPush.noOfVertices = originalSubgraph.noOfVertices;
+                    graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
+                    if (NULL == graphToPush.adjacencyMatrix)
+                    {
+                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                        exit(EXIT_FAILURE);
+                    }
+                    graphToPush.description = malloc(sizeof(char));
+                    if (NULL == graphToPush.description)
+                    {
+                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                        exit(EXIT_FAILURE);
+                    }
+                    graphToPush.description[0] = '\0';
+                    for (int l = 0; l < originalSubgraph.noOfVertices; l++)
+                    {
+                        for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                        {
+
+                            graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                        }
+                    }
+                    *((struct Graph *)(newToRetrieveGraphs.data)) = graphToPush;
+                    freeGraph(&originalSubgraph);
                     *((struct Graph *)(newToRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
                     newToRetrieveGraphs.currentNumberOfElements = 2;
                     pushBackVector_Vector(&stackOriginalGraphs, newToRetrieveGraphs);
@@ -1764,16 +1788,26 @@ int main(int argc, char *argv[])
                             graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
                         }
                     }
+                    freeGraph(&originalSubgraph);
                     pushBackVector_Graph(&finalResults, graphToPush);
                 }
             }
+            for (int m = 0; m < currentMaximumCliques.currentNumberOfElements; m++)
+            {
+                free(((struct Vector *)currentMaximumCliques.data + m)->data);
+            }
             free(currentMaximumCliques.data);
+            if (mainLoopIndex != 0)
+                freeGraph(toRetrieveGraphs.data);
             free(toRetrieveGraphs.data);
-  
+            mainLoopIndex++;
         }
         free(stackCurrentIndex.data);
         free(stackMaximumClique.data);
-    
+        free(stackOriginalGraphs.data);
+        if (stackOriginalGraphs.currentNumberOfElements > 0)
+            freeGraph(((struct Vector *)stackOriginalGraphs.data)->data);
+
 #ifdef PRINTTOCMD
         printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, 1);
 #endif
@@ -1784,30 +1818,14 @@ int main(int argc, char *argv[])
             freeGraph((struct Graph *)finalResults.data + i);
         }
         free(finalResults.data);
-        fprintf(outputFile, "-------------------------------------------------\n");
-        fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
-#ifdef PRINTTOCMD
-        printf("-------------------------------------------------\n");
-        printf("Maximum common subgraph for all input graphs: \n");
-#endif
-        int noOfEdges = 0;
-        noOfEdges = countGraphEdges(&originalSubgraph);
-        fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
-        fprintf(outputFile, "Adjacency matrix:\n");
-#ifdef PRINTTOCMD
-        printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
-        printf("Adjacency matrix:\n");
-        printGraph(originalSubgraph);
-#endif
-        saveToFileGraph(&originalSubgraph, outputFile);
+
         freeGraph(&newOriginalSubgraph);
-        freeGraph(&originalSubgraph);
+        // freeGraph(&originalSubgraph);
         for (int i = 0; i < bronResult.currentNumberOfElements; i++)
         {
             free(((struct Vector *)bronResult.data + i)->data);
         }
         free(bronResult.data);
-        
 
         time_end = clock();
         maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
