@@ -1661,14 +1661,13 @@ int main(int argc, char *argv[])
 
                     pushBackVector_Vector(&stackMaximumClique, maxBrons);
 
-                    // This might be fault, I'm not 100% sure if I can reassign to this graph without creating a new one, if something doesn't work the fault might be here below
                     struct Vector newToRetrieveGraphs;
                     createVector_Graph(&newToRetrieveGraphs, 2);
                     *((struct Graph *)(newToRetrieveGraphs.data)) = originalSubgraph;
                     *((struct Graph *)(newToRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
                     newToRetrieveGraphs.currentNumberOfElements = 2;
                     pushBackVector_Vector(&stackOriginalGraphs, newToRetrieveGraphs);
-                    // -------------------------end of potential problematic code------------------------------
+                    
                     pushBackVector_Int(&stackCurrentIndex, index + 1);
                 }
                 else
