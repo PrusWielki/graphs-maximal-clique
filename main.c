@@ -1486,7 +1486,7 @@ int main(int argc, char *argv[])
                 1. Initialize the stack with two graphs, maximum common subgraphs of those graphs, and next graph if more than 2 graphs, else null, and index of the furthest of two graphs.
                 2. If stack is not empty do:
                     1. For each stack element:
-                        1. Take one of the maximum cliques
+                        1. Take one of the maximum cliques, so the below for each maximum clique in the set. Pop the vector and loop over it.
                         2. Map it onto the original graphs present in stack.
                         3. If there is a next graph (should also hold index of the current graph in stack):
                             1. Multiply the result by the next graph.
@@ -1586,6 +1586,16 @@ int main(int argc, char *argv[])
         struct Graph newOriginalSubgraph;
         newOriginalSubgraph.adjacencyMatrix = NULL;
         newOriginalSubgraph.description = NULL;
+
+        while(stackMaximumClique.currentNumberOfElements>0){
+
+
+
+
+
+
+
+        }
         for (int i = 2; i < noOfGraphs; i++)
         {
             struct Vector R;
