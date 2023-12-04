@@ -1482,6 +1482,19 @@ int main(int argc, char *argv[])
             4. Can do this with recursion of a stack.
                 1. a stack is an array of arrays of maxbron result for each branch of computation. Also should probably store the depth of computation for each array.
                 2. The stack should hold: array of maximum common cliques, two graphs that resulted in the maximum common clique, next graph to multiply with, if next graph is null we are at a leaf.
+            3. Procedure:
+                1. Initialize the stack with two graphs, maximum common subgraphs of those graphs, and next graph if more than 2 graphs, else null.
+                2. If stack is not empty do:
+                    1. For each stack element:
+                        1. Take one of the maximum cliques
+                        2. Map it onto the original graphs present in stack.
+                        3. If there is a next graph (should also hold index of the current graph in stack):
+                            1. Multiply the result by the next graph.
+                            2. Find the maximum cliques of the multiplication.
+                            3. Push to stack: new maximum cliques, taken maximum clique mapped onto one of the graphs, next graph that was multipled, next graph. 
+                        4. Else:
+                            1. Push the original graph to results.
+                3. Take the results and report largest results as maximum common subgraph.
 
         */
         maximal_clique_modular_product_time = 0;
