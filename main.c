@@ -1481,8 +1481,32 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
             pushBackVector_Vector(&permutations, toPush);
         }
     }
-    // For each permutation create a new graph and test it 
+    // For each permutation create a new graph and test it
 
+    for (int i = 0; i < permutations.currentNumberOfElements; i++)
+    {
+
+        struct Graph permutatedMappedGraph;
+        permutatedMappedGraph.noOfVertices = mapped.noOfVertices;
+
+        permutatedMappedGraph.adjacencyMatrix = calloc(mapped.noOfVertices * mapped.noOfVertices, sizeof(int));
+        if (NULL == permutatedMappedGraph.adjacencyMatrix)
+        {
+            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+            exit(EXIT_FAILURE);
+        }
+        permutatedMappedGraph.description = malloc(sizeof(char));
+        if (NULL == permutatedMappedGraph.description)
+        {
+            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+            exit(EXIT_FAILURE);
+        }
+        permutatedMappedGraph.description[0] = '\0';
+
+
+
+        freeGraph(&permutatedMappedGraph);
+    }
 
     for (int i = 0; i < permutations.currentNumberOfElements; i++)
     {
@@ -1492,6 +1516,8 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
 
     freeGraph(&mapped);
     free(inputGraphs.data);
+
+    return 0;
 }
 
 int main(int argc, char *argv[])
