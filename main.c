@@ -1336,6 +1336,21 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
     return toreturn;
 }
 
+int isASubgraph (struct Graph maximumCommonSubgraph, struct Graph originalGraph1, struct Graph originalGraph2){
+
+    /*
+        1. Take a found maximum common subgraph candidate and second graph of multiplication.
+        2. Permute the found maximum common subgraph candidate, I think it might simply mean changing the order of rows in adjacency matrix maybe, maybe it should be done with respect to diagonal.
+            1. To permutate one needs to swap rows AND columns.
+        3. Wrong I think: For each permutation find a maximum common subgraph of the candidate and the second graph.
+        3. Map the result to the second graph.
+        3. For each permutation
+            1. Compare the permutated result with the mapped result
+    */
+
+
+}
+
 int main(int argc, char *argv[])
 {
     /*
