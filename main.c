@@ -1664,6 +1664,7 @@ int main(int argc, char *argv[])
             {
                 // 3.2.1.2
 
+
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
                 // 3.2.1.3
@@ -1671,6 +1672,8 @@ int main(int argc, char *argv[])
                 if (index < noOfGraphs - 1)
                 {
                     // 3.2.1.3.1
+                    freeGraph(GH);
+                    free(GH);
                     GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + index + 1));
 
                     // 3.2.1.3.2
@@ -1717,6 +1720,11 @@ int main(int argc, char *argv[])
                             pushBackVector_Vector(&maxBrons, toPush);
                         }
                     }
+                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+                    {
+                        free(((struct Vector *)bronResult.data + i)->data);
+                    }
+                    free(bronResult.data);
 
                     // 3.2.1.3.3
 
@@ -1733,15 +1741,49 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    pushBackVector_Graph(&finalResults, originalSubgraph);
+                    struct Graph graphToPush;
+                    graphToPush.noOfVertices = originalSubgraph.noOfVertices;
+                    graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
+                    if (NULL == graphToPush.adjacencyMatrix)
+                    {
+                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                        exit(EXIT_FAILURE);
+                    }
+                    graphToPush.description = malloc(sizeof(char));
+                    if (NULL == graphToPush.description)
+                    {
+                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                        exit(EXIT_FAILURE);
+                    }
+                    graphToPush.description[0] = '\0';
+                    for (int l = 0; l < originalSubgraph.noOfVertices; l++)
+                    {
+                        for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                        {
+
+                            graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                        }
+                    }
+                    pushBackVector_Graph(&finalResults, graphToPush);
                 }
             }
+            free(currentMaximumCliques.data);
+            free(toRetrieveGraphs.data);
+  
         }
+        free(stackCurrentIndex.data);
+        free(stackMaximumClique.data);
+    
 #ifdef PRINTTOCMD
         printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, 1);
 #endif
         saveToFileGraphs_Max((struct Graph *)finalResults.data, outputFile, finalResults.currentNumberOfElements, 1);
 
+        for (int i = 0; i < finalResults.currentNumberOfElements; i++)
+        {
+            freeGraph((struct Graph *)finalResults.data + i);
+        }
+        free(finalResults.data);
         fprintf(outputFile, "-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
 #ifdef PRINTTOCMD
@@ -1765,7 +1807,7 @@ int main(int argc, char *argv[])
             free(((struct Vector *)bronResult.data + i)->data);
         }
         free(bronResult.data);
-        free(toRetrieveGraphs.data);
+        
 
         time_end = clock();
         maximal_clique_modular_product_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
