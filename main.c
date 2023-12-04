@@ -1483,7 +1483,7 @@ int main(int argc, char *argv[])
                 1. a stack is an array of arrays of maxbron result for each branch of computation. Also should probably store the depth of computation for each array.
                 2. The stack should hold: array of maximum common cliques, two graphs that resulted in the maximum common clique, next graph to multiply with, if next graph is null we are at a leaf.
             3. Procedure:
-                1. Initialize the stack with two graphs, maximum common subgraphs of those graphs, and next graph if more than 2 graphs, else null.
+                1. Initialize the stack with two graphs, maximum common subgraphs of those graphs, and next graph if more than 2 graphs, else null, and index of the furthest of two graphs.
                 2. If stack is not empty do:
                     1. For each stack element:
                         1. Take one of the maximum cliques
@@ -1521,6 +1521,65 @@ int main(int argc, char *argv[])
         *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
         toRetrieveGraphs.currentNumberOfElements = 2;
         GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
+
+        struct Vector R;
+        createVector_Int(&R, 1);
+        struct Vector P;
+        createVector_Int(&P, 1);
+        for (int j = 0; j < GH->noOfVertices; j++)
+        {
+            pushBackVector_Int(&P, j);
+        }
+        struct Vector X;
+        createVector_Int(&X, 1);
+
+        struct Vector bronResult;
+        createVector_Vector(&bronResult, 1);
+        iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+
+        struct Vector maxBrons;
+
+        createVector_Vector(&maxBrons, 1);
+
+        int max = 0;
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
+
+            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+            {
+                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+            }
+        }
+        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        {
+
+            if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+            {
+                struct Vector toPush;
+                createVector_Int(&toPush, 1);
+                for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
+                {
+                    pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
+                }
+                pushBackVector_Vector(&maxBrons, toPush);
+            }
+        }
+
+        // 3.1
+        pushBackVector_Vector(&stackOriginalGraphs, toRetrieveGraphs);
+        pushBackVector_Vector(&stackMaximumClique, maxBrons);
+        pushBackVector_Int(&stackCurrentIndex, 1);
+        if (noOfGraphs > 2)
+        {
+            pushBackVector_Graph(&stackNextGraph, *((struct Graph *)(graphs.data) + 2));
+        }
+        else
+        {
+            struct Graph emptyGraph;
+            emptyGraph.noOfVertices = 0;
+            pushBackVector_Graph(&stackNextGraph, emptyGraph);
+        }
+
         struct Graph originalSubgraph;
         originalSubgraph.adjacencyMatrix = NULL;
         originalSubgraph.description = NULL;
@@ -1604,35 +1663,7 @@ int main(int argc, char *argv[])
             *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
             *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)(graphs.data) + i);
         }
-        struct Vector R;
-        createVector_Int(&R, 1);
-        struct Vector P;
-        createVector_Int(&P, 1);
-        for (int j = 0; j < GH->noOfVertices; j++)
-        {
-            pushBackVector_Int(&P, j);
-        }
-        struct Vector X;
-        createVector_Int(&X, 1);
 
-        struct Vector bronResult;
-        createVector_Vector(&bronResult, 1);
-        iterPivotBronKerbosch(R, P, X, GH, &bronResult);
-
-        struct Vector maxBron;
-        maxBron.data = NULL;
-        int max = 0;
-        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-        {
-
-            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-            {
-                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
-                maxBron.data = ((struct Vector *)(bronResult.data) + i)->data;
-                maxBron.currentNumberOfElements = max;
-                maxBron.size = max;
-            }
-        }
         freeGraph(&newOriginalSubgraph);
         newOriginalSubgraph = retrieveOriginalVerticesGraph(maxBron, toRetrieveGraphs);
 
