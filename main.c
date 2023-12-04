@@ -385,21 +385,6 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
         printGraph(graphs[i]);
     }
 }
-void saveToFileGraph(struct Graph *graph, FILE *output_file)
-{
-    for (int i = 0; i < graph->noOfVertices; i++)
-    {
-
-        for (int j = 0; j < graph->noOfVertices; j++)
-        {
-            fprintf(output_file, "%d ", graph->adjacencyMatrix[i * graph->noOfVertices + j]);
-        }
-        fprintf(output_file, "\n");
-    }
-    fprintf(output_file, "Additional information: %s\n", graph->description);
-    fprintf(output_file, "-------------------------------------------------\n\n");
-}
-
 int countGraphEdges(struct Graph *graph)
 {
 
@@ -415,6 +400,79 @@ int countGraphEdges(struct Graph *graph)
     }
     return noOfEdges;
 }
+void printGraphs_Max(struct Graph *graphs, int noOfGraphs, int limit)
+{
+    int max = graphs[0].noOfVertices;
+    for (int i = 1; i < noOfGraphs; i++)
+    {
+        if (max < graphs[i].noOfVertices)
+            max = graphs[i].noOfVertices;
+    }
+
+    int count = 0;
+
+    printf("-------------------------------------------------\n");
+
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        if (0 != limit && count == limit)
+            break;
+        if (graphs[i].noOfVertices == max)
+        {
+            printf("------------------Graph %d----------------------\n", i);
+            int noOfEdges = 0;
+            noOfEdges = countGraphEdges(graphs + i);
+            printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + graphs[i].noOfVertices, graphs[i].noOfVertices, noOfEdges);
+            printf("Adjacency matrix:\n");
+            printGraph(graphs[i]);
+            count++;
+        }
+    }
+}
+void saveToFileGraph(struct Graph *graph, FILE *output_file)
+{
+    for (int i = 0; i < graph->noOfVertices; i++)
+    {
+
+        for (int j = 0; j < graph->noOfVertices; j++)
+        {
+            fprintf(output_file, "%d ", graph->adjacencyMatrix[i * graph->noOfVertices + j]);
+        }
+        fprintf(output_file, "\n");
+    }
+    fprintf(output_file, "Additional information: %s\n", graph->description);
+    fprintf(output_file, "-------------------------------------------------\n\n");
+}
+void saveToFileGraphs_Max(struct Graph *graphs, FILE *outputFile, int noOfGraphs, int limit)
+{
+    int max = graphs[0].noOfVertices;
+    for (int i = 1; i < noOfGraphs; i++)
+    {
+        if (max < graphs[i].noOfVertices)
+            max = graphs[i].noOfVertices;
+    }
+
+    int count = 0;
+
+    fprintf(outputFile, "-------------------------------------------------\n");
+
+    for (int i = 0; i < noOfGraphs; i++)
+    {
+        if (0 != limit && count == limit)
+            break;
+        if (graphs[i].noOfVertices == max)
+        {
+            fprintf(outputFile, "------------------Graph %d----------------------\n", i);
+            int noOfEdges = 0;
+            noOfEdges = countGraphEdges(graphs + i);
+            fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + graphs[i].noOfVertices, graphs[i].noOfVertices, noOfEdges);
+            fprintf(outputFile, "Adjacency matrix:\n");
+            saveToFileGraph(graphs + i, outputFile);
+            count++;
+        }
+    }
+}
+
 void freeGraph(struct Graph *graph)
 {
     if (NULL == graph)
@@ -1395,7 +1453,7 @@ int main(int argc, char *argv[])
         toUndirectedGraph(*((struct Graph *)(graphs.data) + i));
         iterPivotBronKerbosch(R, P, X, ((struct Graph *)(graphs.data) + i), &bronResult);
 #ifdef PRINTTOCMD
-        printVector_Vector(bronResult);
+        printVector_Vector_Max(bronResult);
 #endif
         fprintf(outputFile, "Maximum Cliques for graph %d: \n", i);
         saveToFileVector_Vector_Max(bronResult, outputFile);
@@ -1475,7 +1533,7 @@ int main(int argc, char *argv[])
     {
         /*
             1. Abstract
-            TODO: To add backtracking:
+            DONE: To add backtracking:
             1. Instead of taking just the first largest bronResult, take all the max results.
             2. For each max result do the process.
             3. Repeat.
@@ -1495,10 +1553,11 @@ int main(int argc, char *argv[])
                         4. Else:
                             1. Push the original graph to results.
                 3. Take the results and report largest results as maximum common subgraph.
-            4. TODO: Check for isomorphism.
+            4. TODO: Free Memory
+            5. TODO: Check for isomorphism.
                 1. I think it's enough that after we find the mapped maximum clique, we check if it's isomorphic to both original graphs, if not dont push to stack.
-            5. TODO: Optimize graph copying, stack doesnt have to contain the second modular product graph I think, just index should be enough and the originalGraph
-            
+            6. TODO: Optimize graph copying, stack doesnt have to contain the second modular product graph I think, just index should be enough and the originalGraph
+
         */
 
         // stack
@@ -1678,7 +1737,10 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        printGraphs((struct Graph *)finalResults.data, finalResults.currentNumberOfElements);
+#ifdef PRINTTOCMD
+        printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, 1);
+#endif
+        saveToFileGraphs_Max((struct Graph *)finalResults.data, outputFile, finalResults.currentNumberOfElements, 1);
 
         fprintf(outputFile, "-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
@@ -1842,7 +1904,7 @@ int main(int argc, char *argv[])
     clock_t time_all_end = clock();
 
     printf("Time of calculating maximum cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
-    fprintf(outputFile, "Time of calculating maximum cliques for for all input graphs: %fs\n", maximal_cliques_time);
+    fprintf(outputFile, "Time of calculating maximum cliques (Bron-Kerbosch) for for all input graphs: %fs\n", maximal_cliques_time);
 
     printf("Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
     fprintf(outputFile, "Time of calculating maximum clique approximations for for all input graphs: %fs\n", maximal_clique_approximation_time);
@@ -1850,15 +1912,15 @@ int main(int argc, char *argv[])
     // printf("Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
     // fprintf(outputFile, "Time of calculating modular product for all input graphs: %fs\n", modular_product_time);
 
-    printf("Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
-    fprintf(outputFile, "Time of calculating maximum common subgraphs (Bron-Kerbosch) for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    printf("Time of calculating maximum common subgraphs for all input graphs: %fs\n", maximal_clique_modular_product_time);
+    fprintf(outputFile, "Time of calculating maximum common subgraphs for all input graphs: %fs\n", maximal_clique_modular_product_time);
 
     printf("Time of approximating maximum common subgraph for all input graphs: %fs\n", maximal_common_subgraph_approximation_time);
     fprintf(outputFile, "Time of approximating maximum common subgraph for all input graphs: %fs\n", maximal_common_subgraph_approximation_time);
 
     printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
     fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
-    printf("For results open output.txt file\n");
+    printf("\n Results have been saved to output.txt file\n");
     freeGraph(GH);
     free(GH);
 
