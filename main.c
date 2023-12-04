@@ -1407,10 +1407,10 @@ struct Graph retrieveOriginalVerticesGraphTwo(struct Vector maximumCommonSubgrap
         for (int j = 0; j < ((struct Vector *)result.data + 1)->currentNumberOfElements; j++)
         {
 
-            if (((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)] != 0)
+            if (((struct Graph *)inputGraphs.data + 1)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data + 1)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)] != 0)
             {
 
-                toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] = ((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)];
+                toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] = ((struct Graph *)inputGraphs.data + 1)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data + 1)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)];
             }
         }
     }
