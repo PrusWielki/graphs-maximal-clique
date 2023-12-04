@@ -402,8 +402,8 @@ int countGraphEdges(struct Graph *graph)
 }
 void printGraphs_Max(struct Graph *graphs, int noOfGraphs, int limit)
 {
-    if(0==limit)
-    limit=noOfGraphs;
+    if (0 == limit)
+        limit = noOfGraphs;
     int max = graphs[0].noOfVertices;
     for (int i = 1; i < noOfGraphs; i++)
     {
@@ -447,8 +447,8 @@ void saveToFileGraph(struct Graph *graph, FILE *output_file)
 }
 void saveToFileGraphs_Max(struct Graph *graphs, FILE *outputFile, int noOfGraphs, int limit)
 {
-    if(0==limit)
-    limit=noOfGraphs;
+    if (0 == limit)
+        limit = noOfGraphs;
     int max = graphs[0].noOfVertices;
     for (int i = 1; i < noOfGraphs; i++)
     {
@@ -1302,9 +1302,9 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
             currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
         }
     }
-    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements - 1; i++)
+    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements; i++)
     {
-        for (int j = i + 1; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
+        for (int j = 0; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
         {
 
             if (((struct Graph *)inputGraphs.data)->adjacencyMatrix[*((int *)(((struct Vector *)result.data)->data) + i) * ((struct Graph *)inputGraphs.data)->noOfVertices + *((int *)(((struct Vector *)result.data)->data) + j)] != 0)
@@ -1315,16 +1315,16 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
         }
     }
 
-    for (int i = 0; i < toreturn.noOfVertices; i++)
-    {
-        for (int j = 0; j < toreturn.noOfVertices; j++)
-        {
-            if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
-            {
-                toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
-            }
-        }
-    }
+    // for (int i = 0; i < toreturn.noOfVertices; i++)
+    // {
+    //     for (int j = 0; j < toreturn.noOfVertices; j++)
+    //     {
+    //         if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
+    //         {
+    //             toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
+    //         }
+    //     }
+    // }
 
     for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
     {
@@ -1334,6 +1334,232 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
     free(result.data);
 
     return toreturn;
+}
+
+struct Graph retrieveOriginalVerticesGraphTwo(struct Vector maximumCommonSubgraph, struct Vector inputGraphs)
+{
+    /*
+        1. Purpose of this function is to map maximum clique from modular graph product to original graphs.
+        2. To do that notice that:
+            1. In the case of two graphs to retrieve the original vertices one needs to: divide the vertex number from modular graph product
+            by the amount of vertices in graph 1, the int result is the index of vertex in 1, then multply the result by the amount of vertices in 1
+            and subtract that from the amount of vertices in graph 2 to get the index of vertex from graph 2.
+            2. Repeat this process until you get to the first original graph, so repeat n - 1 times, where n is the amount of original graphs.
+    */
+    struct Graph toreturn;
+    toreturn.noOfVertices = maximumCommonSubgraph.currentNumberOfElements;
+    toreturn.adjacencyMatrix = calloc(maximumCommonSubgraph.currentNumberOfElements * maximumCommonSubgraph.currentNumberOfElements, sizeof(int));
+    if (NULL == toreturn.adjacencyMatrix)
+    {
+        printf("Error allocating memory when retrieving original graph");
+        exit(EXIT_FAILURE);
+    }
+    toreturn.description = malloc(sizeof(char));
+    if (NULL == toreturn.description)
+    {
+        printf("Error allocating memory when retrieving original graph");
+        exit(EXIT_FAILURE);
+    }
+    toreturn.description[0] = '\0';
+    struct Vector result;
+    createVector_Vector(&result, inputGraphs.currentNumberOfElements);
+
+    for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
+    {
+        createVector_Int((struct Vector *)result.data + i, maximumCommonSubgraph.currentNumberOfElements);
+    }
+
+    int currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
+
+    for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
+    {
+        currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
+    }
+
+    for (int j = 0; j < maximumCommonSubgraph.currentNumberOfElements; j++)
+    {
+        int currentVertexIndex = *((int *)maximumCommonSubgraph.data + j);
+        int row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1)->noOfVertices;
+        for (int i = 0; i < inputGraphs.currentNumberOfElements - 1; i++)
+        {
+
+            int column = currentVertexIndex - (row * ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices);
+            *((int *)(((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->data) + j) = column;
+            ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements = ((struct Vector *)result.data + inputGraphs.currentNumberOfElements - 1 - i)->currentNumberOfElements + 1;
+            if (i < inputGraphs.currentNumberOfElements - 2)
+            {
+                currentLeftHandGraphSize = currentLeftHandGraphSize / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+                currentVertexIndex = row;
+                row = currentVertexIndex / ((struct Graph *)inputGraphs.data + inputGraphs.currentNumberOfElements - 1 - i)->noOfVertices;
+            }
+        }
+        *((int *)(((struct Vector *)result.data)->data) + j) = row;
+        ((struct Vector *)result.data)->currentNumberOfElements = ((struct Vector *)result.data)->currentNumberOfElements + 1;
+        currentLeftHandGraphSize = ((struct Graph *)inputGraphs.data)->noOfVertices;
+
+        for (int i = 1; i < inputGraphs.currentNumberOfElements - 1; i++)
+        {
+            currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
+        }
+    }
+    for (int i = 0; i < ((struct Vector *)result.data + 1)->currentNumberOfElements; i++)
+    {
+        for (int j = 0; j < ((struct Vector *)result.data + 1)->currentNumberOfElements; j++)
+        {
+
+            if (((struct Graph *)inputGraphs.data + 1)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data + 1)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)] != 0)
+            {
+
+                toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] = ((struct Graph *)inputGraphs.data + 1)->adjacencyMatrix[*((int *)(((struct Vector *)result.data + 1)->data) + i) * ((struct Graph *)inputGraphs.data + 1)->noOfVertices + *((int *)(((struct Vector *)result.data + 1)->data) + j)];
+            }
+        }
+    }
+
+    // for (int i = 0; i < toreturn.noOfVertices; i++)
+    // {
+    //     for (int j = 0; j < toreturn.noOfVertices; j++)
+    //     {
+    //         if (toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j] != 0)
+    //         {
+    //             toreturn.adjacencyMatrix[j * toreturn.noOfVertices + i] = toreturn.adjacencyMatrix[i * toreturn.noOfVertices + j];
+    //         }
+    //     }
+    // }
+
+    for (int i = 0; i < inputGraphs.currentNumberOfElements; i++)
+    {
+        // printVector_Int(*((struct Vector *)result.data + i));
+        free(((struct Vector *)result.data + i)->data);
+    }
+    free(result.data);
+
+    return toreturn;
+}
+int getFactorial(int n)
+{
+    if (n < 1)
+        return -1;
+    int result = 1;
+    for (int i = 1; i < n; i++)
+    {
+        result = result * i;
+    }
+    return result;
+}
+int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1, struct Graph originalGraph2)
+{
+
+    /*
+        1. Take a found maximum common subgraph candidate and second graph of multiplication.
+        2. Permute the found maximum common subgraph candidate, I think it might simply mean changing the order of rows in adjacency matrix maybe, maybe it should be done with respect to diagonal.
+            1. To permutate one needs to swap rows AND columns.
+            2. Generate pairs of numbers, all from a given range, were order does not matter.
+        3. Wrong I think: For each permutation find a maximum common subgraph of the candidate and the second graph.
+        3. Map the result to the second graph.
+        3. For each permutation
+            1. Compare the permutated result with the mapped result
+    */
+
+    struct Vector inputGraphs;
+    createVector_Graph(&inputGraphs, 2);
+    pushBackVector_Graph(&inputGraphs, originalGraph1);
+    pushBackVector_Graph(&inputGraphs, originalGraph2);
+    struct Graph mapped2 = retrieveOriginalVerticesGraphTwo(maximumCommonSubgraph, inputGraphs);
+    struct Graph mapped1 = retrieveOriginalVerticesGraph(maximumCommonSubgraph, inputGraphs);
+    int noOfPermutations = getFactorial(mapped2.noOfVertices);
+
+    struct Vector permutations;
+    createVector_Vector(&permutations, noOfPermutations);
+    for (int i = 0; i < mapped2.noOfVertices; i++)
+    {
+
+        for (int j = i + 1; j < mapped2.noOfVertices; j++)
+        {
+            struct Vector toPush;
+            createVector_Int(&toPush, 2);
+            pushBackVector_Int(&toPush, i);
+            pushBackVector_Int(&toPush, j);
+            pushBackVector_Vector(&permutations, toPush);
+        }
+    }
+    // For each permutation create a new graph and test it
+
+    for (int i = 0; i < permutations.currentNumberOfElements; i++)
+    {
+
+        struct Graph permutatedMappedGraph;
+        permutatedMappedGraph.noOfVertices = mapped2.noOfVertices;
+
+        permutatedMappedGraph.adjacencyMatrix = calloc(mapped2.noOfVertices * mapped2.noOfVertices, sizeof(int));
+        if (NULL == permutatedMappedGraph.adjacencyMatrix)
+        {
+            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+            exit(EXIT_FAILURE);
+        }
+        permutatedMappedGraph.description = malloc(sizeof(char));
+        if (NULL == permutatedMappedGraph.description)
+        {
+            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+            exit(EXIT_FAILURE);
+        }
+        permutatedMappedGraph.description[0] = '\0';
+
+        for (int j = 0; j < permutatedMappedGraph.noOfVertices; j++)
+        {
+            for (int k = 0; k < permutatedMappedGraph.noOfVertices; k++)
+            {
+                int row = j;
+                int column = k;
+                if ((row == *(int *)((struct Vector *)permutations.data + i)->data && column == *((int *)(((struct Vector *)permutations.data + i)->data) + 1)) || (column == *(int *)((struct Vector *)permutations.data + i)->data && row == *((int *)(((struct Vector *)permutations.data + i)->data) + 1)))
+                {
+                    row = k;
+                    column = j;
+                }
+                permutatedMappedGraph.adjacencyMatrix[row * permutatedMappedGraph.noOfVertices + column] = mapped1.adjacencyMatrix[j * mapped1.noOfVertices + k];
+            }
+        }
+        int theSame = 1;
+        for (int j = 0; j < permutatedMappedGraph.noOfVertices; j++)
+        {
+            for (int k = 0; k < permutatedMappedGraph.noOfVertices; k++)
+            {
+                if (permutatedMappedGraph.adjacencyMatrix[j * permutatedMappedGraph.noOfVertices + k] != mapped2.adjacencyMatrix[j * mapped2.noOfVertices + k])
+                {
+                    theSame = -1;
+                    break;
+                }
+            }
+            if (-1 == theSame)
+                break;
+        }
+        if (-1 != theSame)
+        {
+            for (int i = 0; i < permutations.currentNumberOfElements; i++)
+            {
+                free(((struct Vector *)permutations.data + i)->data);
+            }
+            free(permutations.data);
+            freeGraph(&mapped1);
+            freeGraph(&mapped2);
+            free(inputGraphs.data);
+            freeGraph(&permutatedMappedGraph);
+            return 1;
+        }
+
+        freeGraph(&permutatedMappedGraph);
+    }
+
+    for (int i = 0; i < permutations.currentNumberOfElements; i++)
+    {
+        free(((struct Vector *)permutations.data + i)->data);
+    }
+    free(permutations.data);
+
+    freeGraph(&mapped1);
+    freeGraph(&mapped2);
+    free(inputGraphs.data);
+
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -1657,6 +1883,9 @@ int main(int argc, char *argv[])
             for (int k = 0; k < currentMaximumCliques.currentNumberOfElements; k++)
             {
                 // 3.2.1.2
+
+                if (0 == isASubgraph(*((struct Vector *)(currentMaximumCliques.data) + k), *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
+                    continue;
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
