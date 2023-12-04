@@ -1587,14 +1587,18 @@ int main(int argc, char *argv[])
         newOriginalSubgraph.adjacencyMatrix = NULL;
         newOriginalSubgraph.description = NULL;
 
-        while(stackMaximumClique.currentNumberOfElements>0){
+        // 3.2
+        while (stackMaximumClique.currentNumberOfElements > 0)
+        {
+            // 3.2.1.1
+            struct Vector currentMaximumCliques = popVector_Vector(&stackMaximumClique);
+            for (int k = 0; k < currentMaximumCliques.currentNumberOfElements; k++)
+            {
+                // 3.2.1.2
+                toRetrieveGraphs = popVector_Vector(&stackOriginalGraphs);
 
-
-
-
-
-
-
+                originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
+            }
         }
         for (int i = 2; i < noOfGraphs; i++)
         {
