@@ -40,7 +40,7 @@ Add `#define PRINTTOCMD` to the beginning of the main.c. Regardless of that, pro
 - [x] OPTIONAL: Add pivoting to iterative Bron Kerbosch.
 - [x] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also. It should be checked if the results are isomoprhpic to subgraphs in original graphs.
 - [ ] The result of maximum common subgraph is not entirely correct I think. It whould be mapped to vertices of original graphs and for multigraphs it should be somehow checked if weights are the same.
-- [ ] Add backtracking to current search for maximum common subgraph.
+- [x] Add backtracking to current search for maximum common subgraph.
 - [ ] Add isomorphism check for multigraphs.
 - [ ] OPTIONAL: Do the above three steps for adjacency list also.
 - [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
