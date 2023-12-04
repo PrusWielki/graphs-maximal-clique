@@ -1491,12 +1491,27 @@ int main(int argc, char *argv[])
                         3. If there is a next graph (should also hold index of the current graph in stack):
                             1. Multiply the result by the next graph.
                             2. Find the maximum cliques of the multiplication.
-                            3. Push to stack: new maximum cliques, taken maximum clique mapped onto one of the graphs, next graph that was multipled, next graph. 
+                            3. Push to stack: new maximum cliques, taken maximum clique mapped onto one of the graphs, next graph that was multipled, next graph.
                         4. Else:
                             1. Push the original graph to results.
                 3. Take the results and report largest results as maximum common subgraph.
 
         */
+
+        // stack
+
+        struct Vector stackMaximumClique;
+        createVector_Vector(&stackMaximumClique, 1);
+        // Hold vectors of size 2, that hold original graphs.
+        struct Vector stackOriginalGraphs;
+        createVector_Vector(&stackOriginalGraphs, 1);
+
+        struct Vector stackNextGraph;
+        createVector_Graph(&stackNextGraph, 1);
+
+        struct Vector stackCurrentIndex;
+        createVector_Int(&stackCurrentIndex, 1);
+
         maximal_clique_modular_product_time = 0;
         time_begin = clock();
         struct Vector toRetrieveGraphs;
