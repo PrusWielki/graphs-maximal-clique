@@ -1302,7 +1302,7 @@ struct Graph retrieveOriginalVerticesGraph(struct Vector maximumCommonSubgraph, 
             currentLeftHandGraphSize = currentLeftHandGraphSize * ((struct Graph *)inputGraphs.data + i)->noOfVertices;
         }
     }
-    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements ; i++)
+    for (int i = 0; i < ((struct Vector *)result.data)->currentNumberOfElements; i++)
     {
         for (int j = 0; j < ((struct Vector *)result.data)->currentNumberOfElements; j++)
         {
@@ -1533,7 +1533,18 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
                 break;
         }
         if (-1 != theSame)
+        {
+            for (int i = 0; i < permutations.currentNumberOfElements; i++)
+            {
+                free(((struct Vector *)permutations.data + i)->data);
+            }
+            free(permutations.data);
+            freeGraph(&mapped1);
+            freeGraph(&mapped2);
+            free(inputGraphs.data);
+            freeGraph(&permutatedMappedGraph);
             return 1;
+        }
 
         freeGraph(&permutatedMappedGraph);
     }
