@@ -1503,7 +1503,21 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
         }
         permutatedMappedGraph.description[0] = '\0';
 
-
+        for (int j = 0; j < permutatedMappedGraph.noOfVertices; j++)
+        {
+            for (int k = 0; k < permutatedMappedGraph.noOfVertices; k++)
+            {
+                int row = j;
+                int column = k;
+                if ((row == *(int *)((struct Vector *)permutations.data + i)->data && column == *((int *)(((struct Vector *)permutations.data + i)->data) + 1)) || (column == *(int *)((struct Vector *)permutations.data + i)->data && row == *((int *)(((struct Vector *)permutations.data + i)->data) + 1)))
+                {
+                    row = k;
+                    column = j;
+                }
+                permutatedMappedGraph.adjacencyMatrix[row*permutatedMappedGraph.noOfVertices+column]=mapped.adjacencyMatrix[j*mapped.noOfVertices+k];
+            }
+        }
+        
 
         freeGraph(&permutatedMappedGraph);
     }
