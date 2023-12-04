@@ -7,6 +7,8 @@
 #define PRINTTOCMD
 // #define dbg
 
+#define MAXIMUM_OUTPUT_COUNT 1
+
 typedef intptr_t ssize_t;
 
 ssize_t getline(char **lineptr, size_t *n, FILE *stream)
@@ -377,8 +379,6 @@ void printGraph(struct Graph graph)
 void printGraphs(struct Graph *graphs, int noOfGraphs)
 {
 
-    printf("-------------------------------------------------\n");
-
     for (int i = 0; i < noOfGraphs; i++)
     {
         printf("------------------Graph %d----------------------\n", i);
@@ -402,6 +402,8 @@ int countGraphEdges(struct Graph *graph)
 }
 void printGraphs_Max(struct Graph *graphs, int noOfGraphs, int limit)
 {
+    if(0==limit)
+    limit=noOfGraphs;
     int max = graphs[0].noOfVertices;
     for (int i = 1; i < noOfGraphs; i++)
     {
@@ -411,15 +413,15 @@ void printGraphs_Max(struct Graph *graphs, int noOfGraphs, int limit)
 
     int count = 0;
 
-    printf("-------------------------------------------------\n");
-
     for (int i = 0; i < noOfGraphs; i++)
     {
         if (0 != limit && count == limit)
             break;
         if (graphs[i].noOfVertices == max)
         {
-            printf("------------------Graph %d----------------------\n", i);
+            if (limit > 1)
+                printf("------------------Graph %d----------------------\n", i);
+
             int noOfEdges = 0;
             noOfEdges = countGraphEdges(graphs + i);
             printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + graphs[i].noOfVertices, graphs[i].noOfVertices, noOfEdges);
@@ -445,6 +447,8 @@ void saveToFileGraph(struct Graph *graph, FILE *output_file)
 }
 void saveToFileGraphs_Max(struct Graph *graphs, FILE *outputFile, int noOfGraphs, int limit)
 {
+    if(0==limit)
+    limit=noOfGraphs;
     int max = graphs[0].noOfVertices;
     for (int i = 1; i < noOfGraphs; i++)
     {
@@ -454,15 +458,15 @@ void saveToFileGraphs_Max(struct Graph *graphs, FILE *outputFile, int noOfGraphs
 
     int count = 0;
 
-    fprintf(outputFile, "-------------------------------------------------\n");
-
     for (int i = 0; i < noOfGraphs; i++)
     {
         if (0 != limit && count == limit)
             break;
         if (graphs[i].noOfVertices == max)
         {
-            fprintf(outputFile, "------------------Graph %d----------------------\n", i);
+            if (limit > 1)
+                fprintf(outputFile, "------------------Graph %d----------------------\n", i);
+
             int noOfEdges = 0;
             noOfEdges = countGraphEdges(graphs + i);
             fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + graphs[i].noOfVertices, graphs[i].noOfVertices, noOfEdges);
@@ -1416,13 +1420,9 @@ int main(int argc, char *argv[])
     // -------------------------------------------------------------------------------------------------------------------------------------------------
 
     time_begin = clock();
-#ifdef PRINTTOCMD
-    printf("-------------------------------------------------\n");
-#endif
     for (int i = 0; i < noOfGraphs; i++)
     {
 #ifdef PRINTTOCMD
-        printf("-------------------------------------------------\n");
         printf("Maximum cliques for graph %d\n", i);
 #endif
         struct Vector R;
@@ -1489,14 +1489,10 @@ int main(int argc, char *argv[])
     time_end = clock();
     maximal_clique_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
 
-#ifdef PRINTTOCMD
-    printf("-------------------------------------------------\n");
-#endif
     for (int i = 0; i < noOfGraphs; i++)
     {
         struct Vector currentResult = *((struct Vector *)approximationResult.data + i);
 #ifdef PRINTTOCMD
-        printf("-------------------------------------------------\n");
         printf("Maximum clique approximation for graph %d\n", i);
         printVector_Int(currentResult);
         // printVector_Vector(approximationResult);
@@ -1517,9 +1513,6 @@ int main(int argc, char *argv[])
         free(((struct Vector *)approximationResult.data + i)->data);
     }
     free(approximationResult.data);
-#ifdef PRINTTOCMD
-    printf("-------------------------------------------------\n");
-#endif
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1807,11 +1800,16 @@ int main(int argc, char *argv[])
         free(stackOriginalGraphs.data);
         if (stackOriginalGraphs.currentNumberOfElements > 0)
             freeGraph(((struct Vector *)stackOriginalGraphs.data)->data);
-
+        fprintf(outputFile, "\n-------------------------------------------------\n");
+        fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
 #ifdef PRINTTOCMD
-        printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, 1);
+        printf("\n-------------------------------------------------\n");
+        printf("Maximum common subgraph for all input graphs: \n");
 #endif
-        saveToFileGraphs_Max((struct Graph *)finalResults.data, outputFile, finalResults.currentNumberOfElements, 1);
+#ifdef PRINTTOCMD
+        printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, MAXIMUM_OUTPUT_COUNT);
+#endif
+        saveToFileGraphs_Max((struct Graph *)finalResults.data, outputFile, finalResults.currentNumberOfElements, MAXIMUM_OUTPUT_COUNT);
 
         for (int i = 0; i < finalResults.currentNumberOfElements; i++)
         {
@@ -1980,7 +1978,7 @@ int main(int argc, char *argv[])
 
     printf("Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
     fprintf(outputFile, "Whole program execution time: %fs\n", (double)(time_all_end - time_all_begin) / CLOCKS_PER_SEC);
-    printf("\n Results have been saved to output.txt file\n");
+    printf("\nResults have been saved to output.txt file\n");
     freeGraph(GH);
     free(GH);
 
