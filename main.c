@@ -1664,7 +1664,7 @@ int main(int argc, char *argv[])
 
                     // This might be fault, I'm not 100% sure if I can reassign to this graph without creating a new one, if something doesn't work the fault might be here below
                     *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
-                    *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index);
+                    *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
                     pushBackVector_Vector(&stackOriginalGraphs, toRetrieveGraphs);
                     // -------------------------end of potential problematic code------------------------------
                     pushBackVector_Int(&stackCurrentIndex,  index + 1);
