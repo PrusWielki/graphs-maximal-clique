@@ -4,7 +4,7 @@
 #include <time.h>
 #include <errno.h>
 #include <stdint.h>
-// #define PRINTTOCMD
+ #define PRINTTOCMD
 // #define dbg
 
 typedef intptr_t ssize_t;
@@ -378,9 +378,7 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
 {
 
     printf("-------------------------------------------------\n");
-    printf("Printing graphs in the following format:\n");
 
-    printf("{vertex}: {(vertex, weight)}\n\n");
     for (int i = 0; i < noOfGraphs; i++)
     {
         printf("------------------Graph %d----------------------\n", i);
@@ -1624,6 +1622,7 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
         printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
         printf("Adjacency matrix:\n");
+        printGraph(originalSubgraph);
 #endif
         saveToFileGraph(&originalSubgraph, outputFile);
         freeGraph(&newOriginalSubgraph);
@@ -1750,6 +1749,7 @@ int main(int argc, char *argv[])
 #ifdef PRINTTOCMD
         printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
         printf("Adjacency matrix:\n");
+        printGraph(originalSubgraph);
 
 #endif
         saveToFileGraph(&originalSubgraph, outputFile);
