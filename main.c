@@ -1481,6 +1481,7 @@ int main(int argc, char *argv[])
             3. Repeat.
             4. Can do this with recursion of a stack.
                 1. a stack is an array of arrays of maxbron result for each branch of computation. Also should probably store the depth of computation for each array.
+                2. The stack should hold: array of maximum common cliques, two graphs that resulted in the maximum common clique, next graph to multiply with, if next graph is null we are at a leaf.
 
         */
         maximal_clique_modular_product_time = 0;
