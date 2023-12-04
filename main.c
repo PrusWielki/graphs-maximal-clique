@@ -1464,15 +1464,16 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
     createVector_Graph(&inputGraphs, 2);
     pushBackVector_Graph(&inputGraphs, originalGraph1);
     pushBackVector_Graph(&inputGraphs, originalGraph2);
-    struct Graph mapped = retrieveOriginalVerticesGraphTwo(maximumCommonSubgraph, inputGraphs);
-    int noOfPermutations = getFactorial(mapped.noOfVertices);
+    struct Graph mapped2 = retrieveOriginalVerticesGraphTwo(maximumCommonSubgraph, inputGraphs);
+    struct Graph mapped1 = retrieveOriginalVerticesGraph(maximumCommonSubgraph, inputGraphs);
+    int noOfPermutations = getFactorial(mapped2.noOfVertices);
 
     struct Vector permutations;
     createVector_Vector(&permutations, noOfPermutations);
-    for (int i = 0; i < mapped.noOfVertices; i++)
+    for (int i = 0; i < mapped2.noOfVertices; i++)
     {
 
-        for (int j = i + 1; j < mapped.noOfVertices; j++)
+        for (int j = i + 1; j < mapped2.noOfVertices; j++)
         {
             struct Vector toPush;
             createVector_Int(&toPush, 2);
@@ -1487,9 +1488,9 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
     {
 
         struct Graph permutatedMappedGraph;
-        permutatedMappedGraph.noOfVertices = mapped.noOfVertices;
+        permutatedMappedGraph.noOfVertices = mapped2.noOfVertices;
 
-        permutatedMappedGraph.adjacencyMatrix = calloc(mapped.noOfVertices * mapped.noOfVertices, sizeof(int));
+        permutatedMappedGraph.adjacencyMatrix = calloc(mapped2.noOfVertices * mapped2.noOfVertices, sizeof(int));
         if (NULL == permutatedMappedGraph.adjacencyMatrix)
         {
             printf("Couldn't allocate memory to push a found maximum common subgraph\n");
@@ -1514,10 +1515,25 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
                     row = k;
                     column = j;
                 }
-                permutatedMappedGraph.adjacencyMatrix[row*permutatedMappedGraph.noOfVertices+column]=mapped.adjacencyMatrix[j*mapped.noOfVertices+k];
+                permutatedMappedGraph.adjacencyMatrix[row * permutatedMappedGraph.noOfVertices + column] = mapped1.adjacencyMatrix[j * mapped1.noOfVertices + k];
             }
         }
-        
+        int theSame = 1;
+        for (int j = 0; j < permutatedMappedGraph.noOfVertices; j++)
+        {
+            for (int k = 0; k < permutatedMappedGraph.noOfVertices; k++)
+            {
+                if (permutatedMappedGraph.adjacencyMatrix[j * permutatedMappedGraph.noOfVertices + k] != mapped2.adjacencyMatrix[j * mapped2.noOfVertices + k])
+                {
+                    theSame = -1;
+                    break;
+                }
+            }
+            if (-1 == theSame)
+                break;
+        }
+        if (-1 != theSame)
+            return 1;
 
         freeGraph(&permutatedMappedGraph);
     }
@@ -1528,7 +1544,8 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
     }
     free(permutations.data);
 
-    freeGraph(&mapped);
+    freeGraph(&mapped1);
+    freeGraph(&mapped2);
     free(inputGraphs.data);
 
     return 0;
