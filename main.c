@@ -1495,8 +1495,10 @@ int main(int argc, char *argv[])
                         4. Else:
                             1. Push the original graph to results.
                 3. Take the results and report largest results as maximum common subgraph.
-            4. Check for isomorphism.
+            4. TODO: Check for isomorphism.
                 1. I think it's enough that after we find the mapped maximum clique, we check if it's isomorphic to both original graphs, if not dont push to stack.
+            5. TODO: Optimize graph copying, stack doesnt have to contain the second modular product graph I think, just index should be enough and the originalGraph
+            
         */
 
         // stack
@@ -1667,7 +1669,7 @@ int main(int argc, char *argv[])
                     *((struct Graph *)(newToRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
                     newToRetrieveGraphs.currentNumberOfElements = 2;
                     pushBackVector_Vector(&stackOriginalGraphs, newToRetrieveGraphs);
-                    
+
                     pushBackVector_Int(&stackCurrentIndex, index + 1);
                 }
                 else
