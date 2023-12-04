@@ -1598,6 +1598,77 @@ int main(int argc, char *argv[])
                 toRetrieveGraphs = popVector_Vector(&stackOriginalGraphs);
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
+
+                // 3.2.1.3
+                if (stackCurrentIndex.currentNumberOfElements <= 0)
+                {
+                    printf("Stack of current indexes is empty when it shouldn't\n");
+                    exit(EXIT_FAILURE);
+                }
+                int index = *((int *)(stackCurrentIndex.data) + stackCurrentIndex.currentNumberOfElements - 1);
+                stackCurrentIndex.currentNumberOfElements = stackCurrentIndex.currentNumberOfElements - 1;
+                if (index < noOfGraphs - 1)
+                {
+                    // 3.2.1.3.1
+                    GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + index + 1));
+
+                    // 3.2.1.3.2
+
+                    struct Vector R;
+                    createVector_Int(&R, 1);
+                    struct Vector P;
+                    createVector_Int(&P, 1);
+                    for (int j = 0; j < GH->noOfVertices; j++)
+                    {
+                        pushBackVector_Int(&P, j);
+                    }
+                    struct Vector X;
+                    createVector_Int(&X, 1);
+
+                    struct Vector bronResult;
+                    createVector_Vector(&bronResult, 1);
+                    iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+
+                    struct Vector maxBrons;
+
+                    createVector_Vector(&maxBrons, 1);
+
+                    int max = 0;
+                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+                    {
+
+                        if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                        {
+                            max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+                        }
+                    }
+                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+                    {
+
+                        if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                        {
+                            struct Vector toPush;
+                            createVector_Int(&toPush, 1);
+                            for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
+                            {
+                                pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
+                            }
+                            pushBackVector_Vector(&maxBrons, toPush);
+                        }
+                    }
+
+                    // 3. Push to stack: new maximum cliques, taken maximum clique mapped onto one of the graphs, next graph that was multipled, next graph.
+
+                    pushBackVector_Vector(&stackMaximumClique, maxBrons);
+
+                    // This might be fault, I'm not 100% sure if I can reassign to this graph without creating a new one, if something doesn't work the fault might be here below
+                    *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
+                    *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index);
+                    pushBackVector_Vector(&stackOriginalGraphs, toRetrieveGraphs);
+                    // -------------------------end of potential problematic code------------------------------
+
+
+                }
             }
         }
         for (int i = 2; i < noOfGraphs; i++)
