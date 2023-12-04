@@ -39,9 +39,10 @@ Add `#define PRINTTOCMD` to the beginning of the main.c. Regardless of that, pro
 - [x] OPTIONAL: Implement Adjacency Matrix implementation to improve time complexity at the cost of space complexity.
 - [x] OPTIONAL: Add pivoting to iterative Bron Kerbosch.
 - [x] It was also said that if the algorithm used is exponential then we should find a polynomial approximation algorithm also. It should be checked if the results are isomoprhpic to subgraphs in original graphs.
-- [ ] The result of maximum common subgraph is not entirely correct I think. It whould be mapped to vertices of original graphs and for multigraphs it should be somehow checked if weights are the same.
+- [x] The result of maximum common subgraph is not entirely correct I think. It whould be mapped to vertices of original graphs and for multigraphs it should be somehow checked if weights are the same.
 - [x] Add backtracking to current search for maximum common subgraph.
-- [ ] Add isomorphism check for multigraphs.
+- [x] Add isomorphism check for multigraphs.
+- [ ] Handle isomorphism during approximation? But then the approximation might quite often fail.
 - [ ] OPTIONAL: Do the above three steps for adjacency list also.
 - [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
 - [ ] Run tests, time it to put something to docs.
