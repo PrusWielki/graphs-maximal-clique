@@ -1467,8 +1467,28 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
     struct Graph mapped = retrieveOriginalVerticesGraphTwo(maximumCommonSubgraph, inputGraphs);
     int noOfPermutations = getFactorial(mapped.noOfVertices);
 
+    struct Vector permutations;
+    createVector_Vector(&permutations, noOfPermutations);
+    for (int i = 0; i < mapped.noOfVertices; i++)
+    {
+
+        for (int j = i + 1; j < mapped.noOfVertices; j++)
+        {
+            struct Vector toPush;
+            createVector_Int(&toPush, 2);
+            pushBackVector_Int(&toPush, i);
+            pushBackVector_Int(&toPush, j);
+            pushBackVector_Vector(&permutations, toPush);
+        }
+    }
+    // For each permutation create a new graph and test it 
 
 
+    for (int i = 0; i < permutations.currentNumberOfElements; i++)
+    {
+        free(((struct Vector *)permutations.data + i)->data);
+    }
+    free(permutations.data);
 
     freeGraph(&mapped);
     free(inputGraphs.data);
