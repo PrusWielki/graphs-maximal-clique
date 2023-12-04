@@ -42,6 +42,8 @@ Add `#define PRINTTOCMD` to the beginning of the main.c. Regardless of that, pro
 - [x] The result of maximum common subgraph is not entirely correct I think. It whould be mapped to vertices of original graphs and for multigraphs it should be somehow checked if weights are the same.
 - [x] Add backtracking to current search for maximum common subgraph.
 - [x] Add isomorphism check for multigraphs.
+- [ ] Modify approximating. It might happen that no maximum subgraph will be found, even tho there is one. To fix it, if none found from current maximum clique, find another maximum clique. To do that: remove found clique from target graphs, and find a maximum clique again.
+- [ ] Optimise the code, for example when mapping a maximum clique onto one of the graphs, could we just choose the smaller one?
 - [ ] Handle isomorphism during approximation? But then the approximation might quite often fail.
 - [ ] OPTIONAL: Do the above three steps for adjacency list also.
 - [ ] Prepare some example data (reasonable amount). Preferably with known answers to cross-check.
