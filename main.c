@@ -1607,7 +1607,6 @@ int main(int argc, char *argv[])
 
                 // 3.2.1.3
 
-
                 if (index < noOfGraphs - 1)
                 {
                     // 3.2.1.3.1
@@ -1663,11 +1662,14 @@ int main(int argc, char *argv[])
                     pushBackVector_Vector(&stackMaximumClique, maxBrons);
 
                     // This might be fault, I'm not 100% sure if I can reassign to this graph without creating a new one, if something doesn't work the fault might be here below
-                    *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
-                    *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
-                    pushBackVector_Vector(&stackOriginalGraphs, toRetrieveGraphs);
+                    struct Vector newToRetrieveGraphs;
+                    createVector_Graph(&newToRetrieveGraphs, 2);
+                    *((struct Graph *)(newToRetrieveGraphs.data)) = originalSubgraph;
+                    *((struct Graph *)(newToRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
+                    newToRetrieveGraphs.currentNumberOfElements = 2;
+                    pushBackVector_Vector(&stackOriginalGraphs, newToRetrieveGraphs);
                     // -------------------------end of potential problematic code------------------------------
-                    pushBackVector_Int(&stackCurrentIndex,  index + 1);
+                    pushBackVector_Int(&stackCurrentIndex, index + 1);
                 }
                 else
                 {
@@ -1675,7 +1677,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        printGraphs((struct Graph *)finalResults.data,finalResults.currentNumberOfElements);
+        printGraphs((struct Graph *)finalResults.data, finalResults.currentNumberOfElements);
 
         fprintf(outputFile, "-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
