@@ -1459,7 +1459,8 @@ int isASubgraph(struct Vector maximumCommonSubgraph, struct Graph originalGraph1
         3. For each permutation
             1. Compare the permutated result with the mapped result
     */
-
+    if (maximumCommonSubgraph.currentNumberOfElements <= 1)
+        return 1;
     struct Vector inputGraphs;
     createVector_Graph(&inputGraphs, 2);
     pushBackVector_Graph(&inputGraphs, originalGraph1);
