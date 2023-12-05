@@ -1774,7 +1774,7 @@ int main(int argc, char *argv[])
                             1. Push the original graph to results.
                 3. Take the results and report largest results as maximum common subgraph.
             4. DONE: Free Memory
-            5. TODO: Check for isomorphism.
+            5. DONE: Check for isomorphism.
                 1. I think it's enough that after we find the mapped maximum clique, we check if it's isomorphic to both original graphs, if not dont push to stack.
             6. OPTIONAL: Actually I don't think it's worth doing, I don't copy graphs, just the pointers so it won't give us much space or time: Optimize graph copying, stack doesnt have to contain the second modular product graph I think, just index should be enough and the originalGraph
 
