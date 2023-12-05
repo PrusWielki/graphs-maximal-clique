@@ -404,11 +404,11 @@ void printGraphs_Max(struct Graph *graphs, int noOfGraphs, int limit)
 {
     if (0 == limit)
         limit = noOfGraphs;
-    int max = graphs[0].noOfVertices;
+    int max = graphs[0].noOfVertices + countGraphEdges(graphs);
     for (int i = 1; i < noOfGraphs; i++)
     {
-        if (max < graphs[i].noOfVertices)
-            max = graphs[i].noOfVertices;
+        if (max < graphs[i].noOfVertices + countGraphEdges(graphs + i))
+            max = graphs[i].noOfVertices + countGraphEdges(graphs + i);
     }
 
     int count = 0;
@@ -417,7 +417,7 @@ void printGraphs_Max(struct Graph *graphs, int noOfGraphs, int limit)
     {
         if (0 != limit && count == limit)
             break;
-        if (graphs[i].noOfVertices == max)
+        if (graphs[i].noOfVertices + countGraphEdges(graphs + i) == max)
         {
             if (limit > 1)
                 printf("------------------Graph %d----------------------\n", i);
@@ -449,11 +449,12 @@ void saveToFileGraphs_Max(struct Graph *graphs, FILE *outputFile, int noOfGraphs
 {
     if (0 == limit)
         limit = noOfGraphs;
-    int max = graphs[0].noOfVertices;
+    int max = graphs[0].noOfVertices + countGraphEdges(graphs);
     for (int i = 1; i < noOfGraphs; i++)
     {
-        if (max < graphs[i].noOfVertices)
-            max = graphs[i].noOfVertices;
+        int edges = +countGraphEdges(graphs + i);
+        if (max < graphs[i].noOfVertices + edges)
+            max = graphs[i].noOfVertices + edges;
     }
 
     int count = 0;
@@ -462,13 +463,12 @@ void saveToFileGraphs_Max(struct Graph *graphs, FILE *outputFile, int noOfGraphs
     {
         if (0 != limit && count == limit)
             break;
-        if (graphs[i].noOfVertices == max)
+        int noOfEdges = countGraphEdges(graphs + i);
+        if (graphs[i].noOfVertices + noOfEdges == max)
         {
             if (limit > 1)
                 fprintf(outputFile, "------------------Graph %d----------------------\n", i);
 
-            int noOfEdges = 0;
-            noOfEdges = countGraphEdges(graphs + i);
             fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + graphs[i].noOfVertices, graphs[i].noOfVertices, noOfEdges);
             fprintf(outputFile, "Adjacency matrix:\n");
             saveToFileGraph(graphs + i, outputFile);

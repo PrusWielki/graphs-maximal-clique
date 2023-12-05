@@ -1,0 +1,16 @@
+2
+5
+0 1 1 0 0
+1 0 1 0 0
+1 1 0 1 0
+0 0 1 0 1
+0 0 0 1 0
+graph 1, source: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-7-S4-S6
+
+5
+0 1 0 0 0
+1 0 1 0 0
+0 1 0 1 0
+0 0 1 0 1
+0 0 0 1 0
+graph 2
