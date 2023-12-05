@@ -8,13 +8,15 @@ The program finds maximal clique of each input graph, plus a maximal common indu
 
 `gcc main.c -o main`
 
-## Adjacency list variant
+## Adjacency list variant DEPRECATED!
 
 `gcc adjlist.c -o main`
 
 # How to run with example file
 
-` ./main input/example.txt`
+`./main input/example.txt`
+
+`main.exe input/example.txt`
 
 # If You want to see debug information
 
