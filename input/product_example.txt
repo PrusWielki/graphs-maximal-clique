@@ -1,6 +1,6 @@
 2
 3
-0 2 0
+0 1 0
 1 0 1
 0 1 0
 wikipedia example, source: https://en.wikipedia.org/wiki/Modular_product_of_graphs

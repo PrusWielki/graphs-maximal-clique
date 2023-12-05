@@ -2036,10 +2036,13 @@ int main(int argc, char *argv[])
         printf("\n-------------------------------------------------\n");
         printf("Maximum common subgraph for all input graphs: \n");
 #endif
+
 #ifdef PRINTTOCMD
-        printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, MAXIMUM_OUTPUT_COUNT);
+        if (finalResults.data != NULL && finalResults.currentNumberOfElements > 0)
+            printGraphs_Max((struct Graph *)finalResults.data, finalResults.currentNumberOfElements, MAXIMUM_OUTPUT_COUNT);
 #endif
-        saveToFileGraphs_Max((struct Graph *)finalResults.data, outputFile, finalResults.currentNumberOfElements, MAXIMUM_OUTPUT_COUNT);
+        if (finalResults.data != NULL && finalResults.currentNumberOfElements > 0)
+            saveToFileGraphs_Max((struct Graph *)finalResults.data, outputFile, finalResults.currentNumberOfElements, MAXIMUM_OUTPUT_COUNT);
 
         for (int i = 0; i < finalResults.currentNumberOfElements; i++)
         {
@@ -2076,10 +2079,10 @@ int main(int argc, char *argv[])
 
         originalSubgraph.adjacencyMatrix = NULL;
         originalSubgraph.description = NULL;
-        originalSubgraph.noOfVertices=0;
+        originalSubgraph.noOfVertices = 0;
         newOriginalSubgraph.adjacencyMatrix = NULL;
         newOriginalSubgraph.description = NULL;
-        newOriginalSubgraph.noOfVertices=0;
+        newOriginalSubgraph.noOfVertices = 0;
         struct Vector modularProductApproximationResult;
         modularProductApproximationResult.data = NULL;
         for (int i = 2; i < noOfGraphs; i++)
@@ -2136,7 +2139,7 @@ int main(int argc, char *argv[])
         maximalCliqueApproximation(GH, &modularProductApproximationResult);
 
         freeGraph(&newOriginalSubgraph);
-        
+
         if (0 != isASubgraph(modularProductApproximationResult, *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
         {
             newOriginalSubgraph = retrieveOriginalVerticesGraph(modularProductApproximationResult, toRetrieveGraphs);
@@ -2168,7 +2171,8 @@ int main(int argc, char *argv[])
             }
             originalSubgraph.description[0] = '\0';
         }
-        else{
+        else
+        {
             freeGraph(&originalSubgraph);
         }
 
@@ -2198,6 +2202,14 @@ int main(int argc, char *argv[])
             free(modularProductApproximationResult.data);
             time_end = clock();
             maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+        }
+        else
+        {
+            freeGraph(&newOriginalSubgraph);
+            freeGraph(&originalSubgraph);
+
+            free(toRetrieveGraphs.data);
+            free(modularProductApproximationResult.data);
         }
     }
 #ifdef dbg
