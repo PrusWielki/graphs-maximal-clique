@@ -1904,6 +1904,7 @@ int main(int argc, char *argv[])
                     {
                         for (int n = o; n < currentMaximumCliques.currentNumberOfElements; n++)
                         {
+                            free(((struct Vector *)currentMaximumCliques.data + n)->data);
                             *((struct Vector *)currentMaximumCliques.data + n) = *((struct Vector *)currentMaximumCliques.data + n + 1);
                         }
                         currentMaximumCliques.currentNumberOfElements = currentMaximumCliques.currentNumberOfElements - 1;
