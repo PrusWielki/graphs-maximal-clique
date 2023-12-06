@@ -1780,257 +1780,270 @@ int main(int argc, char *argv[])
             6. OPTIONAL: Actually I don't think it's worth doing, I don't copy graphs, just the pointers so it won't give us much space or time: Optimize graph copying, stack doesnt have to contain the second modular product graph I think, just index should be enough and the originalGraph
 
         */
-
-        // stack
-
-        struct Vector stackMaximumClique;
-        createVector_Vector(&stackMaximumClique, 1);
-        // Hold vectors of size 2, that hold original graphs.
-        struct Vector stackOriginalGraphs;
-        createVector_Vector(&stackOriginalGraphs, 1);
-
-        // struct Vector stackNextGraph;
-        // createVector_Graph(&stackNextGraph, 1);
-
-        struct Vector stackCurrentIndex;
-        createVector_Int(&stackCurrentIndex, 1);
-
+        int repeat = 1;
         struct Vector finalResults;
-
-        createVector_Graph(&finalResults, 1);
-
-        maximal_clique_modular_product_time = 0;
-        time_begin = clock();
-        struct Vector toRetrieveGraphs;
-        createVector_Graph(&toRetrieveGraphs, 2);
-        *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
-        *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
-        toRetrieveGraphs.currentNumberOfElements = 2;
-        GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
-
-        struct Vector R;
-        createVector_Int(&R, 1);
-        struct Vector P;
-        createVector_Int(&P, 1);
-        for (int j = 0; j < GH->noOfVertices; j++)
-        {
-            pushBackVector_Int(&P, j);
-        }
-        struct Vector X;
-        createVector_Int(&X, 1);
-
-        struct Vector bronResult;
-        createVector_Vector(&bronResult, 1);
-        iterPivotBronKerbosch(R, P, X, GH, &bronResult);
-
-        struct Vector maxBrons;
-
-        createVector_Vector(&maxBrons, 1);
-
-        int max = 0;
-        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-        {
-
-            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-            {
-                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
-            }
-        }
-        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-        {
-
-            if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-            {
-                struct Vector toPush;
-                createVector_Int(&toPush, 1);
-                for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
-                {
-                    pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
-                }
-                pushBackVector_Vector(&maxBrons, toPush);
-            }
-        }
-
-        // 3.1
-        pushBackVector_Vector(&stackOriginalGraphs, toRetrieveGraphs);
-        pushBackVector_Vector(&stackMaximumClique, maxBrons);
-        pushBackVector_Int(&stackCurrentIndex, 1);
-        // if (noOfGraphs > 2)
-        // {
-        //     pushBackVector_Graph(&stackNextGraph, *((struct Graph *)(graphs.data) + 2));
-        // }
-        // else
-        // {
-        //     struct Graph emptyGraph;
-        //     emptyGraph.noOfVertices = 0;
-        //     pushBackVector_Graph(&stackNextGraph, emptyGraph);
-        // }
-
-        struct Graph originalSubgraph;
-        originalSubgraph.adjacencyMatrix = NULL;
-        originalSubgraph.description = NULL;
         struct Graph newOriginalSubgraph;
-        newOriginalSubgraph.adjacencyMatrix = NULL;
-        newOriginalSubgraph.description = NULL;
-
-        // 3.2
-        int mainLoopIndex = 0;
-        while (stackMaximumClique.currentNumberOfElements > 0)
+        struct Graph originalSubgraph;
+        struct Vector bronResult;
+        struct Vector toRetrieveGraphs;
+        while (repeat == 1)
         {
-            // 3.2.1.1
-            struct Vector currentMaximumCliques = popVector_Vector(&stackMaximumClique);
-            toRetrieveGraphs = popVector_Vector(&stackOriginalGraphs);
-            int index = *((int *)(stackCurrentIndex.data) + stackCurrentIndex.currentNumberOfElements - 1);
-            stackCurrentIndex.currentNumberOfElements = stackCurrentIndex.currentNumberOfElements - 1;
-            for (int k = 0; k < currentMaximumCliques.currentNumberOfElements; k++)
+            // stack
+
+            struct Vector stackMaximumClique;
+            createVector_Vector(&stackMaximumClique, 1);
+            // Hold vectors of size 2, that hold original graphs.
+            struct Vector stackOriginalGraphs;
+            createVector_Vector(&stackOriginalGraphs, 1);
+
+            // struct Vector stackNextGraph;
+            // createVector_Graph(&stackNextGraph, 1);
+
+            struct Vector stackCurrentIndex;
+            createVector_Int(&stackCurrentIndex, 1);
+
+
+            createVector_Graph(&finalResults, 1);
+
+            maximal_clique_modular_product_time = 0;
+            time_begin = clock();
+
+            createVector_Graph(&toRetrieveGraphs, 2);
+            *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
+            *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
+            toRetrieveGraphs.currentNumberOfElements = 2;
+            GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
+
+            struct Vector R;
+            createVector_Int(&R, 1);
+            struct Vector P;
+            createVector_Int(&P, 1);
+            for (int j = 0; j < GH->noOfVertices; j++)
             {
-                // 3.2.1.2
+                pushBackVector_Int(&P, j);
+            }
+            struct Vector X;
+            createVector_Int(&X, 1);
 
-                if (0 == isASubgraph(*((struct Vector *)(currentMaximumCliques.data) + k), *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
-                    continue;
+            createVector_Vector(&bronResult, 1);
+            iterPivotBronKerbosch(R, P, X, GH, &bronResult);
 
-                originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
+            struct Vector maxBrons;
 
-                // 3.2.1.3
+            createVector_Vector(&maxBrons, 1);
 
-                if (index < noOfGraphs - 1)
+            int max = 0;
+            for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+            {
+
+                if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
                 {
-                    // 3.2.1.3.1
-                    freeGraph(GH);
-                    free(GH);
-                    GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + index + 1));
+                    max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+                }
+            }
+            for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+            {
 
-                    // 3.2.1.3.2
-
-                    struct Vector R;
-                    createVector_Int(&R, 1);
-                    struct Vector P;
-                    createVector_Int(&P, 1);
-                    for (int j = 0; j < GH->noOfVertices; j++)
+                if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                {
+                    struct Vector toPush;
+                    createVector_Int(&toPush, 1);
+                    for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
                     {
-                        pushBackVector_Int(&P, j);
+                        pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
                     }
-                    struct Vector X;
-                    createVector_Int(&X, 1);
+                    pushBackVector_Vector(&maxBrons, toPush);
+                }
+            }
 
-                    struct Vector bronResult;
-                    createVector_Vector(&bronResult, 1);
-                    iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+            // 3.1
+            pushBackVector_Vector(&stackOriginalGraphs, toRetrieveGraphs);
+            pushBackVector_Vector(&stackMaximumClique, maxBrons);
+            pushBackVector_Int(&stackCurrentIndex, 1);
+            // if (noOfGraphs > 2)
+            // {
+            //     pushBackVector_Graph(&stackNextGraph, *((struct Graph *)(graphs.data) + 2));
+            // }
+            // else
+            // {
+            //     struct Graph emptyGraph;
+            //     emptyGraph.noOfVertices = 0;
+            //     pushBackVector_Graph(&stackNextGraph, emptyGraph);
+            // }
 
-                    struct Vector maxBrons;
+            originalSubgraph.adjacencyMatrix = NULL;
+            originalSubgraph.description = NULL;
 
-                    createVector_Vector(&maxBrons, 1);
+            newOriginalSubgraph.adjacencyMatrix = NULL;
+            newOriginalSubgraph.description = NULL;
 
-                    int max = 0;
-                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+            // 3.2
+            int mainLoopIndex = 0;
+            while (stackMaximumClique.currentNumberOfElements > 0)
+            {
+                // 3.2.1.1
+                struct Vector currentMaximumCliques = popVector_Vector(&stackMaximumClique);
+                toRetrieveGraphs = popVector_Vector(&stackOriginalGraphs);
+                int index = *((int *)(stackCurrentIndex.data) + stackCurrentIndex.currentNumberOfElements - 1);
+                stackCurrentIndex.currentNumberOfElements = stackCurrentIndex.currentNumberOfElements - 1;
+                for (int k = 0; k < currentMaximumCliques.currentNumberOfElements; k++)
+                {
+                    // 3.2.1.2
+
+                    if (0 == isASubgraph(*((struct Vector *)(currentMaximumCliques.data) + k), *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
+                        continue;
+
+                    originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
+
+                    // 3.2.1.3
+
+                    if (index < noOfGraphs - 1)
                     {
+                        // 3.2.1.3.1
+                        freeGraph(GH);
+                        free(GH);
+                        GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + index + 1));
 
-                        if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                        // 3.2.1.3.2
+
+                        struct Vector R;
+                        createVector_Int(&R, 1);
+                        struct Vector P;
+                        createVector_Int(&P, 1);
+                        for (int j = 0; j < GH->noOfVertices; j++)
                         {
-                            max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+                            pushBackVector_Int(&P, j);
                         }
-                    }
-                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-                    {
+                        struct Vector X;
+                        createVector_Int(&X, 1);
 
-                        if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                        struct Vector bronResult;
+                        createVector_Vector(&bronResult, 1);
+                        iterPivotBronKerbosch(R, P, X, GH, &bronResult);
+
+                        struct Vector maxBrons;
+
+                        createVector_Vector(&maxBrons, 1);
+
+                        int max = 0;
+                        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
                         {
-                            struct Vector toPush;
-                            createVector_Int(&toPush, 1);
-                            for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
+
+                            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
                             {
-                                pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
+                                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
                             }
-                            pushBackVector_Vector(&maxBrons, toPush);
                         }
-                    }
-                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-                    {
-                        free(((struct Vector *)bronResult.data + i)->data);
-                    }
-                    free(bronResult.data);
-
-                    // 3.2.1.3.3
-
-                    pushBackVector_Vector(&stackMaximumClique, maxBrons);
-
-                    struct Vector newToRetrieveGraphs;
-                    createVector_Graph(&newToRetrieveGraphs, 2);
-                    struct Graph graphToPush;
-                    graphToPush.noOfVertices = originalSubgraph.noOfVertices;
-                    graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
-                    if (NULL == graphToPush.adjacencyMatrix)
-                    {
-                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    graphToPush.description = malloc(sizeof(char));
-                    if (NULL == graphToPush.description)
-                    {
-                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    graphToPush.description[0] = '\0';
-                    for (int l = 0; l < originalSubgraph.noOfVertices; l++)
-                    {
-                        for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
                         {
 
-                            graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                            if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                            {
+                                struct Vector toPush;
+                                createVector_Int(&toPush, 1);
+                                for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
+                                {
+                                    pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
+                                }
+                                pushBackVector_Vector(&maxBrons, toPush);
+                            }
                         }
-                    }
-                    *((struct Graph *)(newToRetrieveGraphs.data)) = graphToPush;
-                    freeGraph(&originalSubgraph);
-                    *((struct Graph *)(newToRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
-                    newToRetrieveGraphs.currentNumberOfElements = 2;
-                    pushBackVector_Vector(&stackOriginalGraphs, newToRetrieveGraphs);
+                        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+                        {
+                            free(((struct Vector *)bronResult.data + i)->data);
+                        }
+                        free(bronResult.data);
 
-                    pushBackVector_Int(&stackCurrentIndex, index + 1);
+                        // 3.2.1.3.3
+
+                        pushBackVector_Vector(&stackMaximumClique, maxBrons);
+
+                        struct Vector newToRetrieveGraphs;
+                        createVector_Graph(&newToRetrieveGraphs, 2);
+                        struct Graph graphToPush;
+                        graphToPush.noOfVertices = originalSubgraph.noOfVertices;
+                        graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
+                        if (NULL == graphToPush.adjacencyMatrix)
+                        {
+                            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        graphToPush.description = malloc(sizeof(char));
+                        if (NULL == graphToPush.description)
+                        {
+                            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        graphToPush.description[0] = '\0';
+                        for (int l = 0; l < originalSubgraph.noOfVertices; l++)
+                        {
+                            for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                            {
+
+                                graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                            }
+                        }
+                        *((struct Graph *)(newToRetrieveGraphs.data)) = graphToPush;
+                        freeGraph(&originalSubgraph);
+                        *((struct Graph *)(newToRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + index + 1);
+                        newToRetrieveGraphs.currentNumberOfElements = 2;
+                        pushBackVector_Vector(&stackOriginalGraphs, newToRetrieveGraphs);
+
+                        pushBackVector_Int(&stackCurrentIndex, index + 1);
+                    }
+                    else
+                    {
+                        struct Graph graphToPush;
+                        graphToPush.noOfVertices = originalSubgraph.noOfVertices;
+                        graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
+                        if (NULL == graphToPush.adjacencyMatrix)
+                        {
+                            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        graphToPush.description = malloc(sizeof(char));
+                        if (NULL == graphToPush.description)
+                        {
+                            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        graphToPush.description[0] = '\0';
+                        for (int l = 0; l < originalSubgraph.noOfVertices; l++)
+                        {
+                            for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                            {
+
+                                graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                            }
+                        }
+                        freeGraph(&originalSubgraph);
+                        pushBackVector_Graph(&finalResults, graphToPush);
+                    }
                 }
-                else
+                for (int m = 0; m < currentMaximumCliques.currentNumberOfElements; m++)
                 {
-                    struct Graph graphToPush;
-                    graphToPush.noOfVertices = originalSubgraph.noOfVertices;
-                    graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
-                    if (NULL == graphToPush.adjacencyMatrix)
-                    {
-                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    graphToPush.description = malloc(sizeof(char));
-                    if (NULL == graphToPush.description)
-                    {
-                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    graphToPush.description[0] = '\0';
-                    for (int l = 0; l < originalSubgraph.noOfVertices; l++)
-                    {
-                        for (int m = 0; m < originalSubgraph.noOfVertices; m++)
-                        {
-
-                            graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
-                        }
-                    }
-                    freeGraph(&originalSubgraph);
-                    pushBackVector_Graph(&finalResults, graphToPush);
+                    free(((struct Vector *)currentMaximumCliques.data + m)->data);
                 }
+                free(currentMaximumCliques.data);
+                if (mainLoopIndex != 0)
+                    freeGraph(toRetrieveGraphs.data);
+                free(toRetrieveGraphs.data);
+                mainLoopIndex++;
             }
-            for (int m = 0; m < currentMaximumCliques.currentNumberOfElements; m++)
+            free(stackCurrentIndex.data);
+            free(stackMaximumClique.data);
+            free(stackOriginalGraphs.data);
+            if (stackOriginalGraphs.currentNumberOfElements > 0)
+                freeGraph(((struct Vector *)stackOriginalGraphs.data)->data);
+
+            if (finalResults.data == NULL || finalResults.currentNumberOfElements <= 0)
             {
-                free(((struct Vector *)currentMaximumCliques.data + m)->data);
+
+                repeat = 1;
             }
-            free(currentMaximumCliques.data);
-            if (mainLoopIndex != 0)
-                freeGraph(toRetrieveGraphs.data);
-            free(toRetrieveGraphs.data);
-            mainLoopIndex++;
+            else
+                repeat = 0;
         }
-        free(stackCurrentIndex.data);
-        free(stackMaximumClique.data);
-        free(stackOriginalGraphs.data);
-        if (stackOriginalGraphs.currentNumberOfElements > 0)
-            freeGraph(((struct Vector *)stackOriginalGraphs.data)->data);
         fprintf(outputFile, "\n-------------------------------------------------\n");
         fprintf(outputFile, "Maximum common subgraph for all input graphs: \n");
 #ifdef PRINTTOCMD
