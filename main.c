@@ -1751,6 +1751,7 @@ int main(int argc, char *argv[])
 
     if (1 < noOfGraphs)
     {
+        int firstCycle = 1;
         /*
             1. Abstract
             DONE: To add backtracking:
@@ -2067,152 +2068,155 @@ int main(int argc, char *argv[])
         // -------------------------------------------------------------------------------------------------------------------------------------------------
         // -------------------------------------------------------------------------------------------------------------------------------------------------
 
-        time_begin = clock();
-
-        createVector_Graph(&toRetrieveGraphs, 2);
-        *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
-        *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
-        toRetrieveGraphs.currentNumberOfElements = 2;
-        freeGraph(GH);
-        free(GH);
-        GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
-
-        originalSubgraph.adjacencyMatrix = NULL;
-        originalSubgraph.description = NULL;
-        originalSubgraph.noOfVertices = 0;
-        newOriginalSubgraph.adjacencyMatrix = NULL;
-        newOriginalSubgraph.description = NULL;
-        newOriginalSubgraph.noOfVertices = 0;
-        struct Vector modularProductApproximationResult;
-        modularProductApproximationResult.data = NULL;
-        for (int i = 2; i < noOfGraphs; i++)
+        if (1 == firstCycle)
         {
+            time_begin = clock();
+
+            createVector_Graph(&toRetrieveGraphs, 2);
+            *((struct Graph *)(toRetrieveGraphs.data)) = *(struct Graph *)graphs.data;
+            *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)graphs.data + 1);
+            toRetrieveGraphs.currentNumberOfElements = 2;
+            freeGraph(GH);
+            free(GH);
+            GH = modularProduct(((struct Graph *)(graphs.data)), ((struct Graph *)(graphs.data) + 1));
+
+            originalSubgraph.adjacencyMatrix = NULL;
+            originalSubgraph.description = NULL;
+            originalSubgraph.noOfVertices = 0;
+            newOriginalSubgraph.adjacencyMatrix = NULL;
+            newOriginalSubgraph.description = NULL;
+            newOriginalSubgraph.noOfVertices = 0;
+            struct Vector modularProductApproximationResult;
+            modularProductApproximationResult.data = NULL;
+            for (int i = 2; i < noOfGraphs; i++)
+            {
+                free(modularProductApproximationResult.data);
+
+                createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
+
+                maximalCliqueApproximation(GH, &modularProductApproximationResult);
+
+                freeGraph(&newOriginalSubgraph);
+
+                if (0 == isASubgraph(modularProductApproximationResult, *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
+                    break;
+
+                newOriginalSubgraph = retrieveOriginalVerticesGraph(modularProductApproximationResult, toRetrieveGraphs);
+                freeGraph(&originalSubgraph);
+                originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
+
+                if (NULL == originalSubgraph.adjacencyMatrix)
+                {
+
+                    printf("Couldn't allocate memory for new subgraph in main\n");
+                    exit(EXIT_FAILURE);
+                }
+                originalSubgraph.noOfVertices = newOriginalSubgraph.noOfVertices;
+                for (int j = 0; j < newOriginalSubgraph.noOfVertices; j++)
+                {
+
+                    for (int k = 0; k < newOriginalSubgraph.noOfVertices; k++)
+                    {
+                        originalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k] = newOriginalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k];
+                    }
+                }
+                originalSubgraph.description = malloc(sizeof(char));
+                if (NULL == originalSubgraph.description)
+                {
+
+                    printf("Couldn't allocate memory for new subgraph in main\n");
+                    exit(EXIT_FAILURE);
+                }
+                originalSubgraph.description[0] = '\0';
+                // printGraph(originalSubgraph);
+                freeGraph(GH);
+                free(GH);
+                GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + i));
+
+                *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
+                *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)(graphs.data) + i);
+            }
+
             free(modularProductApproximationResult.data);
-
             createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
-
             maximalCliqueApproximation(GH, &modularProductApproximationResult);
 
             freeGraph(&newOriginalSubgraph);
 
-            if (0 == isASubgraph(modularProductApproximationResult, *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
-                break;
-
-            newOriginalSubgraph = retrieveOriginalVerticesGraph(modularProductApproximationResult, toRetrieveGraphs);
-            freeGraph(&originalSubgraph);
-            originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
-
-            if (NULL == originalSubgraph.adjacencyMatrix)
+            if (0 != isASubgraph(modularProductApproximationResult, *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
             {
+                newOriginalSubgraph = retrieveOriginalVerticesGraph(modularProductApproximationResult, toRetrieveGraphs);
 
-                printf("Couldn't allocate memory for new subgraph in main\n");
-                exit(EXIT_FAILURE);
-            }
-            originalSubgraph.noOfVertices = newOriginalSubgraph.noOfVertices;
-            for (int j = 0; j < newOriginalSubgraph.noOfVertices; j++)
-            {
+                freeGraph(&originalSubgraph);
+                originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
 
-                for (int k = 0; k < newOriginalSubgraph.noOfVertices; k++)
+                if (NULL == originalSubgraph.adjacencyMatrix)
                 {
-                    originalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k] = newOriginalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k];
+
+                    printf("Couldn't allocate memory for new subgraph in main\n");
+                    exit(EXIT_FAILURE);
                 }
-            }
-            originalSubgraph.description = malloc(sizeof(char));
-            if (NULL == originalSubgraph.description)
-            {
-
-                printf("Couldn't allocate memory for new subgraph in main\n");
-                exit(EXIT_FAILURE);
-            }
-            originalSubgraph.description[0] = '\0';
-            // printGraph(originalSubgraph);
-            freeGraph(GH);
-            free(GH);
-            GH = modularProduct(&originalSubgraph, ((struct Graph *)(graphs.data) + i));
-
-            *((struct Graph *)(toRetrieveGraphs.data)) = originalSubgraph;
-            *((struct Graph *)(toRetrieveGraphs.data) + 1) = *((struct Graph *)(graphs.data) + i);
-        }
-
-        free(modularProductApproximationResult.data);
-        createVector_Int(&modularProductApproximationResult, GH->noOfVertices);
-        maximalCliqueApproximation(GH, &modularProductApproximationResult);
-
-        freeGraph(&newOriginalSubgraph);
-
-        if (0 != isASubgraph(modularProductApproximationResult, *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
-        {
-            newOriginalSubgraph = retrieveOriginalVerticesGraph(modularProductApproximationResult, toRetrieveGraphs);
-
-            freeGraph(&originalSubgraph);
-            originalSubgraph.adjacencyMatrix = calloc(newOriginalSubgraph.noOfVertices * newOriginalSubgraph.noOfVertices, sizeof(int));
-
-            if (NULL == originalSubgraph.adjacencyMatrix)
-            {
-
-                printf("Couldn't allocate memory for new subgraph in main\n");
-                exit(EXIT_FAILURE);
-            }
-            originalSubgraph.noOfVertices = newOriginalSubgraph.noOfVertices;
-            for (int j = 0; j < newOriginalSubgraph.noOfVertices; j++)
-            {
-
-                for (int k = 0; k < newOriginalSubgraph.noOfVertices; k++)
+                originalSubgraph.noOfVertices = newOriginalSubgraph.noOfVertices;
+                for (int j = 0; j < newOriginalSubgraph.noOfVertices; j++)
                 {
-                    originalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k] = newOriginalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k];
+
+                    for (int k = 0; k < newOriginalSubgraph.noOfVertices; k++)
+                    {
+                        originalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k] = newOriginalSubgraph.adjacencyMatrix[j * newOriginalSubgraph.noOfVertices + k];
+                    }
                 }
+                originalSubgraph.description = malloc(sizeof(char));
+                if (NULL == originalSubgraph.description)
+                {
+
+                    printf("Couldn't allocate memory for new subgraph in main\n");
+                    exit(EXIT_FAILURE);
+                }
+                originalSubgraph.description[0] = '\0';
             }
-            originalSubgraph.description = malloc(sizeof(char));
-            if (NULL == originalSubgraph.description)
+            else
             {
-
-                printf("Couldn't allocate memory for new subgraph in main\n");
-                exit(EXIT_FAILURE);
+                freeGraph(&originalSubgraph);
             }
-            originalSubgraph.description[0] = '\0';
-        }
-        else
-        {
-            freeGraph(&originalSubgraph);
-        }
 
-        fprintf(outputFile, "-------------------------------------------------\n");
-        fprintf(outputFile, "Maximum common subgraph approximation for all input graphs: \n");
+            fprintf(outputFile, "-------------------------------------------------\n");
+            fprintf(outputFile, "Maximum common subgraph approximation for all input graphs: \n");
 #ifdef PRINTTOCMD
-        printf("-------------------------------------------------\n");
-        printf("Maximum common subgraph approximation for all input graphs: \n");
+            printf("-------------------------------------------------\n");
+            printf("Maximum common subgraph approximation for all input graphs: \n");
 #endif
-        if (originalSubgraph.noOfVertices > 0)
-        {
-            noOfEdges = 0;
-            noOfEdges = countGraphEdges(&originalSubgraph);
-            fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
-            fprintf(outputFile, "Adjacency matrix:\n");
+            if (originalSubgraph.noOfVertices > 0)
+            {
+                noOfEdges = 0;
+                noOfEdges = countGraphEdges(&originalSubgraph);
+                fprintf(outputFile, "Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
+                fprintf(outputFile, "Adjacency matrix:\n");
 #ifdef PRINTTOCMD
-            printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
-            printf("Adjacency matrix:\n");
-            printGraph(originalSubgraph);
+                printf("Graph is of size %d with %d vertices and %d edges\n", noOfEdges + originalSubgraph.noOfVertices, originalSubgraph.noOfVertices, noOfEdges);
+                printf("Adjacency matrix:\n");
+                printGraph(originalSubgraph);
 
 #endif
-            saveToFileGraph(&originalSubgraph, outputFile);
-            freeGraph(&newOriginalSubgraph);
-            freeGraph(&originalSubgraph);
+                saveToFileGraph(&originalSubgraph, outputFile);
+                freeGraph(&newOriginalSubgraph);
+                freeGraph(&originalSubgraph);
 
-            free(toRetrieveGraphs.data);
-            free(modularProductApproximationResult.data);
-            time_end = clock();
-            maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-        }
-        else
-        {
+                free(toRetrieveGraphs.data);
+                free(modularProductApproximationResult.data);
+                time_end = clock();
+                maximal_common_subgraph_approximation_time = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
+            }
+            else
+            {
 
-            printf("Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
-            fprintf(outputFile,"Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
-            freeGraph(&newOriginalSubgraph);
-            freeGraph(&originalSubgraph);
+                printf("Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
+                fprintf(outputFile, "Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
+                freeGraph(&newOriginalSubgraph);
+                freeGraph(&originalSubgraph);
 
-            free(toRetrieveGraphs.data);
-            free(modularProductApproximationResult.data);
+                free(toRetrieveGraphs.data);
+                free(modularProductApproximationResult.data);
+            }
         }
     }
 #ifdef dbg
