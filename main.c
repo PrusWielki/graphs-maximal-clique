@@ -1826,20 +1826,20 @@ int main(int argc, char *argv[])
 
         createVector_Vector(&maxBrons, 1);
 
-        int max = 0;
+        // int max = 0;
+        // for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+        // {
+
+        //     if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+        //     {
+        //         max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+        //     }
+        // }
         for (int i = 0; i < bronResult.currentNumberOfElements; i++)
         {
 
-            if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-            {
-                max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
-            }
-        }
-        for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-        {
-
-            if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-            {
+            // if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+            // {
                 struct Vector toPush;
                 createVector_Int(&toPush, 1);
                 for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
@@ -1847,7 +1847,7 @@ int main(int argc, char *argv[])
                     pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
                 }
                 pushBackVector_Vector(&maxBrons, toPush);
-            }
+            // }
         }
 
         // 3.1
@@ -1920,20 +1920,20 @@ int main(int argc, char *argv[])
 
                     createVector_Vector(&maxBrons, 1);
 
-                    int max = 0;
+                    // int max = 0;
+                    // for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+                    // {
+
+                    //     if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                    //     {
+                    //         max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
+                    //     }
+                    // }
                     for (int i = 0; i < bronResult.currentNumberOfElements; i++)
                     {
 
-                        if (max < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-                        {
-                            max = ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements;
-                        }
-                    }
-                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
-                    {
-
-                        if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
-                        {
+                        // if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
+                        // {
                             struct Vector toPush;
                             createVector_Int(&toPush, 1);
                             for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
@@ -1941,7 +1941,7 @@ int main(int argc, char *argv[])
                                 pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
                             }
                             pushBackVector_Vector(&maxBrons, toPush);
-                        }
+                        // }
                     }
                     for (int i = 0; i < bronResult.currentNumberOfElements; i++)
                     {
