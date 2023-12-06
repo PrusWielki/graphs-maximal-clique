@@ -9,8 +9,7 @@ ren output.txt output-Graph2_5.txt
 main.exe Graph5_5.txt
 ren output.txt output-Graph5_5.txt
 
-main.exe Graph7_5.txt
-ren output.txt output-Graph7_5.txt
+
 
 
 
@@ -26,28 +25,41 @@ ren output.txt output-Graph2_10.txt
 main.exe Graph5_10.txt
 ren output.txt output-Graph5_10.txt
 
-main.exe Graph7_10.txt
-ren output.txt output-Graph7_10.txt
 
 
 
 
 
-main.exe Graph1_15.txt
-ren output.txt output-Graph1_15.txt
 
-main.exe Graph2_15.txt
-ren output.txt output-Graph2_15.txt
+main.exe Graph1_11.txt
+ren output.txt output-Graph1_11.txt
 
-main.exe Graph5_15.txt
-ren output.txt output-Graph5_15.txt
+main.exe Graph2_11.txt
+ren output.txt output-Graph2_11.txt
 
-main.exe Graph7_15.txt
-ren output.txt output-Graph7_15.txt
+main.exe Graph5_11.txt
+ren output.txt output-Graph5_11.txt
 
 
 
 
+main.exe Graph1_12.txt
+ren output.txt output-Graph1_12.txt
+
+main.exe Graph2_12.txt
+ren output.txt output-Graph2_12.txt
+
+main.exe Graph5_12.txt
+ren output.txt output-Graph5_12.txt
+
+main.exe Graph1_13.txt
+ren output.txt output-Graph1_13.txt
+
+main.exe Graph2_13.txt
+ren output.txt output-Graph2_13.txt
+
+main.exe Graph5_13.txt
+ren output.txt output-Graph5_13.txt
 
 
 main.exe MultiGraph1_5.txt
@@ -59,8 +71,7 @@ ren output.txt output-MultiGraph2_5.txt
 main.exe MultiGraph5_5.txt
 ren output.txt output-MultiGraph5_5.txt
 
-main.exe MultiGraph7_5.txt
-ren output.txt output-MultiGraph7_5.txt
+
 
 
 
@@ -76,26 +87,37 @@ ren output.txt output-MultiGraph2_10.txt
 main.exe MultiGraph5_10.txt
 ren output.txt output-MultiGraph5_10.txt
 
-main.exe MultiGraph7_10.txt
-ren output.txt output-MultiGraph7_10.txt
 
 
 
 
+main.exe MultiGraph1_11.txt
+ren output.txt output-MultiGraph1_11.txt
+
+main.exe MultiGraph2_11.txt
+ren output.txt output-MultiGraph2_11.txt
+
+main.exe MultiGraph5_11.txt
+ren output.txt output-MultiGraph5_11.txt
 
 
-main.exe MultiGraph1_15.txt
-ren output.txt output-MultiGraph1_15.txt
+main.exe MultiGraph1_12.txt
+ren output.txt output-MultiGraph1_12.txt
 
-main.exe MultiGraph2_15.txt
-ren output.txt output-MultiGraph2_15.txt
+main.exe MultiGraph2_12.txt
+ren output.txt output-MultiGraph2_12.txt
 
-main.exe MultiGraph5_15.txt
-ren output.txt output-MultiGraph5_15.txt
+main.exe MultiGraph5_12.txt
+ren output.txt output-MultiGraph5_12.txt
 
-main.exe MultiGraph7_15.txt
-ren output.txt output-MultiGraph7_15.txt
+main.exe MultiGraph1_13.txt
+ren output.txt output-MultiGraph1_13.txt
 
+main.exe MultiGraph2_13.txt
+ren output.txt output-MultiGraph2_13.txt
+
+main.exe MultiGraph5_13.txt
+ren output.txt output-MultiGraph5_13.txt
 
 
 main.exe Graph1_100.txt
