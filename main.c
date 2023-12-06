@@ -1781,7 +1781,6 @@ int main(int argc, char *argv[])
         */
 
         // stack
-
         struct Vector stackMaximumClique;
         createVector_Vector(&stackMaximumClique, 1);
         // Hold vectors of size 2, that hold original graphs.
@@ -1840,13 +1839,13 @@ int main(int argc, char *argv[])
 
             // if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
             // {
-                struct Vector toPush;
-                createVector_Int(&toPush, 1);
-                for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
-                {
-                    pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
-                }
-                pushBackVector_Vector(&maxBrons, toPush);
+            struct Vector toPush;
+            createVector_Int(&toPush, 1);
+            for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
+            {
+                pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
+            }
+            pushBackVector_Vector(&maxBrons, toPush);
             // }
         }
 
@@ -1872,12 +1871,48 @@ int main(int argc, char *argv[])
         newOriginalSubgraph.adjacencyMatrix = NULL;
         newOriginalSubgraph.description = NULL;
 
+        // OPTIONAL: Don't take all cliques at once, take the nth maximum and loop instead, stop when nth maximum cannot be found, main loop should repeat for the amount of maximums in the main bron result.
+        //
+
         // 3.2
         int mainLoopIndex = 0;
         while (stackMaximumClique.currentNumberOfElements > 0)
         {
             // 3.2.1.1
             struct Vector currentMaximumCliques = popVector_Vector(&stackMaximumClique);
+
+            // Filter the currentMaximumCliques to be the length of at least max of current finalResult
+            if (finalResults.currentNumberOfElements > 0)
+            {
+                int max = ((struct Graph *)finalResults.data)->noOfVertices;
+
+                for (int o = 0; o < finalResults.currentNumberOfElements; o++)
+                {
+                    if (max < ((struct Graph *)finalResults.data + o)->noOfVertices)
+                    {
+                        max = ((struct Graph *)finalResults.data + o)->noOfVertices;
+                    }
+                }
+
+                // filter
+
+                int o = 0;
+                while (o < currentMaximumCliques.currentNumberOfElements)
+                {
+
+                    if (max >= ((struct Vector *)currentMaximumCliques.data + o)->currentNumberOfElements)
+                    {
+                        for (int n = o; n < currentMaximumCliques.currentNumberOfElements; n++)
+                        {
+                            free(((struct Vector *)currentMaximumCliques.data + n)->data);
+                            *((struct Vector *)currentMaximumCliques.data + n) = *((struct Vector *)currentMaximumCliques.data + n + 1);
+                        }
+                        currentMaximumCliques.currentNumberOfElements = currentMaximumCliques.currentNumberOfElements - 1;
+                    }
+                    else
+                        o++;
+                }
+            }
             toRetrieveGraphs = popVector_Vector(&stackOriginalGraphs);
             int index = *((int *)(stackCurrentIndex.data) + stackCurrentIndex.currentNumberOfElements - 1);
             stackCurrentIndex.currentNumberOfElements = stackCurrentIndex.currentNumberOfElements - 1;
@@ -1934,13 +1969,13 @@ int main(int argc, char *argv[])
 
                         // if (max == ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements)
                         // {
-                            struct Vector toPush;
-                            createVector_Int(&toPush, 1);
-                            for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
-                            {
-                                pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
-                            }
-                            pushBackVector_Vector(&maxBrons, toPush);
+                        struct Vector toPush;
+                        createVector_Int(&toPush, 1);
+                        for (int j = 0; j < ((struct Vector *)(bronResult.data) + i)->currentNumberOfElements; j++)
+                        {
+                            pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + i)->data) + j));
+                        }
+                        pushBackVector_Vector(&maxBrons, toPush);
                         // }
                     }
                     for (int i = 0; i < bronResult.currentNumberOfElements; i++)
@@ -2207,7 +2242,7 @@ int main(int argc, char *argv[])
         {
 
             printf("Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
-            fprintf(outputFile,"Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
+            fprintf(outputFile, "Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
             freeGraph(&newOriginalSubgraph);
             freeGraph(&originalSubgraph);
 
