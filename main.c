@@ -1802,7 +1802,6 @@ int main(int argc, char *argv[])
             struct Vector stackCurrentIndex;
             createVector_Int(&stackCurrentIndex, 1);
 
-
             createVector_Graph(&finalResults, 1);
 
             maximal_clique_modular_product_time = 0;
@@ -2040,6 +2039,80 @@ int main(int argc, char *argv[])
             {
 
                 repeat = 1;
+                // Remove all cliques from graphs.
+
+                for (int x = 0; x < graphs.currentNumberOfElements; x++)
+                {
+                    // find cliques
+
+                    struct Vector R;
+                    createVector_Int(&R, 1);
+                    struct Vector P;
+                    createVector_Int(&P, 1);
+                    for (int z = 0; z < ((struct Graph *)graphs.data + x)->noOfVertices; z++)
+                    {
+                        pushBackVector_Int(&P, z);
+                    }
+                    struct Vector X;
+                    createVector_Int(&X, 1);
+
+                    struct Vector bronResult;
+                    createVector_Vector(&bronResult, 1);
+                    iterPivotBronKerbosch(R, P, X, ((struct Graph *)graphs.data + x), &bronResult);
+
+                    struct Vector maxBrons;
+
+                    createVector_Vector(&maxBrons, 1);
+
+                    int max = 0;
+                    for (int z = 0; z < bronResult.currentNumberOfElements; z++)
+                    {
+
+                        if (max < ((struct Vector *)(bronResult.data) + z)->currentNumberOfElements)
+                        {
+                            max = ((struct Vector *)(bronResult.data) + z)->currentNumberOfElements;
+                        }
+                    }
+                    for (int z = 0; z < bronResult.currentNumberOfElements; z++)
+                    {
+
+                        if (max == ((struct Vector *)(bronResult.data) + z)->currentNumberOfElements)
+                        {
+                            struct Vector toPush;
+                            createVector_Int(&toPush, 1);
+                            for (int y = 0; y < ((struct Vector *)(bronResult.data) + z)->currentNumberOfElements; y++)
+                            {
+                                pushBackVector_Int(&toPush, *((int *)(((struct Vector *)(bronResult.data) + z)->data) + y));
+                            }
+                            pushBackVector_Vector(&maxBrons, toPush);
+                        }
+                    }
+
+                    // remove max brons from graph
+                    for (int z = 0; z < maxBrons.currentNumberOfElements; z++)
+                    {
+
+                        for (int y = 0; y < ((struct Vector *)maxBrons.data + z)->currentNumberOfElements - 1; y++)
+                        {
+                            ((struct Graph *)graphs.data + x)->adjacencyMatrix[(*(int *)(((struct Vector *)maxBrons.data + z)->data) + y) * ((struct Graph *)graphs.data + x)->noOfVertices + (*(int *)(((struct Vector *)maxBrons.data + z)->data) + y + 1)] = 0;
+                            ((struct Graph *)graphs.data + x)->adjacencyMatrix[(*(int *)(((struct Vector *)maxBrons.data + z)->data) + y + 1) * ((struct Graph *)graphs.data + x)->noOfVertices + (*(int *)(((struct Vector *)maxBrons.data + z)->data) + y)] = 0;
+                        }
+                    }
+
+                    // Now remove all vertices orphaned edges.
+                    // 1. check if each value in a row is 0
+                    // 2. if so mover all later rows to that row, and columns respectively 
+                    // 3. reduce noOfVertices by 1
+                    // 4. If noOfVertices == 1 report that vertex as a maximum common subgraph
+
+                    for (int i = 0; i < bronResult.currentNumberOfElements; i++)
+                    {
+                        free(((struct Vector *)bronResult.data + i)->data);
+                    }
+                    free(bronResult.data);
+
+                    
+                }
             }
             else
                 repeat = 0;
