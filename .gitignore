@@ -56,3 +56,5 @@ main
 valgrind-out.txt
 
 tests/
+Graph*.txt
+output*.txt
