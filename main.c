@@ -482,6 +482,7 @@ void freeGraph(struct Graph *graph)
     if (NULL == graph)
         return;
 
+    graph->noOfVertices = 0;
     free(graph->adjacencyMatrix);
     free(graph->description);
 }
@@ -1902,9 +1903,10 @@ int main(int argc, char *argv[])
 
                     if (max >= ((struct Vector *)currentMaximumCliques.data + o)->currentNumberOfElements)
                     {
-                        for (int n = o; n < currentMaximumCliques.currentNumberOfElements; n++)
+                        free(((struct Vector *)currentMaximumCliques.data + o)->data);
+                        for (int n = o; n < currentMaximumCliques.currentNumberOfElements - 1; n++)
                         {
-                            free(((struct Vector *)currentMaximumCliques.data + n)->data);
+
                             *((struct Vector *)currentMaximumCliques.data + n) = *((struct Vector *)currentMaximumCliques.data + n + 1);
                         }
                         currentMaximumCliques.currentNumberOfElements = currentMaximumCliques.currentNumberOfElements - 1;
@@ -2243,8 +2245,10 @@ int main(int argc, char *argv[])
 
             printf("Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
             fprintf(outputFile, "Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
-            freeGraph(&newOriginalSubgraph);
-            freeGraph(&originalSubgraph);
+            if (newOriginalSubgraph.noOfVertices > 0)
+                freeGraph(&newOriginalSubgraph);
+            if (originalSubgraph.noOfVertices > 0)
+                freeGraph(&originalSubgraph);
 
             free(toRetrieveGraphs.data);
             free(modularProductApproximationResult.data);
