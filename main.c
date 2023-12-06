@@ -2039,6 +2039,7 @@ int main(int argc, char *argv[])
             {
 
                 repeat = 1;
+                firstCycle = 0;
                 // Remove all cliques from graphs.
 
                 for (int x = 0; x < graphs.currentNumberOfElements; x++)
@@ -2101,17 +2102,75 @@ int main(int argc, char *argv[])
 
                     // Now remove all vertices orphaned edges.
                     // 1. check if each value in a row is 0
-                    // 2. if so mover all later rows to that row, and columns respectively 
+                    // 2. if so mover all later rows to that row, and columns respectively
                     // 3. reduce noOfVertices by 1
                     // 4. If noOfVertices == 1 report that vertex as a maximum common subgraph
+
+                    // remove max brons from graph
+                    int loneVertex = 0;
+                    for (int z = 0; z < ((struct Graph *)graphs.data + x)->noOfVertices; z++)
+                    {
+                        int allEmpty = 1;
+                        // 1.
+                        for (int y = 0; y < ((struct Graph *)graphs.data + x)->noOfVertices; y++)
+                        {
+                            if (((struct Graph *)graphs.data + x)->adjacencyMatrix[z * ((struct Graph *)graphs.data + x)->noOfVertices + y] != 0)
+                                allEmpty = 0;
+                        }
+                        // 2 .
+                        if (allEmpty == 1)
+                        {
+                            for (int f = z; f < ((struct Graph *)graphs.data + x)->noOfVertices - 1; f++)
+                            {
+
+                                ((struct Graph *)graphs.data + x)->adjacencyMatrix[z * ((struct Graph *)graphs.data + x)->noOfVertices] = ((struct Graph *)graphs.data + x)->adjacencyMatrix[(z + 1) * ((struct Graph *)graphs.data + x)->noOfVertices];
+                            }
+                            // Somehow remove a column:
+                            for (int f = 0; f < ((struct Graph *)graphs.data + x)->noOfVertices; f++)
+                            {
+                                for (int t = z; t < ((struct Graph *)graphs.data + x)->noOfVertices - 1; t++)
+
+                                    ((struct Graph *)graphs.data + x)->adjacencyMatrix[f * ((struct Graph *)graphs.data + x)->noOfVertices + t] = ((struct Graph *)graphs.data + x)->adjacencyMatrix[f * ((struct Graph *)graphs.data + x)->noOfVertices + t + 1];
+                            }
+                            ((struct Graph *)graphs.data + x)->noOfVertices = ((struct Graph *)graphs.data + x)->noOfVertices - 1;
+                            if (((struct Graph *)graphs.data + x)->noOfVertices == 1)
+                            {
+                                loneVertex = 1;
+                                break;
+                            }
+                        }
+                        if (loneVertex == 1)
+                            break;
+                    }
 
                     for (int i = 0; i < bronResult.currentNumberOfElements; i++)
                     {
                         free(((struct Vector *)bronResult.data + i)->data);
                     }
                     free(bronResult.data);
+                    if (loneVertex == 1)
+                    {
+                        repeat = 0;
+                        struct Graph singleVertex;
+                        singleVertex.noOfVertices = 1;
+                        singleVertex.adjacencyMatrix = calloc(1, sizeof(int));
+                        singleVertex.description = malloc(sizeof(char));
 
-                    
+                        if (NULL == singleVertex.adjacencyMatrix)
+                        {
+                            printf("Couldn't allocate memory for final result\n");
+                            exit(EXIT_FAILURE);
+                        }
+
+                        if (NULL == singleVertex.description)
+                        {
+                            printf("Couldn't allocate memory for final result\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        singleVertex.description[0] = '\0';
+
+                        pushBackVector_Graph(&finalResults, singleVertex);
+                    }
                 }
             }
             else
@@ -2303,6 +2362,12 @@ int main(int argc, char *argv[])
                 free(toRetrieveGraphs.data);
                 free(modularProductApproximationResult.data);
             }
+        }
+        else
+        {
+
+            printf("Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
+            fprintf(outputFile, "Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
         }
     }
 #ifdef dbg
