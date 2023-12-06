@@ -2205,6 +2205,9 @@ int main(int argc, char *argv[])
         }
         else
         {
+
+            printf("Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
+            fprintf(outputFile,"Could not find Maximum Common Subgraph Approximation in polynomial time (exact solution might still exist)\n");
             freeGraph(&newOriginalSubgraph);
             freeGraph(&originalSubgraph);
 
