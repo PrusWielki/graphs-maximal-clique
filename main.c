@@ -1872,6 +1872,11 @@ int main(int argc, char *argv[])
         newOriginalSubgraph.adjacencyMatrix = NULL;
         newOriginalSubgraph.description = NULL;
 
+
+
+        // Don't take all cliques at once, take the nth maximum and loop instead, stop when nth maximum cannot be found
+
+        
         // 3.2
         int mainLoopIndex = 0;
         while (stackMaximumClique.currentNumberOfElements > 0)
