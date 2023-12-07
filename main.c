@@ -387,7 +387,8 @@ void printGraphs(struct Graph *graphs, int noOfGraphs)
 }
 int countGraphEdges(struct Graph *graph)
 {
-
+    if (NULL == graph || NULL == graph->adjacencyMatrix || graph->noOfVertices == 0)
+        return 0;
     int noOfEdges = 0;
     for (int i = 0; i < graph->noOfVertices; i++)
     {
@@ -1901,7 +1902,7 @@ int main(int argc, char *argv[])
                 while (o < currentMaximumCliques.currentNumberOfElements)
                 {
 
-                    if (max >= ((struct Vector *)currentMaximumCliques.data + o)->currentNumberOfElements)
+                    if (max > ((struct Vector *)currentMaximumCliques.data + o)->currentNumberOfElements)
                     {
                         free(((struct Vector *)currentMaximumCliques.data + o)->data);
                         for (int n = o; n < currentMaximumCliques.currentNumberOfElements - 1; n++)
@@ -1924,7 +1925,7 @@ int main(int argc, char *argv[])
 
                 if (0 == isASubgraph(*((struct Vector *)(currentMaximumCliques.data) + k), *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
                     continue;
-                if (finalResults.currentNumberOfElements > 0 && ((struct Vector *)(currentMaximumCliques.data) + k)->currentNumberOfElements <= ((struct Graph *)finalResults.data)->noOfVertices)
+                if (finalResults.currentNumberOfElements > 0 && ((struct Vector *)(currentMaximumCliques.data) + k)->currentNumberOfElements < ((struct Graph *)finalResults.data)->noOfVertices)
                     continue;
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
@@ -2027,37 +2028,46 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    struct Graph graphToPush;
-                    graphToPush.noOfVertices = originalSubgraph.noOfVertices;
-                    graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
-                    if (NULL == graphToPush.adjacencyMatrix)
+                    int newNoOfEdges = countGraphEdges(&originalSubgraph);
+                    int oldNoOfEdges = countGraphEdges(finalResults.data);
+                    if (finalResults.currentNumberOfElements == 0 || (originalSubgraph.noOfVertices >= ((struct Graph *)finalResults.data)->noOfVertices && newNoOfEdges > oldNoOfEdges))
                     {
-                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    graphToPush.description = malloc(sizeof(char));
-                    if (NULL == graphToPush.description)
-                    {
-                        printf("Couldn't allocate memory to push a found maximum common subgraph\n");
-                        exit(EXIT_FAILURE);
-                    }
-                    graphToPush.description[0] = '\0';
-                    for (int l = 0; l < originalSubgraph.noOfVertices; l++)
-                    {
-                        for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                        struct Graph graphToPush;
+                        graphToPush.noOfVertices = originalSubgraph.noOfVertices;
+                        graphToPush.adjacencyMatrix = calloc(originalSubgraph.noOfVertices * originalSubgraph.noOfVertices, sizeof(int));
+                        if (NULL == graphToPush.adjacencyMatrix)
                         {
-
-                            graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                            exit(EXIT_FAILURE);
                         }
-                    }
-                    freeGraph(&originalSubgraph);
-                    if (finalResults.currentNumberOfElements > 0)
-                        freeGraph(finalResults.data);
-                    finalResults.currentNumberOfElements = 1;
+                        graphToPush.description = malloc(sizeof(char));
+                        if (NULL == graphToPush.description)
+                        {
+                            printf("Couldn't allocate memory to push a found maximum common subgraph\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        graphToPush.description[0] = '\0';
+                        for (int l = 0; l < originalSubgraph.noOfVertices; l++)
+                        {
+                            for (int m = 0; m < originalSubgraph.noOfVertices; m++)
+                            {
 
-                    *(struct Graph *)finalResults.data = graphToPush;
-                    // printGraph(graphToPush);
-                    // pushBackVector_Graph(&finalResults, graphToPush);
+                                graphToPush.adjacencyMatrix[l * graphToPush.noOfVertices + m] = originalSubgraph.adjacencyMatrix[l * originalSubgraph.noOfVertices + m];
+                            }
+                        }
+                        freeGraph(&originalSubgraph);
+                        if (finalResults.currentNumberOfElements > 0)
+                            freeGraph(finalResults.data);
+                        finalResults.currentNumberOfElements = 1;
+
+                        *(struct Graph *)finalResults.data = graphToPush;
+                        // printGraph(graphToPush);
+                        // pushBackVector_Graph(&finalResults, graphToPush);
+                    }
+                    else
+                    {
+                        freeGraph(&originalSubgraph);
+                    }
                 }
             }
             for (int m = 0; m < currentMaximumCliques.currentNumberOfElements; m++)
