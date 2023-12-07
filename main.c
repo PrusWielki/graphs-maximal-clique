@@ -1930,6 +1930,11 @@ int main(int argc, char *argv[])
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
+                if (finalResults.currentNumberOfElements > 0 && (finalResults.currentNumberOfElements > originalSubgraph.noOfVertices || (finalResults.currentNumberOfElements == originalSubgraph.noOfVertices && countGraphEdges(finalResults.data) >= countGraphEdges(&originalSubgraph))))
+                {
+                    freeGraph(&originalSubgraph);
+                    continue;
+                }
                 // 3.2.1.3
 
                 if (index < noOfGraphs - 1)
@@ -2032,7 +2037,7 @@ int main(int argc, char *argv[])
                     int oldNoOfEdges = 0;
                     if (finalResults.currentNumberOfElements > 0)
                         oldNoOfEdges = countGraphEdges(finalResults.data);
-                    if (finalResults.currentNumberOfElements == 0 || (originalSubgraph.noOfVertices >= ((struct Graph *)finalResults.data)->noOfVertices && newNoOfEdges > oldNoOfEdges))
+                    if (finalResults.currentNumberOfElements == 0 || (originalSubgraph.noOfVertices > ((struct Graph *)finalResults.data)->noOfVertices || (originalSubgraph.noOfVertices == ((struct Graph *)finalResults.data)->noOfVertices && newNoOfEdges > oldNoOfEdges)))
                     {
                         struct Graph graphToPush;
                         graphToPush.noOfVertices = originalSubgraph.noOfVertices;
