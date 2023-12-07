@@ -146,6 +146,77 @@ ren output.txt output-MultiGraph5_14.txt
 
 
 
+main.exe MultiGraph1_5.txt
+ren output.txt output-MultiGraph1_5.txt
+
+main.exe MultiGraph2_5.txt
+ren output.txt output-MultiGraph2_5.txt
+
+main.exe MultiGraph5_5.txt
+ren output.txt output-MultiGraph5_5.txt
+
+
+
+
+
+
+
+
+main.exe MultiGraph1_5_10.txt
+ren output.txt output-MultiGraph1_5_10.txt
+
+main.exe MultiGraph2_5_10.txt
+ren output.txt output-MultiGraph2_5_10.txt
+
+main.exe MultiGraph5_5_10.txt
+ren output.txt output-MultiGraph5_5_10.txt
+
+
+
+
+
+main.exe MultiGraph1_5_11.txt
+ren output.txt output-MultiGraph1_5_11.txt
+
+main.exe MultiGraph2_5_11.txt
+ren output.txt output-MultiGraph2_5_11.txt
+
+main.exe MultiGraph5_5_11.txt
+ren output.txt output-MultiGraph5_5_11.txt
+
+
+main.exe MultiGraph1_5_12.txt
+ren output.txt output-MultiGraph1_5_12.txt
+
+main.exe MultiGraph2_5_12.txt
+ren output.txt output-MultiGraph2_5_12.txt
+
+main.exe MultiGraph5_5_12.txt
+ren output.txt output-MultiGraph5_5_12.txt
+
+main.exe MultiGraph1_5_13.txt
+ren output.txt output-MultiGraph1_5_13.txt
+
+main.exe MultiGraph2_5_13.txt
+ren output.txt output-MultiGraph2_5_13.txt
+
+main.exe MultiGraph5_5_13.txt
+ren output.txt output-MultiGraph5_5_13.txt
+
+
+main.exe MultiGraph1_5_14.txt
+ren output.txt output-MultiGraph1_5_14.txt
+
+main.exe MultiGraph2_5_14.txt
+ren output.txt output-MultiGraph2_5_14.txt
+
+main.exe MultiGraph5_5_14.txt
+ren output.txt output-MultiGraph5_5_14.txt
+
+
+
+
+
 
 main.exe Graph1_100.txt
 ren output.txt output-Graph1_100.txt
