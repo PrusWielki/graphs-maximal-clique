@@ -155,21 +155,60 @@ main.exe MultiGraph1_100.txt
 ren output.txt output-MultiGraph1_100.txt
 
 
-
-main.exe Graph1_1000.txt
-ren output.txt output-Graph1_1000.txt
-
-main.exe MultiGraph1_1000.txt
-ren output.txt output-MultiGraph1_1000.txt
+main.exe Graph1_200.txt
+ren output.txt output-Graph1_200.txt
 
 
+main.exe MultiGraph1_200.txt
+ren output.txt output-MultiGraph1_200.txt
 
-main.exe Graph1_1500.txt
-ren output.txt output-Graph1_1500.txt
+main.exe Graph1_300.txt
+ren output.txt output-Graph1_300.txt
 
 
-main.exe MultiGraph1_1500.txt
-ren output.txt output-MultiGraph1_1500.txt
+main.exe MultiGraph1_300.txt
+ren output.txt output-MultiGraph1_300.txt
+
+
+main.exe Graph1_400.txt
+ren output.txt output-Graph1_400.txt
+
+
+main.exe MultiGraph1_400.txt
+ren output.txt output-MultiGraph1_400.txt
+
+
+main.exe Graph1_500.txt
+ren output.txt output-Graph1_500.txt
+
+
+main.exe MultiGraph1_500.txt
+ren output.txt output-MultiGraph1_500.txt
+
+
+main.exe Graph1_600.txt
+ren output.txt output-Graph1_600.txt
+
+
+main.exe MultiGraph1_600.txt
+ren output.txt output-MultiGraph1_600.txt
+
+
+main.exe Graph1_700.txt
+ren output.txt output-Graph1_700.txt
+
+
+main.exe MultiGraph1_700.txt
+ren output.txt output-MultiGraph1_700.txt
+
+
+main.exe Graph1_800.txt
+ren output.txt output-Graph1_800.txt
+
+
+main.exe MultiGraph1_800.txt
+ren output.txt output-MultiGraph1_800.txt
+
  
 
  
