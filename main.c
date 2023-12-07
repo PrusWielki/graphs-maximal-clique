@@ -1930,7 +1930,7 @@ int main(int argc, char *argv[])
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
-                if (finalResults.currentNumberOfElements > 0 && (finalResults.currentNumberOfElements > originalSubgraph.noOfVertices || (finalResults.currentNumberOfElements == originalSubgraph.noOfVertices && countGraphEdges(finalResults.data) >= countGraphEdges(&originalSubgraph))))
+                if (finalResults.currentNumberOfElements > 0 && (finalResults.currentNumberOfElements > originalSubgraph.noOfVertices || (finalResults.currentNumberOfElements == originalSubgraph.noOfVertices && countGraphEdges(finalResults.data) < countGraphEdges(&originalSubgraph))))
                 {
                     freeGraph(&originalSubgraph);
                     continue;
