@@ -2029,7 +2029,9 @@ int main(int argc, char *argv[])
                 else
                 {
                     int newNoOfEdges = countGraphEdges(&originalSubgraph);
-                    int oldNoOfEdges = countGraphEdges(finalResults.data);
+                    int oldNoOfEdges = 0;
+                    if (finalResults.currentNumberOfElements > 0)
+                        oldNoOfEdges = countGraphEdges(finalResults.data);
                     if (finalResults.currentNumberOfElements == 0 || (originalSubgraph.noOfVertices >= ((struct Graph *)finalResults.data)->noOfVertices && newNoOfEdges > oldNoOfEdges))
                     {
                         struct Graph graphToPush;
