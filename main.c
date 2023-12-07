@@ -1924,6 +1924,8 @@ int main(int argc, char *argv[])
 
                 if (0 == isASubgraph(*((struct Vector *)(currentMaximumCliques.data) + k), *(struct Graph *)toRetrieveGraphs.data, *((struct Graph *)toRetrieveGraphs.data + 1)))
                     continue;
+                if (finalResults.currentNumberOfElements > 0 && ((struct Vector *)(currentMaximumCliques.data) + k)->currentNumberOfElements <= ((struct Graph *)finalResults.data)->noOfVertices)
+                    continue;
 
                 originalSubgraph = retrieveOriginalVerticesGraph(*((struct Vector *)(currentMaximumCliques.data) + k), toRetrieveGraphs);
 
@@ -2049,7 +2051,13 @@ int main(int argc, char *argv[])
                         }
                     }
                     freeGraph(&originalSubgraph);
-                    pushBackVector_Graph(&finalResults, graphToPush);
+                    if (finalResults.currentNumberOfElements > 0)
+                        freeGraph(finalResults.data);
+                    finalResults.currentNumberOfElements = 1;
+
+                    *(struct Graph *)finalResults.data = graphToPush;
+                    // printGraph(graphToPush);
+                    // pushBackVector_Graph(&finalResults, graphToPush);
                 }
             }
             for (int m = 0; m < currentMaximumCliques.currentNumberOfElements; m++)

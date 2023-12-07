@@ -6,7 +6,10 @@ def generate_symmetric_random_matrix(size):
     matrix = [[0 for _ in range(size)] for _ in range(size)]
     for i in range(size):
         for j in range(i + 1, size):
-            value = random.randint(0, 10)
+            createEdge =random.randint(0,1)
+            value=0
+            if createEdge == 1:
+                value = random.randint(1, 10)
             matrix[i][j] = value
             matrix[j][i] = value
     return matrix
