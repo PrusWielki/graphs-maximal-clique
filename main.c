@@ -395,7 +395,7 @@ int countGraphEdges(struct Graph *graph)
         for (int j = 0; j < graph->noOfVertices; j++)
         {
             if (graph->adjacencyMatrix[i * graph->noOfVertices + j] != 0)
-                noOfEdges++;
+                noOfEdges = noOfEdges + graph->adjacencyMatrix[i * graph->noOfVertices + j];
         }
     }
     return noOfEdges;
