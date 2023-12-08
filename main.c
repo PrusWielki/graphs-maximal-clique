@@ -589,7 +589,6 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
             bytesRead = getline(&line, &lineLength, filePtr);
             while (bytesRead > 0 && line[0] != '\r' && line[0] != '\n')
             {
-                printf("Additional information: %s\n", line);
 
                 char *newDescription = malloc(sizeof(char) * (totalDescriptionSize + bytesRead + 1));
 
