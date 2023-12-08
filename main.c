@@ -513,7 +513,6 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
     {
 
         bytesRead = getline(&line, &lineLength, filePtr);
-
         if (0 >= bytesRead)
             continue;
         struct Graph newGraph;
@@ -572,10 +571,13 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
             }
         }
 
+        int totalDescriptionSize = 0;
+
         bytesRead = getline(&line, &lineLength, filePtr);
-        if (0 < bytesRead)
+        if (0 < bytesRead && line[0] != '\r' && line[0] != '\n')
         {
             newGraph.description = malloc(sizeof(char) * (bytesRead + 1));
+            totalDescriptionSize = bytesRead;
             if (NULL == newGraph.description)
             {
 
@@ -584,9 +586,32 @@ void readGraphsFromFile(FILE *filePtr, int *noOfGraphs, struct Vector *graphsVec
             }
 
             strncpy(newGraph.description, line, bytesRead);
-            newGraph.description[bytesRead] = '\0';
-            if (newGraph.description[bytesRead - 1] == '\n')
-                newGraph.description[bytesRead - 1] = '\0';
+
+            bytesRead = getline(&line, &lineLength, filePtr);
+            while (bytesRead > 0 && line[0] != '\r' && line[0] != '\n')
+            {
+
+                char *newDescription = malloc(sizeof(char) * (totalDescriptionSize + bytesRead + 1));
+
+                for (int l = 0; l < totalDescriptionSize; l++)
+                {
+                    newDescription[l] = newGraph.description[l];
+                }
+                for (int l = 0; l < bytesRead; l++)
+                {
+                    newDescription[l + totalDescriptionSize] = line[l];
+                }
+
+                totalDescriptionSize = totalDescriptionSize + bytesRead;
+                free(newGraph.description);
+                newGraph.description = newDescription;
+                bytesRead = getline(&line, &lineLength, filePtr);
+            }
+
+            // strncpy(newGraph.description, line, bytesRead);
+            newGraph.description[totalDescriptionSize] = '\0';
+            if (newGraph.description[totalDescriptionSize - 1] == '\n')
+                newGraph.description[totalDescriptionSize - 1] = '\0';
 
 #ifdef dbg
             printf("Additional graph information: %s\n", newGraph.description);
