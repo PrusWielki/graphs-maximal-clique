@@ -265,21 +265,6 @@ main.exe MultiGraph1_600.txt
 ren output.txt output-MultiGraph1_600.txt
 
 
-main.exe Graph1_700.txt
-ren output.txt output-Graph1_700.txt
-
-
-main.exe MultiGraph1_700.txt
-ren output.txt output-MultiGraph1_700.txt
-
-
-main.exe Graph1_800.txt
-ren output.txt output-Graph1_800.txt
-
-
-main.exe MultiGraph1_800.txt
-ren output.txt output-MultiGraph1_800.txt
-
  
 
  
